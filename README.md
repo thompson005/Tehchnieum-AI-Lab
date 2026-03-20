@@ -1,5 +1,8 @@
 # TECHNIEUM AI Security Research Labs
 
+[![Deploy To EC2](https://github.com/thompson005/Tehchnieum-AI-Lab/actions/workflows/deploy-ec2.yml/badge.svg)](https://github.com/thompson005/Tehchnieum-AI-Lab/actions/workflows/deploy-ec2.yml)
+[![Live Portal](https://img.shields.io/badge/Live%20Portal-13.232.249.249%3A5555-2ea44f)](http://13.232.249.249:5555)
+
 > **For authorized security training only. Contains intentional AI vulnerabilities.**
 
 A unified platform for learning AI/LLM security through hands-on exploitation of five production-grade vulnerable applications. Built for cybersecurity conferences and workshops.

@@ -3,8 +3,11 @@ set -Eeuo pipefail
 
 REPO_URL=${1:?"usage: deploy.sh <repo_url> [branch] [app_dir] [rollback_sha]"}
 BRANCH=${2:-main}
-APP_DIR=${3:-/opt/technieum-ai-lab}
+APP_DIR=${3:-/home/ubuntu/ai-labs}
 ROLLBACK_SHA=${4:-}
+
+# Keep image build/extract pressure low on single-disk EC2 hosts.
+export COMPOSE_PARALLEL_LIMIT=${COMPOSE_PARALLEL_LIMIT:-1}
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "docker is not installed on this host" >&2
