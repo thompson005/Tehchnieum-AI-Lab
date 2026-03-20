@@ -26,5 +26,8 @@ coverage/
 dist/
 build/
 
+# Private keys
+*.pem
+
 # Docker local artifacts
 docker-data/

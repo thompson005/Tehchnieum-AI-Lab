@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 WORKDIR /app
-COPY requirements.txt .
+COPY requirements-ai-agent.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY ai_agent/main.py .
 COPY ai_agent/rag_setup.py .

@@ -53,13 +53,13 @@ sudo mkdir -p /opt/technieum-ai-lab
 sudo chown -R $USER:$USER /opt/technieum-ai-lab
 ```
 
-Create `/opt/technieum-ai-lab/.env` using values from `.env.example`.
+Create `/home/ubuntu/ai-labs/.env` using values from `.env.example`.
 
 Required minimum:
 
 ```env
-PUBLIC_BASE_URL=http://YOUR_EC2_PUBLIC_IP
-OPENAI_API_KEY=YOUR_REAL_KEY
+PUBLIC_BASE_URL=http://13.232.249.249
+OPENAI_API_KEY=REPLACE_WITH_REAL_OPENAI_KEY
 OPENAI_MODEL=gpt-4o-mini
 LLM_MODEL=gpt-4o-mini
 ```
@@ -68,11 +68,11 @@ LLM_MODEL=gpt-4o-mini
 
 In GitHub -> Settings -> Secrets and variables -> Actions, create:
 
-- `EC2_HOST`: EC2 public IP or DNS
-- `EC2_USER`: SSH username (example: `ubuntu`)
-- `EC2_SSH_KEY`: private SSH key content (PEM format)
-- `EC2_SSH_PORT`: optional, default `22`
-- `EC2_APP_DIR`: optional, default `/opt/technieum-ai-lab`
+- `EC2_HOST`: `13.232.249.249`
+- `EC2_USER`: `ubuntu`
+- `EC2_SSH_KEY`: content of your `ai-labs.pem` private key file (include BEGIN and END lines)
+- `EC2_SSH_PORT`: `22`
+- `EC2_APP_DIR`: `/home/ubuntu/ai-labs`
 
 ## 4) Workflow behavior
 

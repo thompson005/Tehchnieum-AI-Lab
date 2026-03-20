@@ -31,7 +31,7 @@ jobs:
 
             APP_DIR="${{ secrets.EC2_APP_DIR }}"
             if [ -z "${APP_DIR}" ]; then
-              APP_DIR="/opt/technieum-ai-lab"
+              APP_DIR="/home/ubuntu/ai-labs"
             fi
 
             REPO_URL="https://github.com/${{ github.repository }}.git"
