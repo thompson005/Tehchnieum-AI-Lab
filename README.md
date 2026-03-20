@@ -4,6 +4,15 @@
 
 A unified platform for learning AI/LLM security through hands-on exploitation of five production-grade vulnerable applications. Built for cybersecurity conferences and workshops.
 
+## Live Deployment
+
+- Portal: http://13.232.249.249:5555
+- LAB-1: http://13.232.249.249:5000
+- LAB-2: http://13.232.249.249:3000
+- LAB-3: http://13.232.249.249:8080
+- LAB-4: http://13.232.249.249:3100
+- LAB-5: http://13.232.249.249:3200
+
 ---
 
 ## Platform Overview
