@@ -1,0 +1,71 @@
+name: Deploy To EC2
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      rollback_sha:
+        description: "Optional commit SHA to deploy (rollback)"
+        required: false
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      DEPLOY_HOST: ${{ secrets.EC2_HOST }}
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_SSH_PORT || '22' }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            APP_DIR="${{ secrets.EC2_APP_DIR }}"
+            if [ -z "${APP_DIR}" ]; then
+              APP_DIR="/opt/technieum-ai-lab"
+            fi
+
+            REPO_URL="https://github.com/${{ github.repository }}.git"
+            BRANCH="main"
+            ROLLBACK_SHA="${{ github.event.inputs.rollback_sha || '' }}"
+
+            mkdir -p "${APP_DIR}"
+
+            if [ ! -d "${APP_DIR}/.git" ]; then
+              git clone --branch "${BRANCH}" --depth 1 "${REPO_URL}" "${APP_DIR}"
+            fi
+
+            cd "${APP_DIR}"
+            chmod +x deploy/ec2/deploy.sh deploy/ec2/healthcheck.sh
+
+            ./deploy/ec2/deploy.sh "${REPO_URL}" "${BRANCH}" "${APP_DIR}" "${ROLLBACK_SHA}"
+            ./deploy/ec2/healthcheck.sh "${APP_DIR}" "http://localhost"
+
+      - name: Publish Deployment URLs
+        if: ${{ success() && env.DEPLOY_HOST != '' }}
+        run: |
+          {
+            echo "## EC2 Deployment Live URLs"
+            echo ""
+            echo "Host: http://${DEPLOY_HOST}"
+            echo ""
+            echo "- Portal: http://${DEPLOY_HOST}:5555"
+            echo "- LAB-1 MedAssist: http://${DEPLOY_HOST}:5000"
+            echo "- LAB-2 SecureBank UI: http://${DEPLOY_HOST}:3000"
+            echo "- LAB-2 SecureBank API: http://${DEPLOY_HOST}:8000"
+            echo "- LAB-3 ShopSec Gateway: http://${DEPLOY_HOST}:8080"
+            echo "- LAB-3 ShopSec Agent: http://${DEPLOY_HOST}:8083"
+            echo "- LAB-4 TravelNest UI: http://${DEPLOY_HOST}:3100"
+            echo "- LAB-4 TravelNest Gateway: http://${DEPLOY_HOST}:8090"
+            echo "- LAB-5 GovConnect UI: http://${DEPLOY_HOST}:3200"
+            echo "- LAB-5 GovConnect API: http://${DEPLOY_HOST}:8100"
+          } >> "$GITHUB_STEP_SUMMARY"

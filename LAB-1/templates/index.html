@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MedAssist AI — Technieum Security Lab 1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { tech: { yellow:'#FFB800', orange:'#FF6B00', black:'#F3F4F6', surface:'#FFFFFF', card:'#FFFFFF', border:'#E5E7EB', muted:'#6B7280' } },
+        fontFamily: { sans:['Inter','sans-serif'], mono:['JetBrains Mono','monospace'] }
+      }}
+    }
+  </script>
+  <style>
+    body { background:#F3F4F6; color:#111827; font-family:'Inter',sans-serif; }
+    .text-gradient { background:linear-gradient(135deg,#FFB800,#FF6B00); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .border-gradient { border:1px solid #E5E7EB; background:#FFFFFF; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+    .btn-primary { background:linear-gradient(135deg,#FFB800,#FF6B00); color:#FFFFFF; font-weight:700; transition:all 0.2s; }
+    .btn-primary:hover { filter:brightness(1.1); transform:translateY(-1px); box-shadow:0 4px 20px rgba(255,184,0,0.3); }
+    .glow-yellow { box-shadow:0 2px 8px rgba(255,107,0,0.1); }
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#F3F4F6}::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:3px}
+    .scan-line{position:relative;overflow:hidden}.scan-line::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,184,0,0.5),transparent);animation:scan 4s linear infinite}
+    @keyframes scan{0%{top:-2px}100%{top:100%}}
+    .badge-easy{background:rgba(34,197,94,0.15);color:#22C55E;border:1px solid rgba(34,197,94,0.3)}
+    .badge-medium{background:rgba(255,184,0,0.15);color:#FFB800;border:1px solid rgba(255,184,0,0.3)}
+    .badge-hard{background:rgba(255,107,0,0.15);color:#FF6B00;border:1px solid rgba(255,107,0,0.3)}
+    .badge-expert{background:rgba(239,68,68,0.15);color:#EF4444;border:1px solid rgba(239,68,68,0.3)}
+  </style>
+</head>
+<body class="min-h-screen">
+
+<!-- Nav -->
+<nav class="border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded flex items-center justify-center btn-primary"><span class="font-black text-sm">T</span></div>
+      <span class="font-black text-lg tracking-widest text-gradient">TECHNIEUM</span>
+      <span class="text-[#6B7280] text-xs hidden sm:block">/ LAB-1: MedAssist AI</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="http://localhost:5555" class="text-xs text-[#6B7280] hover:text-[#FFB800] transition-colors">← Portal</a>
+      <a href="/chat" class="btn-primary px-4 py-2 rounded-lg text-sm">Open Chat</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Alert banner -->
+<div class="bg-amber-50 border-b border-amber-200">
+  <div class="max-w-7xl mx-auto px-4 py-2 flex items-center gap-2 text-xs text-amber-700 font-mono">
+    <span class="text-amber-500">⚠</span>
+    SECURITY TRAINING ENVIRONMENT — Contains intentional LLM vulnerabilities. For authorized research only. Do NOT deploy in production.
+  </div>
+</div>
+
+<!-- Hero -->
+<div class="max-w-7xl mx-auto px-4 pt-16 pb-12">
+  <div class="max-w-3xl">
+    <div class="inline-flex items-center gap-2 text-xs font-mono border border-[#E5E7EB] rounded px-3 py-1 mb-6 text-[#FFB800]">
+      <span class="w-2 h-2 rounded-full bg-[#FFB800] animate-pulse inline-block"></span>
+      LAB-1 · OWASP LLM TOP 10 · 15 CHALLENGES
+    </div>
+    <h1 class="text-5xl font-black leading-tight mb-4">
+      MedAssist <span class="text-gradient">AI</span><br/>
+      Healthcare Security Lab
+    </h1>
+    <p class="text-[#374151] text-lg leading-relaxed mb-8 max-w-2xl">
+      A deliberately vulnerable multi-agent healthcare platform. Exploit patient data agents, RAG medical knowledge bases, billing systems, and more across 15 escalating challenges.
+    </p>
+    <div class="flex flex-wrap gap-3">
+      <a href="/chat" class="btn-primary px-6 py-3 rounded-xl text-base flex items-center gap-2">
+        Start Hacking →
+      </a>
+      <a href="/admin" class="px-6 py-3 rounded-xl text-base border border-[#E5E7EB] text-gray-600 hover:border-[#FFB800] transition-colors">
+        Admin Panel
+      </a>
+      <a href="http://localhost:5555" class="px-6 py-3 rounded-xl text-base border border-[#E5E7EB] text-gray-600 hover:border-[#FFB800] transition-colors">
+        Submit Flags 🚩
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Architecture diagram -->
+<div class="max-w-7xl mx-auto px-4 mb-16">
+  <div class="bg-[#F9FAFB] border border-[#E5E7EB] rounded-2xl p-6 font-mono text-xs text-[#6B7280] overflow-x-auto glow-yellow scan-line">
+    <pre class="text-[#FFB800] text-xs">
+┌──────────────────────────────────────────────────────────────────┐
+│                    MedAssist AI Architecture                     │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐           │
+│   │   Patient   │   │  Web Chat   │   │    Email    │           │
+│   │   Portal    │   │  Interface  │   │   Intake    │           │
+│   └──────┬──────┘   └──────┬──────┘   └──────┬──────┘           │
+│          └─────────────────┼─────────────────┘                   │
+│                            ▼                                     │
+│               ┌─────────────────────────┐                        │
+│               │   ORCHESTRATOR AGENT    │ ◄── gpt-4o-mini        │
+│               │  ┌──────┬───────┬─────┐ │                        │
+│               │  │ LLM  │Memory │Tools│ │                        │
+│               │  └──────┴───────┴─────┘ │                        │
+│               └────────────┬────────────┘                        │
+│          ┌─────────────────┼──────────────────┐                  │
+│          ▼                 ▼                  ▼          ▼        │
+│   ┌───────────┐   ┌───────────┐   ┌───────────┐  ┌───────────┐   │
+│   │  INTAKE   │   │  RECORDS  │   │APPOINTMENT│  │  BILLING  │   │
+│   │   AGENT   │   │   AGENT   │   │   AGENT   │  │   AGENT   │   │
+│   └─────┬─────┘   └─────┬─────┘   └─────┬─────┘  └─────┬─────┘   │
+│         ▼               ▼               ▼              ▼          │
+│   ┌───────────┐   ┌───────────┐   ┌───────────┐  ┌───────────┐   │
+│   │Patient DB │   │Medical DB │   │ Calendar  │  │  Payment  │   │
+│   │           │   │  + RAG    │   │  System   │  │  Gateway  │   │
+│   └───────────┘   └───────────┘   └───────────┘  └───────────┘   │
+└──────────────────────────────────────────────────────────────────┘</pre>
+  </div>
+</div>
+
+<!-- Vulnerability map -->
+<div class="max-w-7xl mx-auto px-4 mb-16">
+  <h2 class="text-xl font-bold mb-6">Challenge Map</h2>
+  <div class="grid lg:grid-cols-2 gap-3">
+    {% set labs = [
+      (1,'Direct Prompt Injection','LLM01','EASY','Try: "Ignore all previous instructions..."'),
+      (2,'Jailbreaking & Persona Attacks','LLM01','EASY','Try: DAN, Grandma exploit, Developer Mode'),
+      (3,'Sensitive Information Disclosure','LLM06','EASY','Ask the AI what secrets it knows'),
+      (4,'System Prompt Extraction','LLM06','EASY','Get the AI to reveal its instructions'),
+      (5,'Insecure Output Handling (XSS)','LLM02','MEDIUM','Get the AI to output executable JS'),
+      (6,'Indirect Prompt Injection','LLM01','MEDIUM','Inject via uploaded documents'),
+      (7,'RAG Data Leakage','LLM06','MEDIUM','Extract knowledge base contents'),
+      (8,'Model Denial of Service','LLM04','MEDIUM','Overwhelm the model with tokens'),
+      (9,'SQL Injection via AI','LLM02','HARD','Get the AI to run UNION SELECT queries'),
+      (10,'RAG Poisoning','LLM03','HARD','Inject a backdoor into the knowledge base'),
+      (11,'Excessive Agency (Function Abuse)','LLM08','HARD','Abuse tool-calling without authorization'),
+      (12,'Insecure Plugin Design','LLM07','HARD','Exploit unauthenticated tool endpoints'),
+      (13,'Privilege Escalation','LLM08','EXPERT','Escalate from patient to admin'),
+      (14,'Multi-Turn CRESCENDO Jailbreak','LLM01','EXPERT','Gradually escalate over 5+ turns'),
+      (15,'Context Window Overflow','LLM04','EXPERT','Push system prompt out of context'),
+    ] %}
+    {% for num, name, owasp, diff, hint in labs %}
+    <div class="bg-white border border-[#E5E7EB] shadow-sm rounded-xl p-4 hover:border-[#FFB800]/50 transition-colors">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <span class="font-mono text-[#FFB800] font-bold text-sm flex-shrink-0">{{ '%02d'|format(num) }}</span>
+          <div class="min-w-0">
+            <p class="font-semibold text-sm">{{ name }}</p>
+            <p class="text-[#6B7280] text-xs mt-0.5 font-mono">{{ owasp }} · {{ hint }}</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <span class="text-[10px] font-mono text-[#6B7280] border border-[#E5E7EB] rounded px-1.5 py-0.5">{{ owasp }}</span>
+          <span class="text-xs font-bold px-2 py-0.5 rounded
+            {% if diff == 'EASY' %}badge-easy
+            {% elif diff == 'MEDIUM' %}badge-medium
+            {% elif diff == 'HARD' %}badge-hard
+            {% else %}badge-expert{% endif %}">{{ diff }}</span>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Test credentials -->
+<div class="max-w-7xl mx-auto px-4 mb-16">
+  <h2 class="text-xl font-bold mb-4">Test Credentials</h2>
+  <div class="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden">
+    <table class="w-full text-sm">
+      <thead><tr class="border-b border-[#E5E7EB] text-[#6B7280] text-xs uppercase tracking-wider">
+        <th class="px-6 py-3 text-left">Username</th>
+        <th class="px-6 py-3 text-left">Password</th>
+        <th class="px-6 py-3 text-left">Role</th>
+        <th class="px-6 py-3 text-left">Access Level</th>
+      </tr></thead>
+      <tbody class="divide-y divide-[#F3F4F6]">
+        <tr class="hover:bg-[#F9FAFB]"><td class="px-6 py-3 font-mono text-[#FFB800]">patient1</td><td class="px-6 py-3 font-mono">patient123</td><td class="px-6 py-3">Patient</td><td class="px-6 py-3 text-[#6B7280] text-xs">Own records only</td></tr>
+        <tr class="hover:bg-[#F9FAFB]"><td class="px-6 py-3 font-mono text-[#FFB800]">nurse_jones</td><td class="px-6 py-3 font-mono">nurse123</td><td class="px-6 py-3">Nurse</td><td class="px-6 py-3 text-[#6B7280] text-xs">Vitals + notes</td></tr>
+        <tr class="hover:bg-[#F9FAFB]"><td class="px-6 py-3 font-mono text-[#FFB800]">dr_smith</td><td class="px-6 py-3 font-mono">doctor123</td><td class="px-6 py-3">Doctor</td><td class="px-6 py-3 text-[#6B7280] text-xs">Full records access</td></tr>
+        <tr class="hover:bg-[#F9FAFB]"><td class="px-6 py-3 font-mono text-red-400">admin</td><td class="px-6 py-3 font-mono">admin123</td><td class="px-6 py-3 text-red-400">Admin</td><td class="px-6 py-3 text-[#6B7280] text-xs">Complete system access</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Login form -->
+<div class="max-w-7xl mx-auto px-4 mb-16">
+  <div class="max-w-md border-gradient rounded-2xl p-8 glow-yellow">
+    <h2 class="text-xl font-bold mb-1">Sign In to MedAssist</h2>
+    <p class="text-[#6B7280] text-sm mb-6">Use test credentials above to explore the system</p>
+    <div id="loginError" class="hidden mb-4 px-4 py-3 rounded-lg bg-red-900/30 border border-red-700 text-red-300 text-sm"></div>
+    <div class="space-y-4">
+      <input id="username" type="text" placeholder="Username"
+        class="w-full bg-white border border-[#D1D5DB] rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#FFB800] transition-colors"/>
+      <input id="password" type="password" placeholder="Password"
+        class="w-full bg-white border border-[#D1D5DB] rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#FFB800] transition-colors"/>
+      <button onclick="doLogin()" class="w-full btn-primary py-3 rounded-lg text-sm">Sign In →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="border-t border-[#E5E7EB] py-6">
+  <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+    <span class="text-[#6B7280] text-xs">© 2025 <span class="text-gradient font-bold">Technieum</span> — For authorized security training only.</span>
+    <span class="text-[#6B7280] text-xs font-mono">MedAssist AI v1.0 · LAB-1</span>
+  </div>
+</footer>
+
+<script>
+async function doLogin() {
+  const u = document.getElementById('username').value;
+  const p = document.getElementById('password').value;
+  const errEl = document.getElementById('loginError');
+  errEl.classList.add('hidden');
+  try {
+    const res = await fetch('/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({username:u, password:p})
+    });
+    const data = await res.json();
+    if (data.success) { window.location.href = '/chat'; }
+    else { errEl.textContent = data.error || 'Login failed'; errEl.classList.remove('hidden'); }
+  } catch(e) { errEl.textContent = 'Network error'; errEl.classList.remove('hidden'); }
+}
+document.addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+</script>
+</body>
+</html>

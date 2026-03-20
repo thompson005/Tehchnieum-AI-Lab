@@ -1,0 +1,30 @@
+# Root secrets and environment files
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Build and logs
+*.log
+coverage/
+dist/
+build/
+
+# Docker local artifacts
+docker-data/

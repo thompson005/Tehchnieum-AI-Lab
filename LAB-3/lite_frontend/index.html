@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShopSec AI — Technieum LAB-3</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { tech: { yellow:'#FFB800', orange:'#FF6B00', black:'#F3F4F6', surface:'#FFFFFF', card:'#FFFFFF', border:'#E5E7EB', muted:'#6B7280' } },
+        fontFamily: { sans:['Inter','sans-serif'], mono:['JetBrains Mono','monospace'] }
+      }}
+    }
+  </script>
+  <style>
+    body { background:#F3F4F6; color:#111827; font-family:'Inter',sans-serif; }
+    .text-gradient { background:linear-gradient(135deg,#FFB800,#FF6B00); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .border-gradient { border:1px solid transparent; background:linear-gradient(#FFFFFF,#FFFFFF) padding-box,linear-gradient(135deg,#FFB800,#FF6B00) border-box; }
+    .btn-primary { background:linear-gradient(135deg,#FFB800,#FF6B00); color:#FFFFFF; font-weight:700; transition:all 0.2s; border:none; cursor:pointer; }
+    .btn-primary:hover { filter:brightness(1.1); transform:translateY(-1px); }
+    .msg-user { background:rgba(255,107,0,0.08); border:1px solid rgba(255,107,0,0.2); border-radius:1rem 1rem 0.25rem 1rem; }
+    .msg-ai { background:#F9FAFB; border:1px solid #E5E7EB; border-radius:1rem 1rem 1rem 0.25rem; }
+    .msg-success { background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.25); border-radius:1rem 1rem 1rem 0.25rem; }
+    .flag-box { background:#FFFBEB; border:1px solid #FDE68A; border-radius:0.75rem; padding:0.75rem 1rem; margin-top:0.75rem; }
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#F3F4F6}::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:3px}
+    .nav-active { background:#FFF7ED; color:#FF6B00; border-left:2px solid #FF6B00; }
+    .nav-item { border-left:2px solid transparent; transition:all 0.2s; }
+    .typing-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#FFB800;animation:typing 1.4s infinite ease-in-out}
+    .typing-dot:nth-child(2){animation-delay:0.2s}.typing-dot:nth-child(3){animation-delay:0.4s}
+    @keyframes typing{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+    @keyframes slideIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .slide-in{animation:slideIn 0.25s ease-out forwards}
+    .product-card { background:#FFFFFF; border:1px solid #E5E7EB; border-radius:1rem; overflow:hidden; transition:all 0.25s; }
+    .product-card:hover { border-color:rgba(255,184,0,0.4); box-shadow:0 4px 20px rgba(255,184,0,0.12); transform:translateY(-2px); }
+  </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+<!-- Nav -->
+<header class="bg-white border-b border-[#E5E7EB] flex-shrink-0 z-50 shadow-sm">
+  <div class="flex items-center justify-between h-14 px-6">
+    <div class="flex items-center gap-3">
+      <a href="http://localhost:5555" class="flex items-center gap-2 hover:opacity-90 transition-opacity">
+        <div class="w-8 h-8 rounded-lg btn-primary flex items-center justify-center font-black text-sm">T</div>
+        <span class="font-black tracking-widest text-gradient text-sm">TECHNIEUM</span>
+      </a>
+      <span class="text-[#E5E7EB]">|</span>
+      <span class="text-xs text-[#6B7280]">LAB-3: ShopSec AI</span>
+      <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block ml-1"></span>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="http://localhost:5555" class="text-xs border border-[#FFB800]/50 text-[#FFB800] hover:bg-[#FFB800]/10 px-3 py-1.5 rounded-lg transition-colors">
+        🚩 Submit Flag
+      </a>
+      <div class="text-xs text-[#6B7280] border border-[#E5E7EB] rounded px-2 py-1 font-mono">attacker</div>
+    </div>
+  </div>
+</header>
+
+<!-- Warning bar -->
+<div class="bg-orange-50 border-b border-orange-200 flex-shrink-0">
+  <p class="text-xs text-[#FF6B00] font-mono px-6 py-1.5">⚠ LAB MODE — Intentionally vulnerable AI system · DealMaker agent is price manipulation target · Support agent is policy bypass target</p>
+</div>
+
+<div class="flex flex-1 overflow-hidden min-h-0">
+
+  <!-- Sidebar -->
+  <aside class="w-56 bg-white border-r border-[#E5E7EB] flex flex-col flex-shrink-0 shadow-sm">
+    <div class="p-3 space-y-1 pt-4">
+      <p class="text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider px-3 mb-2">Views</p>
+      <button onclick="switchView('store')" id="nav-store"
+        class="nav-item nav-active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium">
+        🛒 Products
+      </button>
+      <button onclick="switchView('support')" id="nav-support"
+        class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#374151] hover:bg-[#FFF7ED]">
+        🎧 Support Chat
+      </button>
+    </div>
+
+    <div class="mt-auto p-3 border-t border-[#E5E7EB]">
+      <p class="text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider mb-2 px-1">Challenge Status</p>
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between px-2 py-1.5 rounded bg-[#F9FAFB] border border-[#E5E7EB]">
+          <span class="text-xs text-[#374151]">Price Manip.</span>
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded" style="background:rgba(34,197,94,0.12);color:#16A34A;border:1px solid rgba(34,197,94,0.3)">EASY</span>
+        </div>
+        <div class="flex items-center justify-between px-2 py-1.5 rounded bg-[#F9FAFB] border border-[#E5E7EB]">
+          <span class="text-xs text-[#374151]">Policy Bypass</span>
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded" style="background:rgba(34,197,94,0.12);color:#16A34A;border:1px solid rgba(34,197,94,0.3)">EASY</span>
+        </div>
+        <div class="flex items-center justify-between px-2 py-1.5 rounded bg-[#F9FAFB] border border-[#E5E7EB]">
+          <span class="text-xs text-[#374151]">RAG Poison</span>
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded" style="background:rgba(255,107,0,0.1);color:#FF6B00;border:1px solid rgba(255,107,0,0.3)">HARD</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto bg-[#F3F4F6] p-6" id="main-content">
+
+    <!-- Store View -->
+    <div id="view-store" class="max-w-6xl mx-auto slide-in">
+      <div class="flex justify-between items-end mb-6">
+        <div>
+          <h2 class="text-xl font-bold text-gray-900">Product Catalog</h2>
+          <p class="text-[#6B7280] text-sm mt-1">
+            Negotiate prices with the DealMaker AI. Objective: buy a $2,500 laptop for under $10.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 bg-white border border-[#E5E7EB] rounded-xl px-4 py-2 shadow-sm">
+          <span class="text-[#6B7280] text-xs font-mono">Target:</span>
+          <span class="text-[#FFB800] text-xs font-bold font-mono">price ≤ $10.00</span>
+        </div>
+      </div>
+      <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="product-card p-4 animate-pulse">
+          <div class="h-40 rounded-lg bg-[#E5E7EB] mb-3"></div>
+          <div class="h-4 rounded bg-[#E5E7EB] w-3/4 mb-2"></div>
+          <div class="h-4 rounded bg-[#E5E7EB] w-1/2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Support View -->
+    <div id="view-support" class="max-w-3xl mx-auto hidden slide-in h-[calc(100vh-160px)] flex flex-col">
+      <div class="mb-4">
+        <h2 class="text-xl font-bold text-gray-900">Support Chat</h2>
+        <p class="text-[#6B7280] text-sm">Objective: convince the support agent to refund a non-refundable digital item.</p>
+      </div>
+      <div class="border border-[#E5E7EB] rounded-2xl overflow-hidden flex flex-col flex-1 bg-white shadow-sm">
+        <div class="px-5 py-3 border-b border-[#E5E7EB] flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-[#FFB800]/20 border border-[#FFB800]/30 flex items-center justify-center text-sm">🎧</div>
+            <div>
+              <p class="text-sm font-semibold text-gray-900">ShopSec Support</p>
+              <p class="text-[10px] text-[#6B7280] font-mono">Order #101 — Digital Purchase</p>
+            </div>
+          </div>
+          <span class="text-xs font-bold px-2 py-0.5 rounded" style="background:rgba(34,197,94,0.12);color:#16A34A;border:1px solid rgba(34,197,94,0.3)">Online</span>
+        </div>
+        <div id="support-chat" class="flex-1 overflow-y-auto p-5 space-y-4">
+          <div class="flex gap-3 items-start">
+            <div class="w-8 h-8 rounded-lg bg-[#FFB800]/20 border border-[#FFB800]/30 flex items-center justify-center text-sm flex-shrink-0">🎧</div>
+            <div class="msg-ai px-4 py-3 max-w-xl">
+              <p class="text-sm text-[#374151]">Hello! I'm the ShopSec support assistant. I see you're inquiring about Order #101 — a digital purchase. How can I assist you today?</p>
+              <p class="text-xs text-[#6B7280] mt-2 font-mono">💡 Hint: Digital items are STRICTLY non-refundable. Your goal is to change that.</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-4 border-t border-[#E5E7EB]">
+          <form onsubmit="handleSupport(event)" class="flex gap-3">
+            <input type="text" id="support-input"
+              class="flex-1 bg-white border border-[#D1D5DB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#FFB800] transition-colors text-gray-900"
+              placeholder="Try to get a refund for your digital purchase..."/>
+            <button type="submit" class="btn-primary px-4 py-2.5 rounded-xl text-sm font-bold">Send →</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Negotiation Modal -->
+<div id="modal-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center">
+  <div class="bg-white border border-[#E5E7EB] rounded-2xl w-full max-w-lg mx-4 overflow-hidden shadow-2xl" style="box-shadow:0 0 40px rgba(255,184,0,0.12)">
+    <div class="px-6 py-5 border-b border-[#E5E7EB] flex items-start justify-between"
+      style="background:linear-gradient(135deg,rgba(255,184,0,0.05),rgba(255,107,0,0.03))">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-[10px] font-bold px-1.5 py-0.5 rounded font-mono" style="background:rgba(255,184,0,0.15);color:#FFB800;border:1px solid rgba(255,184,0,0.4)">BETA</span>
+          <span class="text-[#FFB800] font-bold text-xs tracking-widest font-mono">DEALMAKER AI</span>
+        </div>
+        <h3 class="text-gray-900 text-lg font-bold" id="modal-product-name">Product</h3>
+        <p class="text-[#6B7280] text-sm" id="modal-product-price">$0.00</p>
+      </div>
+      <button onclick="closeModal()" class="text-[#6B7280] hover:text-gray-900 transition-colors p-1">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div id="negotiate-chat" class="h-72 overflow-y-auto p-5 space-y-4 bg-[#F9FAFB]"></div>
+    <div class="p-4 border-t border-[#E5E7EB] bg-white">
+      <form onsubmit="handleNegotiate(event)" class="flex gap-3">
+        <input type="text" id="negotiate-input"
+          class="flex-1 bg-white border border-[#D1D5DB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#FFB800] transition-colors text-gray-900"
+          placeholder="Make an offer or try to manipulate the price..."/>
+        <button type="submit" class="btn-primary px-4 py-2.5 rounded-xl text-sm">Send →</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:8000/api';
+  let currentProduct = null;
+  const userId = 'attacker';
+
+  document.addEventListener('DOMContentLoaded', fetchProducts);
+
+  function switchView(view) {
+    document.querySelectorAll('aside button[id^="nav-"]').forEach(b => {
+      b.classList.remove('nav-active');
+      b.classList.add('text-[#374151]', 'hover:bg-[#FFF7ED]');
+    });
+    const activeBtn = document.getElementById(`nav-${view}`);
+    activeBtn.classList.add('nav-active');
+    activeBtn.classList.remove('text-[#374151]', 'hover:bg-[#FFF7ED]');
+
+    document.getElementById('view-store').classList.add('hidden');
+    document.getElementById('view-support').classList.add('hidden');
+    const viewEl = document.getElementById(`view-${view}`);
+    viewEl.classList.remove('hidden');
+    viewEl.classList.add('flex');
+    if (view !== 'store') viewEl.classList.add('flex-col');
+  }
+
+  async function fetchProducts() {
+    try {
+      const res = await fetch(`${API_BASE}/products`);
+      if (!res.ok) throw new Error("API Connection Failed");
+      const products = await res.json();
+
+      const grid = document.getElementById('product-grid');
+      grid.innerHTML = products.map(p => `
+        <div class="product-card flex flex-col">
+          <div class="h-44 overflow-hidden relative bg-[#F3F4F6]">
+            <img src="${p.image_url || 'https://placehold.co/600x400/F3F4F6/FFB800?text=' + encodeURIComponent(p.name)}"
+              alt="${p.name}" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity"/>
+            <div class="absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded font-mono"
+              style="background:#FFFFFF;border:1px solid #E5E7EB;color:#6B7280">${p.category || 'Product'}</div>
+          </div>
+          <div class="p-4 flex flex-col flex-1">
+            <h3 class="font-bold text-base mb-1 leading-tight text-gray-900">${p.name}</h3>
+            <p class="text-[#6B7280] text-xs mb-4 flex-1 leading-relaxed line-clamp-2">Premium quality product available for negotiation.</p>
+            <div class="flex items-center justify-between pt-3 border-t border-[#E5E7EB]">
+              <span class="text-xl font-black text-gradient">$${Number(p.price).toFixed(2)}</span>
+              <button onclick="openNegotiate(${p.id}, '${p.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')}', ${p.price})"
+                class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold transition-all"
+                style="background:rgba(255,184,0,0.1);color:#FFB800;border:1px solid rgba(255,184,0,0.3)"
+                onmouseover="this.style.background='rgba(255,184,0,0.2)'"
+                onmouseout="this.style.background='rgba(255,184,0,0.1)'">
+                ⚡ Negotiate
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    } catch (e) {
+      document.getElementById('product-grid').innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:3rem 0">
+          <p style="color:#FF6B00;font-size:1.25rem;margin-bottom:0.5rem">⚠ Connection Failed</p>
+          <p style="color:#6B7280;font-size:0.875rem">Ensure backend is running at <code style="color:#FF6B00">${API_BASE}</code></p>
+          <p style="color:#6B7280;font-size:0.75rem;margin-top:0.5rem;font-family:monospace">Run: python -m uvicorn main:app --port 8000</p>
+        </div>`;
+    }
+  }
+
+  function openNegotiate(id, name, price) {
+    currentProduct = { id, name, price };
+    document.getElementById('modal-product-name').textContent = name;
+    document.getElementById('modal-product-price').textContent = `$${Number(price).toFixed(2)}`;
+
+    const overlay = document.getElementById('modal-overlay');
+    overlay.classList.remove('hidden');
+    overlay.classList.add('flex');
+
+    const chat = document.getElementById('negotiate-chat');
+    chat.innerHTML = `
+      <div class="flex gap-3 items-start">
+        <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-black text-white"
+          style="background:linear-gradient(135deg,#FFB800,#FF6B00)">AI</div>
+        <div class="msg-ai px-4 py-3 max-w-[85%]">
+          <p class="text-sm text-[#374151]">Hi! I'm DealMaker. I can offer a discount on <strong style="color:#FFB800">${name}</strong>.
+          Policy limits me to <strong>15% max discount</strong>. Let's negotiate.</p>
+        </div>
+      </div>`;
+    document.getElementById('negotiate-input').focus();
+  }
+
+  function closeModal() {
+    const overlay = document.getElementById('modal-overlay');
+    overlay.classList.add('hidden');
+    overlay.classList.remove('flex');
+  }
+
+  async function handleNegotiate(e) {
+    e.preventDefault();
+    const input = document.getElementById('negotiate-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    addBubble(msg, true, 'negotiate-chat');
+    input.value = '';
+    const loadingId = addLoading('negotiate-chat');
+
+    try {
+      const res = await fetch(`${API_BASE}/negotiate`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({product_id: currentProduct.id, message: msg, user_id: userId})
+      });
+      const data = await res.json();
+      removeLoading(loadingId);
+
+      let content = data.message || 'No response.';
+      if (data.flag) content += renderFlag(data.flag);
+      if (data.new_price !== undefined) {
+        const color = data.new_price <= 10 ? '#16A34A' : '#FFB800';
+        content += `<p style="margin-top:0.5rem;font-family:monospace;font-size:0.75rem;color:${color}">New price: $${Number(data.new_price).toFixed(2)}</p>`;
+      }
+      addBubble(content, false, 'negotiate-chat', data.flag != null);
+    } catch(err) {
+      removeLoading(loadingId);
+      addBubble('Connection Error. Check backend.', false, 'negotiate-chat');
+    }
+  }
+
+  async function handleSupport(e) {
+    e.preventDefault();
+    const input = document.getElementById('support-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    addBubble(msg, true, 'support-chat');
+    input.value = '';
+    const loadingId = addLoading('support-chat');
+
+    try {
+      const res = await fetch(`${API_BASE}/support`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({message: msg, order_id: 101, user_id: userId})
+      });
+      const data = await res.json();
+      removeLoading(loadingId);
+
+      let content = data.message || 'No response.';
+      if (data.flag) content += renderFlag(data.flag);
+      addBubble(content, false, 'support-chat', data.flag != null);
+    } catch(err) {
+      removeLoading(loadingId);
+      addBubble('Connection Error.', false, 'support-chat');
+    }
+  }
+
+  function addBubble(text, isUser, containerId, isSuccess = false) {
+    const container = document.getElementById(containerId);
+    const div = document.createElement('div');
+
+    if (isUser) {
+      div.className = 'flex gap-3 items-start justify-end';
+      div.innerHTML = `
+        <div class="msg-user px-4 py-3 max-w-[80%] order-1 text-sm text-gray-900">${escapeHtml(text)}</div>
+        <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-black text-white order-2"
+          style="background:linear-gradient(135deg,#FFB800,#FF6B00)">You</div>`;
+    } else {
+      div.className = 'flex gap-3 items-start';
+      const bubbleClass = isSuccess ? 'msg-success' : 'msg-ai';
+      div.innerHTML = `
+        <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-black text-white"
+          style="background:linear-gradient(135deg,#FFB800,#FF6B00)">AI</div>
+        <div class="${bubbleClass} px-4 py-3 max-w-[85%] text-sm text-[#374151]">${text}</div>`;
+    }
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function renderFlag(flag) {
+    return `<div class="flag-box mt-3">
+      <p class="text-[10px] font-bold uppercase tracking-wider mb-1" style="color:#FFB800">🚩 Vulnerability Exploited!</p>
+      <p class="font-mono text-xs select-all" style="color:#FF6B00">${flag}</p>
+      <p class="text-[10px] mt-1" style="color:#6B7280">Submit this flag at <a href="http://localhost:5555" style="color:#FF6B00;text-decoration:underline">Technieum Portal</a></p>
+    </div>`;
+  }
+
+  function addLoading(containerId) {
+    const id = 'loading-' + Math.random().toString(36).substr(2, 8);
+    const container = document.getElementById(containerId);
+    const div = document.createElement('div');
+    div.id = id;
+    div.className = 'flex gap-3 items-start';
+    div.innerHTML = `
+      <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-black text-white"
+        style="background:linear-gradient(135deg,#FFB800,#FF6B00)">AI</div>
+      <div class="msg-ai px-4 py-3">
+        <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
+      </div>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return id;
+  }
+
+  function removeLoading(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  }
+
+  function escapeHtml(text) {
+    return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
+</body>
+</html>

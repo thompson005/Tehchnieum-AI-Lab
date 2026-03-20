@@ -1,0 +1,759 @@
+# ══════════════════════════════════════════════════════════════════════════
+#  TECHNIEUM AI Security Labs — Full Platform Docker Compose
+#  Portal (5555) + LAB-1 (5000) + LAB-2 (3000,8000) + LAB-3 (8080,8083,3001)
+#                + LAB-4 (3100,8090,9000) + LAB-5 (3200,8100,8110-8118)
+# ══════════════════════════════════════════════════════════════════════════
+
+x-openai-env: &openai-env
+  OPENAI_API_KEY: ${OPENAI_API_KEY}
+  OPENAI_MODEL: gpt-4o-mini
+
+networks:
+  technieum:
+    driver: bridge
+
+volumes:
+  lab2-postgres-data:
+  lab2-redis-data:
+  lab2-chroma-data:
+  lab3-postgres-data:
+  portal-data:
+  lab4-postgres-data:
+  lab4-chroma-data:
+  lab5-postgres-data:
+  lab5-govconnect-files:
+
+# ──────────────────────────────────────────────────────────────────────────
+# PORTAL  :5555
+# ──────────────────────────────────────────────────────────────────────────
+services:
+
+  portal:
+    build:
+      context: ./portal
+      dockerfile: Dockerfile
+    container_name: technieum-portal
+    ports:
+      - "5555:5555"
+    environment:
+      PORTAL_PORT: 5555
+      PORTAL_DEBUG: "False"
+      # These URLs are rendered in the browser UI, so they must be host-accessible.
+      LAB1_URL: ${PUBLIC_BASE_URL:-http://localhost}:5000
+      LAB2_URL: ${PUBLIC_BASE_URL:-http://localhost}:3000
+      LAB3_URL: ${PUBLIC_BASE_URL:-http://localhost}:8080
+      LAB4_URL: ${PUBLIC_BASE_URL:-http://localhost}:3100
+      LAB5_URL: ${PUBLIC_BASE_URL:-http://localhost}:3200
+    volumes:
+      - portal-data:/app/data
+    networks:
+      - technieum
+    restart: unless-stopped
+
+# ──────────────────────────────────────────────────────────────────────────
+# LAB-1  MedAssist AI  :5000
+# ──────────────────────────────────────────────────────────────────────────
+
+  lab1:
+    build:
+      context: ./LAB-1
+      dockerfile: Dockerfile
+    container_name: technieum-lab1
+    ports:
+      - "5000:5000"
+    environment:
+      <<: *openai-env
+      LLM_MODEL: gpt-4o-mini
+      FLASK_DEBUG: "False"
+      HOST: "0.0.0.0"
+      PORT: 5000
+      ADMIN_API_KEY: admin_secret_123
+      ALLOW_RAG_UPLOADS: "True"
+      ENABLE_DEBUG_MODE: "True"
+    networks:
+      - technieum
+    restart: unless-stopped
+
+# ──────────────────────────────────────────────────────────────────────────
+# LAB-2  SecureBank AI  :3000 (UI), :8000 (API)
+# ──────────────────────────────────────────────────────────────────────────
+
+  lab2-postgres:
+    image: postgres:15-alpine
+    container_name: technieum-lab2-db
+    environment:
+      POSTGRES_DB: securebank
+      POSTGRES_USER: bankadmin
+      POSTGRES_PASSWORD: SecureBank2024!
+    volumes:
+      - lab2-postgres-data:/var/lib/postgresql/data
+      - ./LAB-2/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bankadmin -d securebank"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab2-redis:
+    image: redis:7-alpine
+    container_name: technieum-lab2-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab2-backend:
+    build:
+      context: ./LAB-2/backend
+      dockerfile: Dockerfile
+    container_name: technieum-lab2-api
+    ports:
+      - "8000:8000"
+    environment:
+      <<: *openai-env
+      DATABASE_URL: postgresql://bankadmin:SecureBank2024!@lab2-postgres:5432/securebank
+      REDIS_URL: redis://lab2-redis:6379
+      SECRET_KEY: technieum-lab2-secret-key-change-me
+      ENVIRONMENT: development
+    volumes:
+      - lab2-chroma-data:/app/chroma_data
+      - ./LAB-2/database/policies:/app/knowledge_base
+    depends_on:
+      lab2-postgres:
+        condition: service_healthy
+      lab2-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+    networks:
+      - technieum
+    restart: unless-stopped
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+  lab2-frontend:
+    build:
+      context: ./LAB-2/frontend
+      dockerfile: Dockerfile
+    container_name: technieum-lab2-ui
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: ${PUBLIC_BASE_URL:-http://localhost}:8000
+      NODE_ENV: production
+    depends_on:
+      lab2-backend:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped
+
+# ──────────────────────────────────────────────────────────────────────────
+# LAB-3  ShopSec AI  :8080 (gateway), :8083 (agent), :3001 (frontend)
+# ──────────────────────────────────────────────────────────────────────────
+
+  lab3-postgres:
+    image: pgvector/pgvector:pg16
+    container_name: technieum-lab3-db
+    environment:
+      POSTGRES_USER: shopsec
+      POSTGRES_PASSWORD: shopsec123
+      POSTGRES_DB: shopsec_db
+    volumes:
+      - lab3-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shopsec -d shopsec_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab3-order:
+    build:
+      context: ./LAB-3
+      dockerfile: backend/services/order_service/Dockerfile
+    container_name: technieum-lab3-order
+    environment:
+      DATABASE_URL: postgresql://shopsec:shopsec123@lab3-postgres:5432/shopsec_db
+    depends_on:
+      lab3-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    networks:
+      - technieum
+    restart: unless-stopped
+    command: uvicorn main:app --host 0.0.0.0 --port 8001
+
+  lab3-agent:
+    build:
+      context: ./LAB-3
+      dockerfile: backend/services/agent_core/Dockerfile
+    container_name: technieum-lab3-agent
+    ports:
+      - "8083:8003"
+    environment:
+      <<: *openai-env
+      ORDER_SERVICE_URL: http://lab3-order:8001
+      DATABASE_URL: postgresql://shopsec:shopsec123@lab3-postgres:5432/shopsec_db
+    depends_on:
+      lab3-postgres:
+        condition: service_healthy
+      lab3-order:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8003/health')"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+    networks:
+      - technieum
+    restart: unless-stopped
+    command: uvicorn main:app --host 0.0.0.0 --port 8003
+
+  lab3-gateway:
+    build:
+      context: ./LAB-3/backend
+      dockerfile: Dockerfile
+    container_name: technieum-lab3-gateway
+    ports:
+      - "8080:8000"
+    environment:
+      AGENT_CORE_URL: http://lab3-agent:8003
+      ORDER_SERVICE_URL: http://lab3-order:8001
+      ADMIN_PASSWORD: admin123
+    depends_on:
+      lab3-agent:
+        condition: service_started
+      lab3-order:
+        condition: service_started
+    networks:
+      - technieum
+    restart: unless-stopped
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+
+  lab3-frontend:
+    image: python:3.11-slim
+    container_name: technieum-lab3-ui
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./LAB-3/lite_frontend:/app
+    working_dir: /app
+    command: python -m http.server 3001
+    networks:
+      - technieum
+    restart: unless-stopped
+
+# ──────────────────────────────────────────────────────────────────────────
+# LAB-4  TravelNest AI  :3100 (UI), :8090 (Gateway), :9000 (AI Agent)
+# ──────────────────────────────────────────────────────────────────────────
+
+  lab4-postgres:
+    image: postgres:15-alpine
+    container_name: lab4-postgres
+    environment:
+      POSTGRES_DB: travelnest
+      POSTGRES_USER: travelnest
+      POSTGRES_PASSWORD: ${LAB4_DB_PASSWORD:-travelnest123}
+    volumes:
+      - ./LAB-4/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - lab4-postgres-data:/var/lib/postgresql/data
+    networks:
+      - technieum
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U travelnest"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  lab4-redis:
+    image: redis:7-alpine
+    container_name: lab4-redis
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-chromadb:
+    image: chromadb/chroma:latest
+    container_name: lab4-chromadb
+    volumes:
+      - lab4-chroma-data:/chroma/chroma
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-user:
+    build:
+      context: ./LAB-4/backend
+      dockerfile: user_service/Dockerfile
+    container_name: lab4-user
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+      SECRET_KEY: ${LAB4_SECRET_KEY:-travelnest_secret_key_2024}
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-flight:
+    build:
+      context: ./LAB-4/backend
+      dockerfile: flight_service/Dockerfile
+    container_name: lab4-flight
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-hotel:
+    build:
+      context: ./LAB-4/backend
+      dockerfile: hotel_service/Dockerfile
+    container_name: lab4-hotel
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-booking:
+    build:
+      context: ./LAB-4/backend
+      dockerfile: booking_service/Dockerfile
+    container_name: lab4-booking
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-payment:
+    build:
+      context: ./LAB-4/backend
+      dockerfile: payment_service/Dockerfile
+    container_name: lab4-payment
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-transport:
+    build:
+      context: ./LAB-4/backend
+      dockerfile: transport_service/Dockerfile
+    container_name: lab4-transport
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-ai-agent:
+    build:
+      context: ./LAB-4/backend
+      dockerfile: ai_agent/Dockerfile
+    container_name: lab4-ai-agent
+    ports:
+      - "9000:9000"
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      FLIGHT_SERVICE_URL: http://lab4-flight:8002
+      HOTEL_SERVICE_URL: http://lab4-hotel:8003
+      BOOKING_SERVICE_URL: http://lab4-booking:8004
+      PAYMENT_SERVICE_URL: http://lab4-payment:8005
+      TRANSPORT_SERVICE_URL: http://lab4-transport:8006
+      REDIS_URL: redis://lab4-redis:6379
+      CHROMA_HOST: lab4-chromadb
+      CHROMA_PORT: 8000
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+      lab4-chromadb:
+        condition: service_started
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-gateway:
+    build:
+      context: ./LAB-4/backend
+      dockerfile: gateway/Dockerfile
+    container_name: lab4-gateway
+    ports:
+      - "8090:8000"
+    environment:
+      USER_SERVICE_URL: http://lab4-user:8001
+      FLIGHT_SERVICE_URL: http://lab4-flight:8002
+      HOTEL_SERVICE_URL: http://lab4-hotel:8003
+      BOOKING_SERVICE_URL: http://lab4-booking:8004
+      PAYMENT_SERVICE_URL: http://lab4-payment:8005
+      TRANSPORT_SERVICE_URL: http://lab4-transport:8006
+      AI_AGENT_URL: http://lab4-ai-agent:9000
+    depends_on:
+      - lab4-user
+      - lab4-flight
+      - lab4-hotel
+      - lab4-booking
+      - lab4-payment
+      - lab4-transport
+      - lab4-ai-agent
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-frontend:
+    build:
+      context: ./LAB-4/frontend
+    container_name: lab4-frontend
+    ports:
+      - "3100:3100"
+    networks:
+      - technieum
+    restart: unless-stopped
+
+# ──────────────────────────────────────────────────────────────────────────
+# LAB-5  GovConnect AI  :3200 (UI), :8100 (API), :8110-8118 (MCP Servers)
+# ──────────────────────────────────────────────────────────────────────────
+
+  lab5-postgres:
+    image: postgres:15-alpine
+    container_name: govconnect-postgres
+    environment:
+      POSTGRES_DB: govconnect
+      POSTGRES_USER: govconnect
+      POSTGRES_PASSWORD: govconnect2024
+    volumes:
+      - lab5-postgres-data:/var/lib/postgresql/data
+      - ./LAB-5/database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U govconnect -d govconnect"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab5-redis:
+    image: redis:7-alpine
+    container_name: govconnect-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab5-mcp-citizen:
+    build:
+      context: ./LAB-5/mcp_servers/citizen_records_mcp
+      dockerfile: Dockerfile
+    container_name: govconnect-mcp-citizen
+    ports:
+      - "8110:8110"
+    environment:
+      DATABASE_URL: postgresql://govconnect:govconnect2024@lab5-postgres:5432/govconnect
+    depends_on:
+      lab5-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8110/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab5-mcp-dmv:
+    build:
+      context: ./LAB-5/mcp_servers/dmv_mcp
+      dockerfile: Dockerfile
+    container_name: govconnect-mcp-dmv
+    ports:
+      - "8111:8111"
+    environment:
+      DATABASE_URL: postgresql://govconnect:govconnect2024@lab5-postgres:5432/govconnect
+    depends_on:
+      lab5-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8111/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab5-mcp-tax:
+    build:
+      context: ./LAB-5/mcp_servers/tax_authority_mcp
+      dockerfile: Dockerfile
+    container_name: govconnect-mcp-tax
+    ports:
+      - "8112:8112"
+    environment:
+      DATABASE_URL: postgresql://govconnect:govconnect2024@lab5-postgres:5432/govconnect
+    depends_on:
+      lab5-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8112/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab5-mcp-permit:
+    build:
+      context: ./LAB-5/mcp_servers/permit_office_mcp
+      dockerfile: Dockerfile
+    container_name: govconnect-mcp-permit
+    ports:
+      - "8113:8113"
+    environment:
+      DATABASE_URL: postgresql://govconnect:govconnect2024@lab5-postgres:5432/govconnect
+    depends_on:
+      lab5-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8113/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab5-mcp-health:
+    build:
+      context: ./LAB-5/mcp_servers/health_registry_mcp
+      dockerfile: Dockerfile
+    container_name: govconnect-mcp-health
+    ports:
+      - "8114:8114"
+    environment:
+      DATABASE_URL: postgresql://govconnect:govconnect2024@lab5-postgres:5432/govconnect
+    depends_on:
+      lab5-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8114/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab5-mcp-docs:
+    build:
+      context: ./LAB-5/mcp_servers/internal_docs_mcp
+      dockerfile: Dockerfile
+    container_name: govconnect-mcp-docs
+    ports:
+      - "8115:8115"
+    environment:
+      DATABASE_URL: postgresql://govconnect:govconnect2024@lab5-postgres:5432/govconnect
+    depends_on:
+      lab5-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8115/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab5-mcp-notify:
+    build:
+      context: ./LAB-5/mcp_servers/notification_mcp
+      dockerfile: Dockerfile
+    container_name: govconnect-mcp-notify
+    ports:
+      - "8116:8116"
+    environment:
+      DATABASE_URL: postgresql://govconnect:govconnect2024@lab5-postgres:5432/govconnect
+    depends_on:
+      lab5-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8116/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab5-mcp-files:
+    build:
+      context: ./LAB-5/mcp_servers/filesystem_mcp
+      dockerfile: Dockerfile
+    container_name: govconnect-mcp-files
+    ports:
+      - "8117:8117"
+    environment:
+      DATABASE_URL: postgresql://govconnect:govconnect2024@lab5-postgres:5432/govconnect
+      FILES_ROOT: /data/govconnect-files
+    volumes:
+      - lab5-govconnect-files:/data/govconnect-files
+    depends_on:
+      lab5-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8117/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab5-mcp-civic:
+    build:
+      context: ./LAB-5/mcp_servers/civic_feedback_mcp
+      dockerfile: Dockerfile
+    container_name: govconnect-mcp-civic
+    ports:
+      - "8118:8118"
+    environment:
+      DATABASE_URL: postgresql://govconnect:govconnect2024@lab5-postgres:5432/govconnect
+    depends_on:
+      lab5-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8118/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab5-backend:
+    build:
+      context: ./LAB-5/backend
+      dockerfile: Dockerfile
+    container_name: govconnect-backend
+    ports:
+      - "8100:8100"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      DATABASE_URL: postgresql+asyncpg://govconnect:govconnect2024@lab5-postgres:5432/govconnect
+      JWT_SECRET: govconnect_secret_key_2024
+      REDIS_URL: redis://lab5-redis:6379
+      MCP_CITIZEN_URL: http://lab5-mcp-citizen:8110
+      MCP_DMV_URL: http://lab5-mcp-dmv:8111
+      MCP_TAX_URL: http://lab5-mcp-tax:8112
+      MCP_PERMIT_URL: http://lab5-mcp-permit:8113
+      MCP_HEALTH_URL: http://lab5-mcp-health:8114
+      MCP_DOCS_URL: http://lab5-mcp-docs:8115
+      MCP_NOTIFY_URL: http://lab5-mcp-notify:8116
+      MCP_FILES_URL: http://lab5-mcp-files:8117
+      MCP_CIVIC_URL: http://lab5-mcp-civic:8118
+    depends_on:
+      lab5-postgres:
+        condition: service_healthy
+      lab5-redis:
+        condition: service_healthy
+      lab5-mcp-citizen:
+        condition: service_healthy
+      lab5-mcp-dmv:
+        condition: service_healthy
+      lab5-mcp-tax:
+        condition: service_healthy
+      lab5-mcp-permit:
+        condition: service_healthy
+      lab5-mcp-health:
+        condition: service_healthy
+      lab5-mcp-docs:
+        condition: service_healthy
+      lab5-mcp-notify:
+        condition: service_healthy
+      lab5-mcp-files:
+        condition: service_healthy
+      lab5-mcp-civic:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8100/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab5-frontend:
+    build:
+      context: ./LAB-5/frontend
+      dockerfile: Dockerfile
+    container_name: govconnect-frontend
+    ports:
+      - "3200:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: ${PUBLIC_BASE_URL:-http://localhost}:8100
+    depends_on:
+      lab5-backend:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped

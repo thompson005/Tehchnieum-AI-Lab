@@ -1,0 +1,216 @@
+version: '3.9'
+
+# ══════════════════════════════════════════════════════════════════════════
+#  TravelNest AI Security Lab — Standalone Docker Compose
+#  LAB-4 for the TECHNIEUM AI Security Labs platform
+#  Frontend: http://localhost:3100
+#  Gateway:  http://localhost:8090
+#  AI Agent: http://localhost:9000
+# ══════════════════════════════════════════════════════════════════════════
+
+networks:
+  technieum:
+    driver: bridge
+
+volumes:
+  lab4-postgres-data:
+  lab4-chroma-data:
+
+services:
+
+  # ──────────────────────────────────────────────────────────────────────
+  # Database
+  # ──────────────────────────────────────────────────────────────────────
+  lab4-postgres:
+    image: postgres:15-alpine
+    container_name: lab4-postgres
+    environment:
+      POSTGRES_DB: travelnest
+      POSTGRES_USER: travelnest
+      POSTGRES_PASSWORD: ${LAB4_DB_PASSWORD:-travelnest123}
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - lab4-postgres-data:/var/lib/postgresql/data
+    networks:
+      - technieum
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U travelnest"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  lab4-redis:
+    image: redis:7-alpine
+    container_name: lab4-redis
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-chromadb:
+    image: chromadb/chroma:latest
+    container_name: lab4-chromadb
+    volumes:
+      - lab4-chroma-data:/chroma/chroma
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────────
+  # Backend Microservices
+  # ──────────────────────────────────────────────────────────────────────
+  lab4-user:
+    build:
+      context: ./backend
+      dockerfile: user_service/Dockerfile
+    container_name: lab4-user
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+      SECRET_KEY: ${LAB4_SECRET_KEY:-travelnest_secret_key_2024}
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-flight:
+    build:
+      context: ./backend
+      dockerfile: flight_service/Dockerfile
+    container_name: lab4-flight
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-hotel:
+    build:
+      context: ./backend
+      dockerfile: hotel_service/Dockerfile
+    container_name: lab4-hotel
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-booking:
+    build:
+      context: ./backend
+      dockerfile: booking_service/Dockerfile
+    container_name: lab4-booking
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-payment:
+    build:
+      context: ./backend
+      dockerfile: payment_service/Dockerfile
+    container_name: lab4-payment
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-transport:
+    build:
+      context: ./backend
+      dockerfile: transport_service/Dockerfile
+    container_name: lab4-transport
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  lab4-ai-agent:
+    build:
+      context: ./backend
+      dockerfile: ai_agent/Dockerfile
+    container_name: lab4-ai-agent
+    ports:
+      - "9000:9000"
+    environment:
+      DATABASE_URL: postgresql://travelnest:${LAB4_DB_PASSWORD:-travelnest123}@lab4-postgres:5432/travelnest
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      FLIGHT_SERVICE_URL: http://lab4-flight:8002
+      HOTEL_SERVICE_URL: http://lab4-hotel:8003
+      BOOKING_SERVICE_URL: http://lab4-booking:8004
+      PAYMENT_SERVICE_URL: http://lab4-payment:8005
+      TRANSPORT_SERVICE_URL: http://lab4-transport:8006
+      REDIS_URL: redis://lab4-redis:6379
+      CHROMA_HOST: lab4-chromadb
+      CHROMA_PORT: 8000
+    depends_on:
+      lab4-postgres:
+        condition: service_healthy
+      lab4-chromadb:
+        condition: service_started
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────────
+  # Gateway
+  # ──────────────────────────────────────────────────────────────────────
+  lab4-gateway:
+    build:
+      context: ./backend
+      dockerfile: gateway/Dockerfile
+    container_name: lab4-gateway
+    ports:
+      - "8090:8000"
+    environment:
+      USER_SERVICE_URL: http://lab4-user:8001
+      FLIGHT_SERVICE_URL: http://lab4-flight:8002
+      HOTEL_SERVICE_URL: http://lab4-hotel:8003
+      BOOKING_SERVICE_URL: http://lab4-booking:8004
+      PAYMENT_SERVICE_URL: http://lab4-payment:8005
+      TRANSPORT_SERVICE_URL: http://lab4-transport:8006
+      AI_AGENT_URL: http://lab4-ai-agent:9000
+    depends_on:
+      - lab4-user
+      - lab4-flight
+      - lab4-hotel
+      - lab4-booking
+      - lab4-payment
+      - lab4-transport
+      - lab4-ai-agent
+    networks:
+      - technieum
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────────
+  # Frontend
+  # ──────────────────────────────────────────────────────────────────────
+  lab4-frontend:
+    build:
+      context: ./frontend
+    container_name: lab4-frontend
+    ports:
+      - "3100:3100"
+    networks:
+      - technieum
+    restart: unless-stopped

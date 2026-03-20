@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel — MedAssist AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { tech: { yellow:'#FFB800', orange:'#FF6B00', black:'#F3F4F6', surface:'#FFFFFF', card:'#FFFFFF', border:'#E5E7EB', muted:'#6B7280' } },
+        fontFamily: { sans:['Inter','sans-serif'], mono:['JetBrains Mono','monospace'] }
+      }}
+    }
+  </script>
+  <style>
+    body{background:#F3F4F6;color:#111827;font-family:'Inter',sans-serif}
+    .text-gradient{background:linear-gradient(135deg,#FFB800,#FF6B00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .border-gradient{border:1px solid transparent;background:linear-gradient(#FFFFFF,#FFFFFF) padding-box,linear-gradient(135deg,#FFB800,#FF6B00) border-box}
+    .btn-primary{background:linear-gradient(135deg,#FFB800,#FF6B00);color:#FFFFFF;font-weight:700;transition:all 0.2s}
+    .btn-primary:hover{filter:brightness(1.1)}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#F3F4F6}::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:3px}
+  </style>
+</head>
+<body class="min-h-screen">
+
+<!-- Nav -->
+<nav class="border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded btn-primary flex items-center justify-center"><span class="font-black text-xs">T</span></div>
+        <span class="font-black tracking-widest text-gradient text-sm">TECHNIEUM</span>
+      </a>
+      <span class="text-[#E5E7EB]">|</span>
+      <span class="text-red-600 text-xs font-mono font-bold">⚠ ADMIN PANEL</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/chat" class="text-xs border border-[#E5E7EB] text-[#6B7280] hover:border-[#FFB800] hover:text-[#FFB800] px-3 py-1.5 rounded-lg transition-colors">← Chat</a>
+      <a href="http://localhost:5555" class="text-xs border border-[#FFB800]/50 text-[#FFB800] hover:bg-[#FFB800]/10 px-3 py-1.5 rounded-lg transition-colors">🚩 Submit Flag</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Warning banner -->
+<div class="bg-amber-50 border-b border-amber-200">
+  <div class="max-w-7xl mx-auto px-4 py-2 text-xs text-amber-800 font-mono">
+    ⚠ ADMIN ACCESS — Highly privileged endpoint. Authentication bypass is a lab objective.
+    Try: <code class="bg-amber-100 px-1 rounded">X-API-Key: admin_secret_123</code> header for elevated access.
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 py-8">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-black mb-1 text-gray-900">Admin <span class="text-gradient">Control Panel</span></h1>
+    <p class="text-[#6B7280] text-sm">MedAssist AI — System Administration Interface</p>
+  </div>
+
+  <!-- Stats cards -->
+  <div class="grid sm:grid-cols-4 gap-4 mb-8" id="statsCards">
+    <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-sm">
+      <p class="text-[#6B7280] text-xs uppercase tracking-wider mb-1">Users</p>
+      <p class="text-2xl font-black text-[#FFB800]" id="statUsers">—</p>
+    </div>
+    <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-sm">
+      <p class="text-[#6B7280] text-xs uppercase tracking-wider mb-1">Patients</p>
+      <p class="text-2xl font-black text-gray-900" id="statPatients">—</p>
+    </div>
+    <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-sm">
+      <p class="text-[#6B7280] text-xs uppercase tracking-wider mb-1">Agents</p>
+      <p class="text-2xl font-black text-gray-900" id="statAgents">5</p>
+    </div>
+    <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-sm">
+      <p class="text-[#6B7280] text-xs uppercase tracking-wider mb-1">Model</p>
+      <p class="text-sm font-black text-[#FF6B00] font-mono" id="statModel">gpt-4o-mini</p>
+    </div>
+  </div>
+
+  <div class="grid lg:grid-cols-2 gap-6">
+
+    <!-- SQL Query Executor -->
+    <div class="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm">
+      <div class="px-5 py-4 border-b border-[#E5E7EB] flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-red-500"></span>
+        <h2 class="font-bold text-sm text-gray-900">SQL Query Executor</h2>
+        <span class="ml-auto text-xs text-red-600 font-mono">VULNERABLE</span>
+      </div>
+      <div class="p-5">
+        <textarea id="sqlQuery" rows="4"
+          class="w-full bg-white border border-[#D1D5DB] rounded-xl px-4 py-3 font-mono text-xs text-[#FF6B00] focus:outline-none focus:border-[#FFB800] transition-colors resize-none mb-3"
+          placeholder="SELECT * FROM users&#10;SELECT * FROM patients&#10;SELECT username,password,role FROM users"></textarea>
+        <div class="flex gap-2 mb-3">
+          <input id="sqlApiKey" type="text" placeholder="X-API-Key header value"
+            class="flex-1 bg-white border border-[#D1D5DB] rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:border-[#FFB800] transition-colors text-gray-900"/>
+          <button onclick="runSQL()" class="btn-primary px-4 py-2 rounded-lg text-xs">Execute</button>
+        </div>
+        <div id="sqlResult" class="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 font-mono text-xs text-[#FF6B00] min-h-16 overflow-x-auto whitespace-pre-wrap">
+          Results appear here...
+        </div>
+      </div>
+    </div>
+
+    <!-- System Command Runner -->
+    <div class="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm">
+      <div class="px-5 py-4 border-b border-[#E5E7EB] flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-red-500"></span>
+        <h2 class="font-bold text-sm text-gray-900">System Command Runner</h2>
+        <span class="ml-auto text-xs text-red-600 font-mono">RCE SURFACE</span>
+      </div>
+      <div class="p-5">
+        <textarea id="sysCmd" rows="4"
+          class="w-full bg-white border border-[#D1D5DB] rounded-xl px-4 py-3 font-mono text-xs text-green-700 focus:outline-none focus:border-[#FFB800] transition-colors resize-none mb-3"
+          placeholder="whoami&#10;cat .env&#10;ls -la"></textarea>
+        <div class="flex gap-2 mb-3">
+          <input id="cmdApiKey" type="text" placeholder="X-API-Key header value"
+            class="flex-1 bg-white border border-[#D1D5DB] rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:border-[#FFB800] transition-colors text-gray-900"/>
+          <button onclick="runCmd()" class="btn-primary px-4 py-2 rounded-lg text-xs">Execute</button>
+        </div>
+        <div id="cmdResult" class="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 font-mono text-xs text-green-700 min-h-16 overflow-x-auto whitespace-pre-wrap">
+          Output appears here...
+        </div>
+      </div>
+    </div>
+
+    <!-- System Config -->
+    <div class="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm">
+      <div class="px-5 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
+        <h2 class="font-bold text-sm text-gray-900">System Configuration</h2>
+        <button onclick="fetchConfig()" class="text-xs border border-[#E5E7EB] text-[#6B7280] hover:border-[#FFB800] hover:text-[#FFB800] px-3 py-1 rounded transition-colors">Refresh</button>
+      </div>
+      <div class="p-5">
+        <div id="configData" class="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 font-mono text-xs text-[#FF6B00] min-h-32 overflow-x-auto whitespace-pre-wrap">
+          Click Refresh to load...
+        </div>
+      </div>
+    </div>
+
+    <!-- System Prompt Viewer -->
+    <div class="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm">
+      <div class="px-5 py-4 border-b border-[#E5E7EB]">
+        <h2 class="font-bold text-sm text-gray-900">System Prompt Viewer</h2>
+        <p class="text-xs text-[#6B7280] mt-0.5">Lab goal: extract these without using this page</p>
+      </div>
+      <div class="p-5">
+        <div class="flex gap-2 mb-3">
+          <select id="agentSelect" class="flex-1 bg-white border border-[#D1D5DB] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#FFB800] text-gray-900">
+            <option value="orchestrator">Orchestrator</option>
+            <option value="intake">Intake Agent</option>
+            <option value="records">Records Agent</option>
+            <option value="appointment">Appointment Agent</option>
+            <option value="billing">Billing Agent</option>
+          </select>
+          <button onclick="fetchPrompt()" class="btn-primary px-4 py-2 rounded-lg text-xs">View</button>
+        </div>
+        <div id="promptData" class="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 font-mono text-xs text-[#374151] min-h-32 overflow-y-auto max-h-64 whitespace-pre-wrap">
+          Select an agent and click View...
+        </div>
+      </div>
+    </div>
+
+    <!-- API Endpoints -->
+    <div class="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden lg:col-span-2 shadow-sm">
+      <div class="px-5 py-4 border-b border-[#E5E7EB]">
+        <h2 class="font-bold text-sm text-gray-900">Attack Surface — API Endpoints</h2>
+      </div>
+      <div class="p-5">
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs font-mono">
+            <thead><tr class="border-b border-[#E5E7EB] text-[#6B7280]">
+              <th class="text-left pb-2 pr-4">Method</th>
+              <th class="text-left pb-2 pr-4">Endpoint</th>
+              <th class="text-left pb-2">Vulnerability</th>
+            </tr></thead>
+            <tbody class="divide-y divide-[#F3F4F6]">
+              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-green-600">GET</td><td class="py-2 pr-4 text-[#FF6B00]">/api/patients</td><td class="py-2 text-[#6B7280]">No auth — lists all patients</td></tr>
+              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-green-600">GET</td><td class="py-2 pr-4 text-[#FF6B00]">/api/patients/&lt;id&gt;</td><td class="py-2 text-[#6B7280]">IDOR — exposes SSN</td></tr>
+              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-blue-600">POST</td><td class="py-2 pr-4 text-[#FF6B00]">/api/rag/upload</td><td class="py-2 text-[#6B7280]">No auth — RAG poisoning</td></tr>
+              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-blue-600">POST</td><td class="py-2 pr-4 text-[#FF6B00]">/api/rag/query</td><td class="py-2 text-[#6B7280]">Data leakage via verbose results</td></tr>
+              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-red-600">POST</td><td class="py-2 pr-4 text-red-600">/api/admin/execute</td><td class="py-2 text-red-600">RCE + arbitrary SQL (key required)</td></tr>
+              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-green-600">GET</td><td class="py-2 pr-4 text-[#FF6B00]">/api/admin/config</td><td class="py-2 text-[#6B7280]">Exposes internal configuration</td></tr>
+              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-green-600">GET</td><td class="py-2 pr-4 text-[#FF6B00]">/api/admin/system-prompt</td><td class="py-2 text-[#6B7280]">Exposes all agent system prompts</td></tr>
+              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-green-600">GET</td><td class="py-2 pr-4 text-[#FF6B00]">/api/debug/info</td><td class="py-2 text-[#6B7280]">Env vars + installed packages</td></tr>
+              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-blue-600">POST</td><td class="py-2 pr-4 text-[#FF6B00]">/login</td><td class="py-2 text-[#6B7280]">SQL injection via username field</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="border-t border-[#E5E7EB] py-4 mt-8">
+  <div class="max-w-7xl mx-auto px-4 text-center text-xs text-[#6B7280] font-mono">
+    Powered by <span class="text-gradient font-bold">Technieum</span> · LAB-1 Admin Interface
+  </div>
+</footer>
+
+<script>
+async function runSQL() {
+  const query = document.getElementById('sqlQuery').value.trim();
+  const apiKey = document.getElementById('sqlApiKey').value.trim();
+  const out = document.getElementById('sqlResult');
+  out.textContent = 'Executing...';
+  try {
+    const res = await fetch('/api/admin/execute', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-API-Key': apiKey},
+      body: JSON.stringify({type: 'sql', command: query})
+    });
+    const data = await res.json();
+    out.textContent = JSON.stringify(data, null, 2);
+  } catch(e) { out.textContent = 'Error: ' + e.message; }
+}
+
+async function runCmd() {
+  const cmd = document.getElementById('sysCmd').value.trim();
+  const apiKey = document.getElementById('cmdApiKey').value.trim();
+  const out = document.getElementById('cmdResult');
+  out.textContent = 'Executing...';
+  try {
+    const res = await fetch('/api/admin/execute', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-API-Key': apiKey},
+      body: JSON.stringify({type: 'system', command: cmd})
+    });
+    const data = await res.json();
+    out.textContent = data.stdout || data.stderr || JSON.stringify(data, null, 2);
+  } catch(e) { out.textContent = 'Error: ' + e.message; }
+}
+
+async function fetchConfig() {
+  const out = document.getElementById('configData');
+  try {
+    const res = await fetch('/api/admin/config');
+    const data = await res.json();
+    out.textContent = JSON.stringify(data, null, 2);
+  } catch(e) { out.textContent = 'Error: ' + e.message; }
+}
+
+async function fetchPrompt() {
+  const agent = document.getElementById('agentSelect').value;
+  const out = document.getElementById('promptData');
+  try {
+    const res = await fetch(`/api/admin/system-prompt?agent=${agent}`);
+    const data = await res.json();
+    out.textContent = data.system_prompt || JSON.stringify(data, null, 2);
+  } catch(e) { out.textContent = 'Error: ' + e.message; }
+}
+
+// Load stats
+async function loadStats() {
+  try {
+    const [pRes, hRes] = await Promise.all([
+      fetch('/api/patients'),
+      fetch('/api/health')
+    ]);
+    const patients = await pRes.json();
+    document.getElementById('statPatients').textContent = patients.patients?.length || '?';
+    const sql_res = await fetch('/api/admin/execute', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-API-Key': 'admin_secret_123'},
+      body: JSON.stringify({type: 'sql', command: 'SELECT COUNT(*) FROM users'})
+    });
+    const sql_data = await sql_res.json();
+    if (sql_data.results) document.getElementById('statUsers').textContent = sql_data.results[0][0];
+  } catch(e) {}
+}
+loadStats();
+</script>
+</body>
+</html>

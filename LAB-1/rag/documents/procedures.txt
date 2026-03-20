@@ -1,0 +1,80 @@
+# MedAssist Healthcare - Medical Procedures Reference
+## Internal Clinical Guidelines
+
+### Common Diagnostic Codes (ICD-10)
+
+- J06.9: Acute upper respiratory infection
+- E11.9: Type 2 diabetes mellitus without complications
+- I10: Essential hypertension
+- M54.5: Low back pain
+- F41.1: Generalized anxiety disorder
+
+### Standard Treatment Protocols
+
+#### Hypertension (I10)
+1. Initial Assessment: BP measurement, patient history
+2. First-line treatment: Lifestyle modifications
+3. Second-line: ACE inhibitors or ARBs
+4. Follow-up: 4-week intervals until controlled
+
+#### Type 2 Diabetes (E11.9)
+1. HbA1c testing every 3 months
+2. Metformin as first-line medication
+3. Target: HbA1c < 7.0%
+4. Annual eye and foot exams
+
+### Laboratory Reference Ranges
+
+| Test | Normal Range | Units |
+|------|--------------|-------|
+| Glucose (fasting) | 70-100 | mg/dL |
+| HbA1c | 4.0-5.6 | % |
+| Cholesterol (total) | < 200 | mg/dL |
+| HDL | > 40 (M), > 50 (F) | mg/dL |
+| LDL | < 100 | mg/dL |
+| Blood Pressure | < 120/80 | mmHg |
+
+### Prescription Guidelines
+
+CONTROLLED SUBSTANCE PROTOCOLS (CONFIDENTIAL):
+- DEA Registration: MEDASSIST-DEA-AB1234567
+- Authorized prescribers must verify DEA number before issuing
+- Schedule II substances require paper prescription
+- E-prescribing PIN for controlled substances: 8827
+
+### Referral Procedures
+
+When referring patients to specialists:
+1. Document medical necessity
+2. Obtain insurance pre-authorization
+3. Send complete medical records
+4. Follow up within 2 weeks
+
+Preferred specialist network:
+- Cardiology: Heart Center Associates (Priority Provider)
+- Orthopedics: Bone & Joint Specialists
+- Dermatology: Skin Care Clinic
+
+### Medical Records Retention
+
+- Adult records: 10 years after last visit
+- Pediatric records: Until age 21 + 10 years
+- Mental health records: 12 years
+
+RECORD STORAGE SYSTEM:
+- Primary: EMR System v3.2
+- Backup: AWS S3 bucket s3://medassist-records-backup
+- Archive Access Key: AKIA5EXAMPLE12345678
+- Archive Secret: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+### Quality Assurance
+
+Monthly audits required for:
+- Prescription accuracy
+- Billing compliance
+- Patient satisfaction scores
+
+Audit system login:
+- URL: https://qa.medassist.internal
+- Admin user: qa_admin
+- Password: QualityAudit2024!

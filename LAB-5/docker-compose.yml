@@ -1,0 +1,314 @@
+version: "3.9"
+
+services:
+  # ─── Frontend ──────────────────────────────────────────────────────────────
+  govconnect-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: govconnect-frontend
+    ports:
+      - "3200:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8100
+    depends_on:
+      govconnect-backend:
+        condition: service_healthy
+    networks:
+      - govconnect-net
+    restart: unless-stopped
+
+  # ─── Backend ───────────────────────────────────────────────────────────────
+  govconnect-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: govconnect-backend
+    ports:
+      - "8100:8100"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DATABASE_URL=postgresql://govconnect:govconnect2024@postgres:5432/govconnect
+      - JWT_SECRET=govconnect_secret_key_2024
+      - REDIS_URL=redis://redis:6379
+      - MCP_CITIZEN_URL=http://mcp-citizen:8110
+      - MCP_DMV_URL=http://mcp-dmv:8111
+      - MCP_TAX_URL=http://mcp-tax:8112
+      - MCP_PERMIT_URL=http://mcp-permit:8113
+      - MCP_HEALTH_URL=http://mcp-health:8114
+      - MCP_DOCS_URL=http://mcp-docs:8115
+      - MCP_NOTIFY_URL=http://mcp-notify:8116
+      - MCP_FILES_URL=http://mcp-files:8117
+      - MCP_CIVIC_URL=http://mcp-civic:8118
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8100/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - govconnect-net
+    restart: unless-stopped
+
+  # ─── MCP: Citizen Records ──────────────────────────────────────────────────
+  mcp-citizen:
+    build:
+      context: ./mcp_servers/citizen_records_mcp
+      dockerfile: Dockerfile
+    container_name: mcp-citizen
+    ports:
+      - "8110:8110"
+    environment:
+      - DATABASE_URL=postgresql://govconnect:govconnect2024@postgres:5432/govconnect
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8110/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - govconnect-net
+    restart: unless-stopped
+
+  # ─── MCP: DMV ─────────────────────────────────────────────────────────────
+  mcp-dmv:
+    build:
+      context: ./mcp_servers/dmv_mcp
+      dockerfile: Dockerfile
+    container_name: mcp-dmv
+    ports:
+      - "8111:8111"
+    environment:
+      - DATABASE_URL=postgresql://govconnect:govconnect2024@postgres:5432/govconnect
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8111/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - govconnect-net
+    restart: unless-stopped
+
+  # ─── MCP: Tax Authority ────────────────────────────────────────────────────
+  mcp-tax:
+    build:
+      context: ./mcp_servers/tax_authority_mcp
+      dockerfile: Dockerfile
+    container_name: mcp-tax
+    ports:
+      - "8112:8112"
+    environment:
+      - DATABASE_URL=postgresql://govconnect:govconnect2024@postgres:5432/govconnect
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8112/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - govconnect-net
+    restart: unless-stopped
+
+  # ─── MCP: Permit Office ────────────────────────────────────────────────────
+  mcp-permit:
+    build:
+      context: ./mcp_servers/permit_office_mcp
+      dockerfile: Dockerfile
+    container_name: mcp-permit
+    ports:
+      - "8113:8113"
+    environment:
+      - DATABASE_URL=postgresql://govconnect:govconnect2024@postgres:5432/govconnect
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8113/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - govconnect-net
+    restart: unless-stopped
+
+  # ─── MCP: Health Registry ──────────────────────────────────────────────────
+  mcp-health:
+    build:
+      context: ./mcp_servers/health_registry_mcp
+      dockerfile: Dockerfile
+    container_name: mcp-health
+    ports:
+      - "8114:8114"
+    environment:
+      - DATABASE_URL=postgresql://govconnect:govconnect2024@postgres:5432/govconnect
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8114/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - govconnect-net
+    restart: unless-stopped
+
+  # ─── MCP: Internal Docs ───────────────────────────────────────────────────
+  mcp-docs:
+    build:
+      context: ./mcp_servers/internal_docs_mcp
+      dockerfile: Dockerfile
+    container_name: mcp-docs
+    ports:
+      - "8115:8115"
+    environment:
+      - DATABASE_URL=postgresql://govconnect:govconnect2024@postgres:5432/govconnect
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8115/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - govconnect-net
+    restart: unless-stopped
+
+  # ─── MCP: Notification ────────────────────────────────────────────────────
+  mcp-notify:
+    build:
+      context: ./mcp_servers/notification_mcp
+      dockerfile: Dockerfile
+    container_name: mcp-notify
+    ports:
+      - "8116:8116"
+    environment:
+      - DATABASE_URL=postgresql://govconnect:govconnect2024@postgres:5432/govconnect
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8116/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - govconnect-net
+    restart: unless-stopped
+
+  # ─── MCP: Filesystem ──────────────────────────────────────────────────────
+  mcp-files:
+    build:
+      context: ./mcp_servers/filesystem_mcp
+      dockerfile: Dockerfile
+    container_name: mcp-files
+    ports:
+      - "8117:8117"
+    environment:
+      - DATABASE_URL=postgresql://govconnect:govconnect2024@postgres:5432/govconnect
+      - FILES_ROOT=/data/govconnect-files
+    volumes:
+      - govconnect-files:/data/govconnect-files
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8117/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - govconnect-net
+    restart: unless-stopped
+
+  # ─── MCP: Civic Feedback ──────────────────────────────────────────────────
+  mcp-civic:
+    build:
+      context: ./mcp_servers/civic_feedback_mcp
+      dockerfile: Dockerfile
+    container_name: mcp-civic
+    ports:
+      - "8118:8118"
+    environment:
+      - DATABASE_URL=postgresql://govconnect:govconnect2024@postgres:5432/govconnect
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8118/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - govconnect-net
+    restart: unless-stopped
+
+  # ─── PostgreSQL ────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: govconnect-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=govconnect
+      - POSTGRES_USER=govconnect
+      - POSTGRES_PASSWORD=govconnect2024
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U govconnect -d govconnect"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - govconnect-net
+    restart: unless-stopped
+
+  # ─── Redis ────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: govconnect-redis
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - govconnect-net
+    restart: unless-stopped
+
+# ─── Volumes ────────────────────────────────────────────────────────────────
+volumes:
+  postgres-data:
+  govconnect-files:
+
+# ─── Networks ────────────────────────────────────────────────────────────────
+networks:
+  govconnect-net:
+    driver: bridge

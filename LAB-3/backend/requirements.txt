@@ -1,0 +1,58 @@
+# Core Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Database
+sqlalchemy==2.0.25
+psycopg2-binary==2.9.9
+alembic==1.13.1
+pgvector==0.2.4
+
+# AI/ML
+langchain==0.1.4
+langchain-community==0.0.16
+langgraph==0.0.20
+ollama==0.1.6
+openai>=1.0.0
+sentence-transformers==2.3.1
+transformers==4.37.0
+torch==2.1.2
+chromadb==0.4.22
+
+# NeMo Guardrails
+nemoguardrails==0.7.1
+
+# API & Networking
+httpx==0.25.2
+websockets==12.0
+python-multipart==0.0.6
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Utilities
+python-dotenv==1.0.0
+pyyaml==6.0.1
+jinja2==3.1.3
+aiofiles==23.2.1
+
+# Monitoring & Logging
+streamlit==1.30.0
+plotly==5.18.0
+pandas==2.1.4
+loguru==0.7.2
+
+# Testing & Load Generation
+pytest==7.4.4
+pytest-asyncio==0.23.3
+locust==2.20.0
+faker==22.0.0
+
+# Security
+cryptography==42.0.0
+python-multipart==0.0.6
+
+# Image Processing (for CLIP)
+Pillow==10.2.0
+

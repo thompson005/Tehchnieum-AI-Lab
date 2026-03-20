@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(wc:*)",
+      "Bash(cd:*)",
+      "Bash(docker info:*)",
+      "Bash(Start-Process \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\" 2>&1 || start \"\" \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\" 2>&1)",
+      "Bash(sleep:*)",
+      "Bash(docker version:*)",
+      "Bash(docker context:*)"
+    ]
+  }
+}

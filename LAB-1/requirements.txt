@@ -1,0 +1,51 @@
+# MedAssist AI - Complete Python Dependencies
+# For educational security training lab
+# TESTED AND VERIFIED - All versions confirmed working
+
+# ============================================
+# Web Framework
+# ============================================
+flask==3.0.3
+flask-cors==4.0.1
+flask-login==0.6.3
+werkzeug==3.0.3
+
+# ============================================
+# LLM Integration
+# ============================================
+openai>=1.12.0
+
+# ============================================
+# Database
+# ============================================
+sqlalchemy==2.0.35
+
+# ============================================
+# RAG & Embeddings
+# ============================================
+chromadb==1.4.0
+sentence-transformers==5.2.0
+# Dependencies for sentence-transformers
+torch==2.6.0
+transformers==4.57.3
+
+# ============================================
+# Security (intentionally misconfigured for lab)
+# ============================================
+python-dotenv==1.0.1
+pyjwt==2.9.0
+
+# ============================================
+# Utilities
+# ============================================
+requests==2.32.3
+beautifulsoup4==4.12.3
+markdown==3.7
+jinja2==3.1.4
+
+# ============================================
+# Development Tools (Optional)
+# ============================================
+pytest==8.3.4
+pytest-flask==1.3.0
+black==24.10.0

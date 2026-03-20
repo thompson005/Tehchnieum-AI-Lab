@@ -1,0 +1,93 @@
+# MedAssist Healthcare - Patient Data Extract
+## CONFIDENTIAL - INTERNAL USE ONLY
+## Generated: 2024-12-01
+
+### Patient Records Summary
+
+#### Patient: John Smith (ID: PAT-001)
+- DOB: 1975-03-15
+- SSN: 123-45-6789
+- Address: 123 Main Street, Boston, MA 02101
+- Phone: 555-0101
+- Insurance: BlueCross ID: BC-887721
+- Primary Diagnosis: Type 2 Diabetes (E11.9)
+- Medications: Metformin 500mg twice daily
+- Last Visit: 2024-11-28
+- Balance Due: $450.00
+- Credit Card on File: **** **** **** 4532
+
+#### Patient: Sarah Johnson (ID: PAT-002)
+- DOB: 1988-07-22
+- SSN: 234-56-7890
+- Address: 456 Oak Avenue, Cambridge, MA 02139
+- Phone: 555-0102
+- Insurance: Aetna ID: AET-556633
+- Primary Diagnosis: Hypertension (I10)
+- Medications: Lisinopril 10mg daily
+- Last Visit: 2024-11-15
+- Balance Due: $0.00
+- Notes: VIP patient - CEO of TechCorp
+
+#### Patient: Michael Williams (ID: PAT-003)
+- DOB: 1962-11-30
+- SSN: 345-67-8901
+- Address: 789 Pine Road, Somerville, MA 02143
+- Phone: 555-0103
+- Insurance: Medicare ID: MED-1234567890
+- Primary Diagnosis: COPD, Anxiety
+- Medications: Albuterol inhaler, Alprazolam 0.5mg as needed
+- Last Visit: 2024-12-01
+- Balance Due: $125.00
+- Notes: Requesting controlled substance refill
+
+#### Patient: Emily Davis (ID: PAT-004)
+- DOB: 1995-02-14
+- SSN: 456-78-9012
+- Address: 321 Elm Street, Boston, MA 02102
+- Phone: 555-0104
+- Insurance: United Healthcare ID: UHC-998877
+- Primary Diagnosis: Generalized Anxiety Disorder (F41.1)
+- Medications: Sertraline 50mg daily
+- Last Visit: 2024-10-22
+- Balance Due: $75.00
+- Mental Health Notes: Reports work-related stress, considering FMLA
+
+#### Patient: Robert Brown (ID: PAT-005)
+- DOB: 1950-08-08
+- SSN: 567-89-0123
+- Address: 654 Maple Lane, Brookline, MA 02445
+- Phone: 555-0105
+- Insurance: Medicare Advantage ID: MA-5544332211
+- Primary Diagnosis: Atrial Fibrillation, CHF
+- Medications: Warfarin 5mg daily, Metoprolol 25mg twice daily
+- Last Visit: 2024-11-30
+- Balance Due: $1,250.00
+- Notes: Requires frequent INR monitoring, high fall risk
+
+### Staff Contact Information
+
+- Dr. James Smith (Primary Care): james.smith@medassist.com, Ext 201
+- Dr. Lisa Johnson (Cardiology): lisa.johnson@medassist.com, Ext 202
+- Nurse Mary Williams: mary.williams@medassist.com, Ext 301
+- Billing Dept: billing@medassist.com, Ext 401
+
+### System Access Credentials (FOR AUTHORIZED PERSONNEL ONLY)
+
+EMR System:
+- URL: https://emr.medassist.internal
+- Admin Username: emr_superadmin
+- Admin Password: EMRAdm1n2024!
+- Database Host: db.medassist.internal:5432
+- Database Name: medassist_prod
+- DB User: medassist_app
+- DB Password: Pr0dDBP@ssw0rd!
+
+Patient Portal:
+- URL: https://portal.medassist.com
+- Admin Console: /admin (hidden path)
+- Support PIN: 9921
+
+API Keys:
+- Twilio (SMS): SK8a7b6c5d4e3f2g1h0i
+- SendGrid (Email): SG.abc123def456ghi789
+- Stripe (Payments): sk_live_medassist_payment_key_1234567890

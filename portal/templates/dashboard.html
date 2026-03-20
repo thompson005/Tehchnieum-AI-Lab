@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Technieum AI Security Labs{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Lab card colour accent strips */
+  .lab-card { transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease; }
+  .lab-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.1); transform: translateY(-3px); }
+
+  /* Stat cards */
+  .stat-card { background:#FFFFFF; border:1px solid #E5E7EB; border-radius:12px; padding:20px; }
+  .stat-value { font-size:1.75rem; font-weight:900; line-height:1; }
+  .stat-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#9CA3AF; margin-bottom:6px; }
+  .stat-sub   { font-size:0.75rem; color:#9CA3AF; margin-top:4px; }
+
+  /* Lab status pill */
+  .lab-status { display:inline-flex; align-items:center; gap:5px; font-size:0.7rem; font-weight:600;
+                padding:3px 8px; border-radius:20px; }
+  .lab-status-online  { background:#D1FAE5; color:#065F46; }
+  .lab-status-offline { background:#F3F4F6; color:#6B7280; }
+  .lab-status-checking{ background:#FEF3C7; color:#92400E; }
+
+  /* Scoring guide */
+  .score-tier { border-radius:10px; padding:14px; text-align:center; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── Page header ─────────────────────────────────────────────────────── -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900">
+      Welcome back, <span class="text-brand">{{ user.display_name }}</span>
+    </h1>
+    <p class="text-gray-500 text-sm mt-1">
+      Select a lab, exploit vulnerabilities, and submit captured flags for points.
+    </p>
+  </div>
+  <div class="flex items-center gap-2 flex-shrink-0">
+    <button onclick="openFlagModal()"
+            class="btn-primary px-4 py-2.5 shadow-sm">
+      <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"/>
+      </svg>
+      Submit Flag
+    </button>
+    <a href="{{ url_for('scoreboard') }}" class="btn-secondary px-4 py-2.5">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+      </svg>
+      Scoreboard
+    </a>
+  </div>
+</div>
+
+<!-- ── Stats row ───────────────────────────────────────────────────────── -->
+{% set total_pts = namespace(v=0) %}
+{% set total_flags = namespace(v=0) %}
+{% for lab_id, lab_scores in per_lab.items() %}
+  {% set total_pts.v = total_pts.v + lab_scores.points %}
+  {% set total_flags.v = total_flags.v + lab_scores.count %}
+{% endfor %}
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+
+  <div class="stat-card">
+    <div class="stat-label">Total Score</div>
+    <div class="stat-value text-brand">{{ total_pts.v }}</div>
+    <div class="stat-sub">points earned</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Flags Captured</div>
+    <div class="stat-value text-gray-900">{{ total_flags.v }}</div>
+    <div class="stat-sub">of 55 total flags</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Global Rank</div>
+    <div class="stat-value text-gray-900">#{{ rank }}</div>
+    <div class="stat-sub">of {{ total_players }} players</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Labs Active</div>
+    <div class="stat-value text-gray-900">{{ per_lab | length }}</div>
+    <div class="stat-sub">of 5 labs started</div>
+  </div>
+
+</div>
+
+<!-- ── Labs section ────────────────────────────────────────────────────── -->
+<div class="flex items-center justify-between mb-5">
+  <h2 class="font-bold text-gray-900 text-lg">Active Labs</h2>
+  <span class="tag">5 platforms running</span>
+</div>
+
+<div class="grid md:grid-cols-2 xl:grid-cols-3 gap-5 mb-12">
+  {% for lab_id, meta in lab_meta.items() %}
+  {% set lab_score = per_lab.get(lab_id, {'points': 0, 'count': 0}) %}
+  {% set progress_pct = ((lab_score.count / meta.total_flags) * 100) | int %}
+
+  <div class="card lab-card overflow-hidden"
+       style="border-radius:14px;">
+
+    <!-- Top accent bar -->
+    <div style="height:4px; background:linear-gradient(90deg, {{ meta.color }}, {{ meta.color }}99);"></div>
+
+    <div class="p-5">
+
+      <!-- Header row -->
+      <div class="flex items-start justify-between mb-4">
+        <div class="flex items-start gap-3">
+          <!-- Lab icon -->
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+               style="background:{{ meta.color }}18; border:1px solid {{ meta.color }}30;">
+            {{ meta.icon }}
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900 text-sm leading-tight">{{ meta.name }}</h3>
+            <p class="text-xs font-semibold mt-0.5" style="color:{{ meta.color }};">{{ meta.subtitle }}</p>
+          </div>
+        </div>
+        <!-- Status indicator -->
+        <span class="lab-status lab-status-checking" id="status-{{ lab_id }}">
+          <span class="status-checking"></span>
+          Checking…
+        </span>
+      </div>
+
+      <!-- Description -->
+      <p class="text-gray-500 text-sm leading-relaxed mb-4">{{ meta.description }}</p>
+
+      <!-- Tags row -->
+      <div class="flex flex-wrap gap-1.5 mb-4">
+        <span class="tag">{{ meta.difficulty }}</span>
+        <span class="tag">
+          <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"/>
+          </svg>
+          {{ meta.total_flags }} flags
+        </span>
+        <span class="tag font-mono">:{{ meta.port }}</span>
+      </div>
+
+      <!-- Progress -->
+      <div class="mb-4">
+        <div class="flex items-center justify-between text-xs mb-1.5">
+          <span class="text-gray-500 font-medium">Progress</span>
+          <span class="font-semibold" style="color:{{ meta.color }};">
+            {{ lab_score.count }}/{{ meta.total_flags }} flags
+          </span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:{{ progress_pct }}%; background:linear-gradient(90deg,{{ meta.color }},{{ meta.color }}aa);"></div>
+        </div>
+      </div>
+
+      <!-- Points + Launch -->
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs text-gray-400 font-medium">Points earned</p>
+          <p class="font-bold text-base" style="color:{{ meta.color }};">{{ lab_score.points }} pts</p>
+        </div>
+        <a href="http://localhost:{{ meta.port }}"
+           target="_blank"
+           class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150"
+           style="color:{{ meta.color }}; background:{{ meta.color }}15; border:1px solid {{ meta.color }}30;"
+           onmouseover="this.style.background='{{ meta.color }}25'"
+           onmouseout="this.style.background='{{ meta.color }}15'">
+          Launch Lab
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+        </a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ── Scoring guide ───────────────────────────────────────────────────── -->
+<div class="card p-6">
+  <h3 class="section-header mb-5">Point Scoring Guide</h3>
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+
+    <div class="score-tier" style="background:#F0FDF4; border:1px solid #BBF7D0;">
+      <span class="badge badge-easy mb-2">Easy</span>
+      <p class="text-3xl font-black" style="color:#065F46;">100</p>
+      <p class="text-xs text-gray-500 mt-1">pts per flag</p>
+    </div>
+
+    <div class="score-tier" style="background:#FFFBEB; border:1px solid #FDE68A;">
+      <span class="badge badge-medium mb-2">Medium</span>
+      <p class="text-3xl font-black" style="color:#92400E;">250</p>
+      <p class="text-xs text-gray-500 mt-1">pts per flag</p>
+    </div>
+
+    <div class="score-tier" style="background:#FFF7ED; border:1px solid #FED7AA;">
+      <span class="badge badge-hard mb-2">Hard</span>
+      <p class="text-3xl font-black" style="color:#9A3412;">500</p>
+      <p class="text-xs text-gray-500 mt-1">pts per flag</p>
+    </div>
+
+    <div class="score-tier" style="background:#FFF1F2; border:1px solid #FECDD3;">
+      <span class="badge badge-expert mb-2">Expert</span>
+      <p class="text-3xl font-black" style="color:#991B1B;">1000</p>
+      <p class="text-xs text-gray-500 mt-1">pts per flag</p>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Check lab status by hitting each lab's health endpoint
+const labs = [
+  {% for lab_id, meta in lab_meta.items() %}
+  { id: '{{ lab_id }}', port: {{ meta.port }} },
+  {% endfor %}
+];
+
+async function checkLabStatus(lab) {
+  const el = document.getElementById('status-' + lab.id);
+  if (!el) return;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(`http://localhost:${lab.port}/api/health`, {
+      signal: controller.signal,
+      mode: 'no-cors'
+    });
+    clearTimeout(timeout);
+    el.className = 'lab-status lab-status-online';
+    el.innerHTML = '<span class="status-online"></span>Online';
+  } catch (e) {
+    // no-cors fetch always "succeeds" (opaque response) if server is up
+    // but AbortError means it timed out or refused
+    if (e.name === 'AbortError') {
+      el.className = 'lab-status lab-status-offline';
+      el.innerHTML = '<span class="status-offline"></span>Offline';
+    } else {
+      // Network error = likely offline
+      el.className = 'lab-status lab-status-offline';
+      el.innerHTML = '<span class="status-offline"></span>Offline';
+    }
+  }
+}
+
+// Stagger checks so we don't hammer all at once
+labs.forEach((lab, i) => {
+  setTimeout(() => checkLabStatus(lab), i * 400);
+});
+</script>
+{% endblock %}

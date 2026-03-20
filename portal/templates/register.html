@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Register — Technieum AI Security Labs{% endblock %}
+{% block main_class %}flex items-center justify-center min-h-[calc(100vh-64px)] px-4 py-10{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-md mx-auto">
+
+  <!-- Header -->
+  <div class="text-center mb-7">
+    <div class="inline-flex items-center gap-3 mb-4">
+      <div class="w-10 h-10 brand-gradient rounded-xl flex items-center justify-center shadow-sm">
+        <span class="text-white font-black">T</span>
+      </div>
+      <span class="font-black text-xl tracking-[0.15em] text-gray-900">TECHNIEUM</span>
+    </div>
+    <p class="text-gray-500 text-sm">Create your competitor profile to start hacking</p>
+  </div>
+
+  <!-- Card -->
+  <div class="card p-8">
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-900">Create account</h2>
+      <p class="text-gray-500 text-sm mt-1">Join the AI Security Lab CTF</p>
+    </div>
+
+    {% if error %}
+    <div class="alert-error mb-5">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('register') }}" class="space-y-4">
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="display_name">
+          Display Name <span style="color:#FF6B00;">*</span>
+        </label>
+        <input id="display_name" name="display_name" type="text" required
+               class="input-field"
+               placeholder="Hacker Name" />
+        <p class="text-xs text-gray-400 mt-1">This is shown on the scoreboard</p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="username">
+          Username <span style="color:#FF6B00;">*</span>
+        </label>
+        <input id="username" name="username" type="text" required autocomplete="username"
+               class="input-field"
+               placeholder="unique_handle" />
+        <p class="text-xs text-gray-400 mt-1">Min. 3 characters, used to log in</p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="team">
+          Team / Organisation
+          <span class="text-xs font-normal text-gray-400 ml-1">(optional)</span>
+        </label>
+        <input id="team" name="team" type="text"
+               class="input-field"
+               placeholder="Company · University · Solo" />
+      </div>
+
+      <!-- Divider -->
+      <div class="pt-1 pb-1">
+        <hr class="divider" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="password">
+          Password <span style="color:#FF6B00;">*</span>
+        </label>
+        <input id="password" name="password" type="password" required autocomplete="new-password"
+               class="input-field"
+               placeholder="Min. 6 characters" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="confirm_password">
+          Confirm Password <span style="color:#FF6B00;">*</span>
+        </label>
+        <input id="confirm_password" name="confirm_password" type="password" required
+               class="input-field"
+               placeholder="Repeat your password" />
+      </div>
+
+      <div class="pt-2">
+        <button type="submit"
+                class="btn-primary w-full py-2.5 shadow-sm"
+                style="font-size:0.9rem;">
+          Create Account &nbsp;→
+        </button>
+      </div>
+    </form>
+
+    <div class="mt-6 pt-5 text-center" style="border-top:1px solid #F3F4F6;">
+      <p class="text-gray-500 text-sm">
+        Already registered?
+        <a href="{{ url_for('login') }}" class="font-semibold ml-1 hover:underline" style="color:#FF6B00;">
+          Sign in
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Warning -->
+  <p class="text-center text-xs text-gray-400 mt-4 font-mono">
+    ⚠ This environment contains intentional AI security vulnerabilities.
+    Authorized participants only.
+  </p>
+
+</div>
+{% endblock %}

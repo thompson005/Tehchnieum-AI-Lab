@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block title %}Scoreboard — Technieum AI Security Labs{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Podium cards */
+  .podium-card {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+  }
+  .podium-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+  .podium-card-current { box-shadow: 0 0 0 2px #FF6B00; }
+
+  /* Rank badge */
+  .rank-badge {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  /* Lab colour dots in flags table */
+  .lab-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.7rem; font-weight: 700; padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  /* You badge */
+  .you-badge {
+    display: inline-block; font-size: 0.65rem; font-weight: 800;
+    padding: 1px 7px; border-radius: 20px;
+    background: #FFF7ED; color: #FF6B00; border: 1px solid #FDBA74;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-left: 6px;
+  }
+
+  /* Highlighted current user row */
+  tr.current-user-row { background: #FFF7ED !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── Page header ─────────────────────────────────────────────────────── -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-2xl font-bold text-gray-900">
+      Live <span class="text-brand">Scoreboard</span>
+    </h1>
+    <p class="text-gray-500 text-sm mt-1 font-mono">
+      Auto-refreshes every 30 s &nbsp;·&nbsp; {{ board | length }} registered players
+    </p>
+  </div>
+  <div class="flex items-center gap-2 flex-shrink-0">
+    <button onclick="openFlagModal()"
+            class="btn-primary px-4 py-2.5 shadow-sm">
+      <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"/>
+      </svg>
+      Submit Flag
+    </button>
+    <a href="{{ url_for('dashboard') }}" class="btn-secondary px-4 py-2.5">
+      ← Dashboard
+    </a>
+  </div>
+</div>
+
+<!-- ── Top 3 Podium ────────────────────────────────────────────────────── -->
+{% if board | length >= 1 %}
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+
+  {% set medals = [
+    {'emoji':'🥇','label':'1st Place','color':'#F59E0B','bg':'#FFFBEB','border':'#FDE68A'},
+    {'emoji':'🥈','label':'2nd Place','color':'#9CA3AF','bg':'#F9FAFB','border':'#E5E7EB'},
+    {'emoji':'🥉','label':'3rd Place','color':'#CD7F32','bg':'#FDF6EE','border':'#FCD9A8'},
+  ] %}
+
+  {% for i in range([board | length, 3] | min) %}
+  {% set entry = board[i] %}
+  {% set medal = medals[i] %}
+  <div class="podium-card {% if entry.is_current %}podium-card-current{% endif %}"
+       style="border-color:{{ medal.border }}; background:{{ medal.bg }};">
+    <div class="absolute top-0 left-0 right-0 h-1" style="background:{{ medal.color }};"></div>
+
+    <p class="text-2xl mb-3">{{ medal.emoji }}</p>
+    <div class="w-14 h-14 rounded-full mx-auto flex items-center justify-center text-white font-black text-lg mb-3 shadow-sm"
+         style="background:{{ medal.color }};">
+      {{ entry.display_name[0].upper() }}
+    </div>
+    <p class="font-bold text-gray-900">
+      {{ entry.display_name }}
+      {% if entry.is_current %}<span class="you-badge">You</span>{% endif %}
+    </p>
+    {% if entry.team %}
+    <p class="text-gray-500 text-xs mt-0.5">{{ entry.team }}</p>
+    {% endif %}
+    <p class="text-3xl font-black mt-3" style="color:{{ medal.color }};">
+      {{ entry.total_points }}
+    </p>
+    <p class="text-gray-400 text-xs mt-1">{{ entry.flags_captured }} flags captured</p>
+    <p class="text-xs font-semibold mt-1" style="color:{{ medal.color }};">{{ medal.label }}</p>
+  </div>
+  {% endfor %}
+
+</div>
+{% endif %}
+
+<!-- ── Full rankings table ─────────────────────────────────────────────── -->
+<div class="card overflow-hidden mb-10">
+  <!-- Table header bar -->
+  <div class="flex items-center justify-between px-5 py-3.5" style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
+    <h2 class="section-header mb-0">Full Rankings</h2>
+    <span class="text-xs text-gray-400 font-mono" id="lastUpdate">Live</span>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:60px;">Rank</th>
+          <th>Player</th>
+          <th class="hidden sm:table-cell">Team</th>
+          <th class="text-right">Score</th>
+          <th class="text-right">Flags</th>
+          <th class="text-right hidden md:table-cell">Last Solve</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in board %}
+        <tr class="{% if entry.is_current %}current-user-row{% endif %}">
+
+          <!-- Rank -->
+          <td>
+            {% if entry.rank == 1 %}
+            <span class="rank-badge" style="background:#FEF3C7; color:#92400E;">🥇</span>
+            {% elif entry.rank == 2 %}
+            <span class="rank-badge" style="background:#F3F4F6; color:#6B7280;">🥈</span>
+            {% elif entry.rank == 3 %}
+            <span class="rank-badge" style="background:#FDF6EE; color:#CD7F32;">🥉</span>
+            {% else %}
+            <span class="font-mono text-sm text-gray-400 font-semibold">#{{ entry.rank }}</span>
+            {% endif %}
+          </td>
+
+          <!-- Player -->
+          <td>
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 brand-gradient rounded-full flex items-center justify-center text-white text-xs font-black shadow-sm flex-shrink-0">
+                {{ entry.display_name[0].upper() }}
+              </div>
+              <div>
+                <span class="font-semibold text-gray-900 text-sm">{{ entry.display_name }}</span>
+                {% if entry.is_current %}<span class="you-badge">You</span>{% endif %}
+                <p class="text-gray-400 text-xs">@{{ entry.username }}</p>
+              </div>
+            </div>
+          </td>
+
+          <!-- Team -->
+          <td class="hidden sm:table-cell text-gray-500 text-sm">{{ entry.team or '—' }}</td>
+
+          <!-- Score -->
+          <td class="text-right">
+            <span class="font-mono font-bold text-brand text-sm">{{ entry.total_points }}</span>
+          </td>
+
+          <!-- Flags -->
+          <td class="text-right">
+            <span class="font-semibold text-gray-700 text-sm">{{ entry.flags_captured }}</span>
+          </td>
+
+          <!-- Last solve -->
+          <td class="text-right hidden md:table-cell">
+            <span class="text-gray-400 text-xs font-mono">
+              {{ entry.last_submission[:16].replace('T',' ') if entry.last_submission else '—' }}
+            </span>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="py-14 text-center text-gray-400 text-sm">
+            No scores yet — be the first to capture a flag!
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── My captured flags ───────────────────────────────────────────────── -->
+{% if user_flags %}
+<div class="card overflow-hidden">
+  <!-- Header bar -->
+  <div class="px-5 py-3.5 flex items-center justify-between" style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;">
+    <h2 class="section-header mb-0">My Captured Flags</h2>
+    <span class="text-xs font-semibold text-gray-500">{{ user_flags | length }} flags</span>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Flag Name</th>
+          <th>Lab</th>
+          <th>Tier</th>
+          <th class="text-right">Points</th>
+          <th class="text-right hidden md:table-cell">Solved At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set lab_info = {
+          'lab1': {'name':'MedAssist','color':'#EF4444','bg':'#FEF2F2'},
+          'lab2': {'name':'SecureBank','color':'#3B82F6','bg':'#EFF6FF'},
+          'lab3': {'name':'ShopSec','color':'#8B5CF6','bg':'#F5F3FF'},
+          'lab4': {'name':'TravelNest','color':'#0EA5E9','bg':'#F0F9FF'},
+          'lab5': {'name':'GovConnect','color':'#10B981','bg':'#ECFDF5'},
+        } %}
+        {% for f in user_flags %}
+        {% set li = lab_info.get(f.lab, {'name': f.lab, 'color':'#6B7280','bg':'#F3F4F6'}) %}
+        <tr>
+          <td class="font-medium text-gray-900 text-sm">{{ f.flag_name }}</td>
+          <td>
+            <span class="lab-pill"
+                  style="background:{{ li.bg }}; color:{{ li.color }}; border:1px solid {{ li.color }}33;">
+              {{ li.name }}
+            </span>
+          </td>
+          <td>
+            <span class="badge badge-{{ f.tier | lower }}">{{ f.tier }}</span>
+          </td>
+          <td class="text-right">
+            <span class="font-mono font-bold text-sm" style="color:#FF6B00;">+{{ f.points }}</span>
+          </td>
+          <td class="text-right hidden md:table-cell">
+            <span class="text-gray-400 text-xs font-mono">
+              {{ f.submitted_at[:16].replace('T',' ') }}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<!-- Empty state -->
+<div class="card p-10 text-center">
+  <div class="w-14 h-14 brand-gradient rounded-2xl flex items-center justify-center mx-auto mb-4 opacity-80">
+    <svg class="w-7 h-7 text-white" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"/>
+    </svg>
+  </div>
+  <h3 class="font-bold text-gray-900 mb-1">No flags yet</h3>
+  <p class="text-gray-500 text-sm mb-4">Start exploring the labs and submit your first flag to appear here.</p>
+  <a href="{{ url_for('dashboard') }}" class="btn-primary px-5 py-2 inline-flex" style="border-radius:8px;">
+    Go to Labs →
+  </a>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<meta http-equiv="refresh" content="30" />
+<script>
+  document.getElementById('lastUpdate').textContent =
+    'Updated: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+</script>
+{% endblock %}

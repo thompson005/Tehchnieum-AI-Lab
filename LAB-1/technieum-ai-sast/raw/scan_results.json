@@ -1,0 +1,261 @@
+{
+  "summary": {
+    "total_candidates": 4,
+    "confirmed_vulnerabilities": 7,
+    "false_positives": -3,
+    "by_severity": {
+      "CRITICAL": 2,
+      "HIGH": 4,
+      "MEDIUM": 1,
+      "LOW": 0
+    },
+    "by_type": {
+      "CWE-89": 1,
+      "CWE-798": 1,
+      "Broken Access Control / IDOR": 1,
+      "Business Logic Error": 1,
+      "BROKEN_ACCESS CONTROL": 1,
+      "BROKEN ACCESS CONTROL": 1,
+      "BUSINESS LOGIC ERROR": 1
+    }
+  },
+  "vulnerabilities": [
+    {
+      "id": "CVE-GENERIC-SQLI",
+      "type": "CWE-89",
+      "source": {
+        "code": "[CVE Pattern Match]",
+        "location": {
+          "line": 331,
+          "file": "tools/tool_executor.py"
+        }
+      },
+      "sink": {
+        "code": "cursor.execute(f\"SELECT * FROM {table}\")",
+        "location": {
+          "line": 331,
+          "file": "tools/tool_executor.py"
+        }
+      },
+      "code_slice": "cursor.execute(f\"SELECT * FROM {table}\")",
+      "gnn_confidence": 0.5,
+      "llm_verdict": "VULNERABLE",
+      "llm_reasoning": "1. **Verdict:** VULNERABLE\n\n2. **Simple Explanation:** The code directly uses user input to construct a SQL query without any validation or sanitization, making it susceptible to SQL injection attacks. This is dangerous because an attacker could manipulate the input to execute arbitrary SQL commands.\n\n3. **Technical Details:** The code slice shows that the variable `table` is directly interpolated into the SQL query string within the `cursor.execute()` function. There is no indication of any validation or sanitization of the `table` variable before it reaches this point, allowing an attacker to control its value. For example, if an attacker provides a value like `users; DROP TABLE users; --`, they could potentially execute harmful SQL commands.\n\n4. **Impact:** An attacker could exploit this vulnerability to execute arbitrary SQL commands, which could lead to data leakage, data modification, or even complete database destruction (RCE - Remote Code Execution, depending on the database configuration).\n\n5. **Remediation:** To fix this issue, use parameterized queries or prepared statements instead of string interpolation. For example, if using a library like `sqlite3`, the query should be constructed as follows:\n   ```python\n   cursor.execute(\"SELECT * FROM ?\", (table,))\n   ```\n   Additionally, ensure that the `table` variable is validated against a whitelist of allowed table names.\n\n6. **Severity:** CRITICAL\n\n7. **Exploitation:** An attacker could exploit this vulnerability by providing a malicious input for the `table` variable, such as `users; DROP TABLE users; --`, which would execute the DROP TABLE command, leading to data loss or corruption.",
+      "confirmed": false,
+      "poc": null,
+      "poc_result": "SANDBOX_DISABLED - PoC generated but not executed",
+      "severity": "CRITICAL",
+      "confidence_analysis": {
+        "score": 0.7999999999999999,
+        "signals": [
+          [
+            "no_sanitization",
+            0.2
+          ],
+          [
+            "no_validation",
+            0.1
+          ],
+          [
+            "indirect_flow",
+            -0.25
+          ],
+          [
+            "dangerous_sink",
+            0.25
+          ]
+        ],
+        "likely_fp": false,
+        "fp_reason": null
+      },
+      "fp_filtered": false,
+      "is_confirmed": true,
+      "poc_code": "import sqlite3\nimport pytest\n\n# Setup a test database and create a vulnerable function\ndef create_vulnerable_db():\n    conn = sqlite3.connect(':memory:')  # Use in-memory database for testing\n    cursor = conn.cursor()\n    cursor.execute(\"CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)\")\n    cursor.execute(\"INSERT INTO users (name) VALUES ('Alice'), ('Bob')\")\n    conn.commit()\n    return conn\n\ndef vulnerable_query(conn, table):\n    cursor = conn.cursor()\n    # Vulnerable SQL execution\n    cursor.execute(f\"SELECT * FROM {table}\")\n    return cursor.fetchall()\n\n# Define the test case\ndef test_sql_injection():\n    # Setup the vulnerable database\n    conn = create_vulnerable_db()\n    \n    # Malicious input to exploit the SQL injection vulnerability\n    malicious_table_name = \"users; DROP TABLE users; --\"\n    \n    # Execute the vulnerable query with the malicious input\n    with pytest.raises(sqlite3.OperationalError):\n        vulnerable_query(conn, malicious_table_name)\n    \n    # Cleanup: close the connection\n    conn.close()\n\n# To run the test, use the command: pytest -q --tb=short <filename>.py"
+    },
+    {
+      "id": "CVE-GENERIC-HARDCODED-SECRET",
+      "type": "CWE-798",
+      "source": {
+        "code": "[CVE Pattern Match]",
+        "location": {
+          "line": 111,
+          "file": "app.py"
+        }
+      },
+      "sink": {
+        "code": "query = f\"SELECT * FROM users WHERE username='{username}' AND password='{password}'\"",
+        "location": {
+          "line": 111,
+          "file": "app.py"
+        }
+      },
+      "code_slice": "query = f\"SELECT * FROM users WHERE username='{username}' AND password='{password}'\"",
+      "gnn_confidence": 0.45,
+      "llm_verdict": "VULNERABLE",
+      "llm_reasoning": "1. **Verdict:** VULNERABLE\n\n2. **Simple Explanation:** The code directly incorporates user input into a SQL query without any sanitization, making it susceptible to SQL injection attacks. This is dangerous because an attacker could manipulate the input to gain unauthorized access to the database.\n\n3. **Technical Details:** The user input for `username` and `password` is directly used in the SQL query without any validation or sanitization. This means that if an attacker provides a specially crafted input, they can alter the SQL command's structure. For example, if the attacker inputs `username=' OR '1'='1` and any password, the resulting query would always return true, potentially allowing unauthorized access to user data.\n\n4. **Impact:** An attacker could exploit this vulnerability to perform SQL injection, which may lead to unauthorized access to sensitive user data, data manipulation, or even complete database compromise.\n\n5. **Remediation:** To fix this issue, use parameterized queries or prepared statements instead of directly interpolating user input into SQL queries. For example, using a library like `sqlite3` or `psycopg2` in Python, you can write the query as follows:\n   ```python\n   cursor.execute(\"SELECT * FROM users WHERE username=%s AND password=%s\", (username, password))\n   ```\n\n6. **Severity:** CRITICAL\n\n7. **Exploitation:** An attacker could exploit this vulnerability by crafting a malicious input for `username` or `password` that alters the SQL query's logic, allowing them to bypass authentication or retrieve sensitive information from the database. For instance, using `username=' OR '1'='1` would allow them to log in without valid credentials.",
+      "confirmed": false,
+      "poc": null,
+      "poc_result": "SANDBOX_DISABLED - PoC generated but not executed",
+      "severity": "CRITICAL",
+      "confidence_analysis": {
+        "score": 0.5499999999999999,
+        "signals": [
+          [
+            "no_sanitization",
+            0.2
+          ],
+          [
+            "no_validation",
+            0.1
+          ],
+          [
+            "indirect_flow",
+            -0.25
+          ]
+        ],
+        "likely_fp": false,
+        "fp_reason": null
+      },
+      "fp_filtered": false,
+      "is_confirmed": true,
+      "poc_code": "import sqlite3\nimport pytest\n\n# Setup a simple in-memory SQLite database for testing\n@pytest.fixture\ndef setup_database():\n    # Create an in-memory SQLite database\n    conn = sqlite3.connect(':memory:')\n    cursor = conn.cursor()\n    \n    # Create a users table\n    cursor.execute('''\n        CREATE TABLE users (\n            id INTEGER PRIMARY KEY,\n            username TEXT NOT NULL,\n            password TEXT NOT NULL\n        )\n    ''')\n    \n    # Insert a test user\n    cursor.execute(\"INSERT INTO users (username, password) VALUES ('testuser', 'testpass')\")\n    conn.commit()\n    \n    yield conn  # Provide the database connection to the test\n    \n    # Cleanup: close the database connection\n    conn.close()\n\n# Test to demonstrate SQL injection vulnerability\ndef test_sql_injection(setup_database):\n    conn = setup_database\n    cursor = conn.cursor()\n    \n    # Vulnerable SQL query execution\n    username = \"' OR '1'='1\"  # Malicious input\n    password = \"anything\"      # Any password\n    \n    # Execute the vulnerable query\n    cursor.execute(f\"SELECT * FROM users WHERE username='{username}' AND password='{password}'\")\n    \n    # Fetch the results\n    results = cursor.fetchall()\n    \n    # Assert that the malicious input returns the test user, demonstrating the vulnerability\n    assert len(results) == 1  # We should get the test user back\n    assert results[0][1] == 'testuser'  # Check that the username is as expected"
+    },
+    {
+      "id": "DEEP-1",
+      "type": "Broken Access Control / IDOR",
+      "source": {
+        "code": "[Deep Scan - Full File Analysis]",
+        "location": {
+          "line": 116,
+          "file": "venv/lib/python3.13/site-packages/jwt/api_jwt.py"
+        }
+      },
+      "sink": {
+        "code": "N/A",
+        "location": {
+          "line": 116,
+          "file": "venv/lib/python3.13/site-packages/jwt/api_jwt.py"
+        }
+      },
+      "code_slice": "from __future__ import annotations\n\nimport json\nimport warnings\nfrom calendar import timegm\nfrom collections.abc import Iterable\nfrom datetime import datetime, timedelta, timezone\nfrom typing import TYPE_CHECKING, Any, List\n\nfrom . import api_jws\nfrom .exceptions import (\n    DecodeError,\n    ExpiredSignatureError,\n    ImmatureSignatureError,\n    InvalidAudienceError,\n    InvalidIssuedAtError,\n    InvalidIssuerError,\n    MissingRequiredClaimError,\n)\nfrom .warnings import RemovedInPyjwt3Warning\n\n...",
+      "gnn_confidence": 1.0,
+      "llm_verdict": "VULNERABLE",
+      "llm_reasoning": "The decode and decode_complete methods do not enforce any authorization checks on the key parameter, allowing unauthorized users to potentially decode JWTs that they should not have access to.",
+      "confirmed": true,
+      "poc": null,
+      "poc_result": "SANDBOX_DISABLED - PoC generated but not executed",
+      "severity": "HIGH",
+      "poc_code": "import pytest\nimport jwt\n\n# Sample secret key for signing JWTs\nSECRET_KEY = \"supersecretkey\"\n\n# Sample payload that would be encoded in the JWT\npayload = {\n    \"user_id\": 123,\n    \"role\": \"admin\"\n}\n\n# Create a valid JWT token\nvalid_token = jwt.encode(payload, SECRET_KEY, algorithm=\"HS256\")\n\n# Create a malicious token that tries to access another user's data\nmalicious_payload = {\n    \"user_id\": 456,  # This user_id does not belong to the attacker\n    \"role\": \"user\"\n}\nmalicious_token = jwt.encode(malicious_payload, SECRET_KEY, algorithm=\"HS256\")\n\ndef test_jwt_decoding_without_authorization_check():\n    # Attempt to decode the valid token\n    decoded_valid_token = jwt.decode(valid_token, SECRET_KEY, algorithms=[\"HS256\"])\n    \n    # Assert that the valid token decodes correctly\n    assert decoded_valid_token[\"user_id\"] == 123\n    assert decoded_valid_token[\"role\"] == \"admin\"\n\n    # Attempt to decode the malicious token\n    decoded_malicious_token = jwt.decode(malicious_token, SECRET_KEY, algorithms=[\"HS256\"])\n    \n    # Assert that the malicious token decodes correctly\n    # This demonstrates that the vulnerability exists as it allows unauthorized access\n    assert decoded_malicious_token[\"user_id\"] == 456\n    assert decoded_malicious_token[\"role\"] == \"user\"\n\n# Cleanup code is not necessary in this case as no resources are allocated"
+    },
+    {
+      "id": "DEEP-2",
+      "type": "Business Logic Error",
+      "source": {
+        "code": "[Deep Scan - Full File Analysis]",
+        "location": {
+          "line": 98,
+          "file": "venv/lib/python3.13/site-packages/jwt/api_jwt.py"
+        }
+      },
+      "sink": {
+        "code": "N/A",
+        "location": {
+          "line": 98,
+          "file": "venv/lib/python3.13/site-packages/jwt/api_jwt.py"
+        }
+      },
+      "code_slice": "from __future__ import annotations\n\nimport json\nimport warnings\nfrom calendar import timegm\nfrom collections.abc import Iterable\nfrom datetime import datetime, timedelta, timezone\nfrom typing import TYPE_CHECKING, Any, List\n\nfrom . import api_jws\nfrom .exceptions import (\n    DecodeError,\n    ExpiredSignatureError,\n    ImmatureSignatureError,\n    InvalidAudienceError,\n    InvalidIssuedAtError,\n    InvalidIssuerError,\n    MissingRequiredClaimError,\n)\nfrom .warnings import RemovedInPyjwt3Warning\n\n...",
+      "gnn_confidence": 1.0,
+      "llm_verdict": "VULNERABLE",
+      "llm_reasoning": "The decode_complete method allows the verification options to be bypassed by setting verify_signature to False, which could lead to accepting invalid or tampered JWTs without proper validation.",
+      "confirmed": true,
+      "poc": null,
+      "poc_result": "SANDBOX_DISABLED - PoC generated but not executed",
+      "severity": "HIGH",
+      "poc_code": "import pytest\nimport jwt\n\n# Test case for the business logic error in JWT verification\nclass TestJWTVerificationBypass:\n    @pytest.fixture(autouse=True)\n    def setup(self):\n        # Setup code: Create a valid JWT token\n        self.secret = 'my_secret'\n        self.valid_payload = {'user_id': 123, 'role': 'admin'}\n        self.token = jwt.encode(self.valid_payload, self.secret, algorithm='HS256')\n\n    def test_verify_signature_bypass(self):\n        # Attempt to decode the token with verify_signature set to False\n        decoded_payload = jwt.decode(self.token, self.secret, algorithms=['HS256'], options={\"verify_signature\": False})\n\n        # Assert that the decoded payload is equal to the original payload\n        assert decoded_payload == self.valid_payload, \"Vulnerability exists: Signature verification bypassed\"\n\n    @pytest.fixture(autouse=True)\n    def cleanup(self):\n        # Cleanup code: Not needed in this case, but included for completeness\n        pass"
+    },
+    {
+      "id": "DEEP-3",
+      "type": "BROKEN_ACCESS CONTROL",
+      "source": {
+        "code": "[Deep Scan - Full File Analysis]",
+        "location": {
+          "line": 45,
+          "file": "venv/lib/python3.13/site-packages/jwt/api_jws.py"
+        }
+      },
+      "sink": {
+        "code": "N/A",
+        "location": {
+          "line": 45,
+          "file": "venv/lib/python3.13/site-packages/jwt/api_jws.py"
+        }
+      },
+      "code_slice": "from __future__ import annotations\n\nimport binascii\nimport json\nimport warnings\nfrom typing import TYPE_CHECKING, Any\n\nfrom .algorithms import (\n    Algorithm,\n    get_default_algorithms,\n    has_crypto,\n    requires_cryptography,\n)\nfrom .api_jwk import PyJWK\nfrom .exceptions import (\n    DecodeError,\n    InvalidAlgorithmError,\n    InvalidSignatureError,\n    InvalidTokenError,\n)\nfrom .utils import base64url_decode, base64url_encode\nfrom .warnings import RemovedInPyjwt3Warning\n\nif TYPE_CHECKING:\n...",
+      "gnn_confidence": 1.0,
+      "llm_verdict": "VULNERABLE",
+      "llm_reasoning": "The `register_algorithm` and `unregister_algorithm` methods do not have any authorization checks, allowing any user to register or unregister algorithms, which could lead to the use of insecure algorithms.",
+      "confirmed": true,
+      "poc": null,
+      "poc_result": "SANDBOX_DISABLED - PoC generated but not executed",
+      "severity": "HIGH",
+      "poc_code": "import pytest\nfrom jwt.api_jwk import PyJWK\nfrom jwt.exceptions import InvalidAlgorithmError\n\n# Test class to demonstrate the broken access control vulnerability\nclass TestBrokenAccessControl:\n    @pytest.fixture(autouse=True)\n    def setup_and_teardown(self):\n        # Setup: Create a PyJWK instance to manipulate algorithms\n        self.jwk = PyJWK()\n\n        # Ensure the default algorithms are set\n        self.default_algorithms = self.jwk.get_default_algorithms()\n\n        yield  # This will run the tests\n\n        # Cleanup: Reset the algorithms to default after tests\n        self.jwk.unregister_algorithm('insecure_algorithm')\n\n    def test_register_insecure_algorithm(self):\n        # Exploit: Register an insecure algorithm without authorization\n        self.jwk.register_algorithm('insecure_algorithm', 'some_insecure_function')\n\n        # Verify that the insecure algorithm is now registered\n        assert 'insecure_algorithm' in self.jwk.get_default_algorithms()\n\n    def test_unregister_algorithm(self):\n        # First, register the insecure algorithm\n        self.jwk.register_algorithm('insecure_algorithm', 'some_insecure_function')\n\n        # Now, unregister the insecure algorithm\n        self.jwk.unregister_algorithm('insecure_algorithm')\n\n        # Verify that the insecure algorithm is no longer registered\n        assert 'insecure_algorithm' not in self.jwk.get_default_algorithms()\n\n    def test_invalid_algorithm_usage(self):\n        # Attempt to use an invalid algorithm\n        with pytest.raises(InvalidAlgorithmError):\n            self.jwk.get_algorithm('non_existent_algorithm')"
+    },
+    {
+      "id": "DEEP-4",
+      "type": "BROKEN ACCESS CONTROL",
+      "source": {
+        "code": "[Deep Scan - Full File Analysis]",
+        "location": {
+          "line": 113,
+          "file": "venv/lib/python3.13/site-packages/jwt/api_jws.py"
+        }
+      },
+      "sink": {
+        "code": "N/A",
+        "location": {
+          "line": 113,
+          "file": "venv/lib/python3.13/site-packages/jwt/api_jws.py"
+        }
+      },
+      "code_slice": "from __future__ import annotations\n\nimport binascii\nimport json\nimport warnings\nfrom typing import TYPE_CHECKING, Any\n\nfrom .algorithms import (\n    Algorithm,\n    get_default_algorithms,\n    has_crypto,\n    requires_cryptography,\n)\nfrom .api_jwk import PyJWK\nfrom .exceptions import (\n    DecodeError,\n    InvalidAlgorithmError,\n    InvalidSignatureError,\n    InvalidTokenError,\n)\nfrom .utils import base64url_decode, base64url_encode\nfrom .warnings import RemovedInPyjwt3Warning\n\nif TYPE_CHECKING:\n...",
+      "gnn_confidence": 1.0,
+      "llm_verdict": "VULNERABLE",
+      "llm_reasoning": "The `decode_complete` method allows any user to decode JWTs without verifying their authorization to access the payload, potentially exposing sensitive information.",
+      "confirmed": true,
+      "poc": null,
+      "poc_result": "SANDBOX_DISABLED - PoC generated but not executed",
+      "severity": "HIGH",
+      "poc_code": "import pytest\nimport jwt\n\n# Sample JWT secret and payload\nSECRET = \"my_secret\"\nPAYLOAD = {\"user_id\": 1, \"role\": \"admin\"}\n\n# Create a valid JWT token\ndef create_jwt(payload: dict) -> str:\n    return jwt.encode(payload, SECRET, algorithm=\"HS256\")\n\n# Test case for the broken access control vulnerability\ndef test_broken_access_control():\n    # Step 1: Setup - Create a valid JWT token\n    valid_token = create_jwt(PAYLOAD)\n\n    # Step 2: Exploit - Decode the JWT without verifying the signature\n    decoded_payload = jwt.decode(valid_token, options={\"verify_signature\": False})\n\n    # Step 3: Assertions - Verify that the decoded payload exposes sensitive information\n    assert decoded_payload[\"user_id\"] == 1  # User ID should be accessible\n    assert decoded_payload[\"role\"] == \"admin\"  # Role should be accessible\n\n# Cleanup code if needed (none in this case)\n\n# To run the test, use the command: pytest -q --tb=short this_file.py"
+    },
+    {
+      "id": "DEEP-5",
+      "type": "BUSINESS LOGIC ERROR",
+      "source": {
+        "code": "[Deep Scan - Full File Analysis]",
+        "location": {
+          "line": 115,
+          "file": "venv/lib/python3.13/site-packages/jwt/api_jws.py"
+        }
+      },
+      "sink": {
+        "code": "N/A",
+        "location": {
+          "line": 115,
+          "file": "venv/lib/python3.13/site-packages/jwt/api_jws.py"
+        }
+      },
+      "code_slice": "from __future__ import annotations\n\nimport binascii\nimport json\nimport warnings\nfrom typing import TYPE_CHECKING, Any\n\nfrom .algorithms import (\n    Algorithm,\n    get_default_algorithms,\n    has_crypto,\n    requires_cryptography,\n)\nfrom .api_jwk import PyJWK\nfrom .exceptions import (\n    DecodeError,\n    InvalidAlgorithmError,\n    InvalidSignatureError,\n    InvalidTokenError,\n)\nfrom .utils import base64url_decode, base64url_encode\nfrom .warnings import RemovedInPyjwt3Warning\n\nif TYPE_CHECKING:\n...",
+      "gnn_confidence": 1.0,
+      "llm_verdict": "VULNERABLE",
+      "llm_reasoning": "The `decode_complete` method allows for the `detached_payload` to be passed in without validation of its origin, which could lead to a situation where an attacker can manipulate the payload being decoded.",
+      "confirmed": true,
+      "poc": null,
+      "poc_result": null,
+      "severity": "MEDIUM"
+    }
+  ],
+  "source_path": ".",
+  "repo_url": null,
+  "language": "auto"
+}
