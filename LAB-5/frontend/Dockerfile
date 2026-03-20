@@ -12,6 +12,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV RUNNING_IN_DOCKER=true
 RUN npm run build
+RUN mkdir -p /app/public
 
 FROM node:20-alpine AS runner
 WORKDIR /app

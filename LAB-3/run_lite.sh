@@ -9,7 +9,7 @@ echo "🚀 Starting ShopSec-AI in Lite Mode..."
 echo "📦 Setting up environment..."
 source venv/bin/activate
 export DATABASE_URL="sqlite:///$(pwd)/shopsec.db"
-export OPENAI_API_KEY="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"
+export OPENAI_API_KEY="${OPENAI_API_KEY:-sk-replace-with-real-openai-key}"
 export OLLAMA_BASE_URL="http://mock-ollama" # Ignored when OpenAI Key is present
 export ENABLE_GUARDRAILS="false"
 export LOG_LEVEL="INFO"
