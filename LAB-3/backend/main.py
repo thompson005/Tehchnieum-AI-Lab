@@ -106,7 +106,7 @@ async def chat(request: ChatRequest):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{AGENT_SERVICE_URL}/chat",
+                f"{AGENT_SERVICE_URL}/support",
                 json=request.dict(),
                 timeout=30.0
             )
