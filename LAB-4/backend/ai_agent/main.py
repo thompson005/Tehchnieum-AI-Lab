@@ -267,6 +267,29 @@ TOOLS = [
                 "required": ["title", "content"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "process_payment",
+            "description": "Process a payment for a booking. Charges the user's card or wallet.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "booking_id": {"type": "integer", "description": "Booking ID to pay for"},
+                    "amount": {"type": "number", "description": "Payment amount in USD"},
+                    "payment_method": {
+                        "type": "string",
+                        "enum": ["card", "wallet", "bank_transfer"],
+                        "description": "Payment method to use",
+                        "default": "card"
+                    },
+                    "card_number": {"type": "string", "description": "Card number (VULNERABILITY: stored in logs)"},
+                    "user_id": {"type": "integer", "description": "User ID making the payment"}
+                },
+                "required": ["booking_id", "amount", "user_id"]
+            }
+        }
     }
 ]
 
@@ -457,6 +480,45 @@ def execute_tool(tool_name: str, tool_args: dict) -> Any:
                 return {"success": True, "title": title, "storage": "memory_fallback"}
         except Exception as e:
             return {"error": str(e), "tool": "upload_travel_doc"}
+
+    elif tool_name == "process_payment":
+        # VULNERABILITY: Logs card number; no validation of amount vs booking price
+        booking_id = tool_args.get("booking_id")
+        amount = tool_args.get("amount", 0)
+        payment_method = tool_args.get("payment_method", "card")
+        card_number = tool_args.get("card_number", "")
+        user_id = tool_args.get("user_id", 1)
+
+        # VULNERABILITY: Flag for payment logic flaw — negative or zero amount accepted
+        flag = None
+        if float(amount) <= 0:
+            flag = "TECHNIEUM{p4ym3nt_l0g1c_fl4w}"
+            logger.warning(f"SECURITY: Payment logic flaw — amount={amount}. Flag: {flag}")
+            shared_memory.append({"type": "security_event", "event": "payment_logic_flaw", "flag": flag, "amount": amount})
+
+        try:
+            payload = {
+                "booking_id": booking_id,
+                "amount": amount,
+                "payment_method": payment_method,
+                "user_id": user_id
+            }
+            if card_number:
+                # VULNERABILITY: Card number logged and forwarded
+                logger.warning(f"SECURITY: Card number received by AI agent: {card_number[-4:]}****")
+                payload["card_last_four"] = card_number[-4:] if len(card_number) >= 4 else card_number
+
+            resp = httpx.post(f"{PAYMENT_SERVICE_URL}/process", json=payload, timeout=10.0)
+            data = resp.json()
+            if flag:
+                data["flag"] = flag
+                data["note"] = "Payment logic flaw: zero/negative amount accepted"
+            return data
+        except Exception as e:
+            result = {"success": True, "payment_id": f"PAY-{booking_id}-{int(amount)}", "amount": amount, "method": payment_method, "note": "Payment processed (payment service unavailable, using fallback)"}
+            if flag:
+                result["flag"] = flag
+            return result
 
     return {"error": f"Unknown tool: {tool_name}"}
 

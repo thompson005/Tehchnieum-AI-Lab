@@ -407,8 +407,8 @@
       TravelNest AI v2.1.0 · Security Training Environment · LAB-4 TECHNIEUM AI Security Labs
     </p>
     <div class="flex gap-4 text-xs text-[#6B7280]">
-      <a href="http://localhost:5555" target="_blank" class="hover:text-[#0ea5e9]">Portal</a>
-      <a href="http://localhost:8090/docs" target="_blank" class="hover:text-[#0ea5e9]">API Docs</a>
+      <a href="#" id="footer-portal-link" target="_blank" class="hover:text-[#0ea5e9]">Portal</a>
+      <a href="#" id="footer-docs-link" target="_blank" class="hover:text-[#0ea5e9]">API Docs</a>
       <span>Port 3100</span>
     </div>
   </div>
@@ -456,7 +456,7 @@
     <div id="flag-display" class="font-mono text-sm bg-amber-50 border border-amber-200 rounded-lg p-3 my-4 text-amber-800"></div>
     <p class="text-[#6B7280] text-sm mb-6">Submit this flag to the TECHNIEUM portal for points.</p>
     <div class="flex gap-3">
-      <a href="http://localhost:5555" target="_blank" class="btn-primary flex-1 py-3 text-sm text-center block">Submit to Portal</a>
+      <a href="#" id="flag-portal-link" target="_blank" class="btn-primary flex-1 py-3 text-sm text-center block">Submit to Portal</a>
       <button onclick="closeModal('flag-modal')" class="flex-1 py-3 text-sm border border-[#E5E7EB] rounded-lg text-[#6B7280] hover:text-gray-900 bg-white">Close</button>
     </div>
   </div>
@@ -541,7 +541,19 @@
 
 <!-- ═══════════════════════════════════════════════════════════════ SCRIPTS -->
 <script>
-const GATEWAY = 'http://localhost:8090';
+const GATEWAY = `http://${window.location.hostname}:8090`;
+const PORTAL_URL = `http://${window.location.hostname}:5555`;
+
+// Set dynamic portal/docs links once DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  const footerPortal = document.getElementById('footer-portal-link');
+  if (footerPortal) footerPortal.href = PORTAL_URL;
+  const footerDocs = document.getElementById('footer-docs-link');
+  if (footerDocs) footerDocs.href = `${GATEWAY}/docs`;
+  const flagPortal = document.getElementById('flag-portal-link');
+  if (flagPortal) flagPortal.href = PORTAL_URL;
+});
+
 let currentUser = null;
 let currentToken = localStorage.getItem('tn_token');
 let currentBookingData = null;

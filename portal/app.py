@@ -22,7 +22,17 @@ from models import (
 
 app = Flask(__name__)
 app.secret_key = Config.SECRET_KEY
-CORS(app, origins=["http://localhost:5000", "http://localhost:3000", "http://localhost:8080", "http://localhost:8000", "http://localhost:3100", "http://localhost:8090", "http://localhost:9000", "http://localhost:3200", "http://localhost:8100"])
+_localhost_origins = [
+    "http://localhost:5000", "http://localhost:3000", "http://localhost:8080",
+    "http://localhost:8000", "http://localhost:3100", "http://localhost:8090",
+    "http://localhost:9000", "http://localhost:3200", "http://localhost:8100",
+    "http://localhost:5555",
+]
+_public_base = os.getenv("PUBLIC_BASE_URL", "").rstrip("/")
+if _public_base:
+    for _port in [5000, 3000, 8080, 8000, 3100, 8090, 9000, 3200, 8100, 5555, 3001]:
+        _localhost_origins.append(f"{_public_base}:{_port}")
+CORS(app, origins=_localhost_origins)
 
 
 # ─── Auth helper ──────────────────────────────────────────────────────────────

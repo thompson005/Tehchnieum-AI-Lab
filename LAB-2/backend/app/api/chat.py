@@ -39,8 +39,8 @@ async def chat_with_support(
     # Add user message
     history.append({"role": "user", "content": chat_msg.message})
     
-    # Get AI response
-    ai_response = await support_bot.chat(chat_msg.message, user_id)
+    # Get AI response (pass full history so Eva has conversation context)
+    ai_response = await support_bot.chat(chat_msg.message, user_id, history[:-1])
     
     # Add AI response to history
     history.append({"role": "assistant", "content": ai_response})

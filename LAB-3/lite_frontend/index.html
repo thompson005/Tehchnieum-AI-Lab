@@ -42,7 +42,7 @@
 <header class="bg-white border-b border-[#E5E7EB] flex-shrink-0 z-50 shadow-sm">
   <div class="flex items-center justify-between h-14 px-6">
     <div class="flex items-center gap-3">
-      <a href="http://localhost:5555" class="flex items-center gap-2 hover:opacity-90 transition-opacity">
+      <a href="#" id="portal-logo-link" class="flex items-center gap-2 hover:opacity-90 transition-opacity">
         <div class="w-8 h-8 rounded-lg btn-primary flex items-center justify-center font-black text-sm">T</div>
         <span class="font-black tracking-widest text-gradient text-sm">TECHNIEUM</span>
       </a>
@@ -51,7 +51,7 @@
       <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block ml-1"></span>
     </div>
     <div class="flex items-center gap-3">
-      <a href="http://localhost:5555" class="text-xs border border-[#FFB800]/50 text-[#FFB800] hover:bg-[#FFB800]/10 px-3 py-1.5 rounded-lg transition-colors">
+      <a href="#" id="portal-flag-link" class="text-xs border border-[#FFB800]/50 text-[#FFB800] hover:bg-[#FFB800]/10 px-3 py-1.5 rounded-lg transition-colors">
         🚩 Submit Flag
       </a>
       <div class="text-xs text-[#6B7280] border border-[#E5E7EB] rounded px-2 py-1 font-mono">attacker</div>
@@ -200,6 +200,17 @@
   const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:8080/api'
     : `http://${window.location.hostname}:8080/api`;
+  const PORTAL_URL = `http://${window.location.hostname}:5555`;
+
+  // Set dynamic portal links
+  document.addEventListener('DOMContentLoaded', () => {
+    const logoLink = document.getElementById('portal-logo-link');
+    if (logoLink) logoLink.href = PORTAL_URL;
+    const flagLink = document.getElementById('portal-flag-link');
+    if (flagLink) flagLink.href = PORTAL_URL;
+    document.querySelectorAll('.portal-link').forEach(el => { el.href = PORTAL_URL; });
+  });
+
   let currentProduct = null;
   const userId = 'attacker';
 
@@ -375,7 +386,7 @@
     return `<div class="flag-box mt-3">
       <p class="text-[10px] font-bold uppercase tracking-wider mb-1" style="color:#FFB800">🚩 Vulnerability Exploited!</p>
       <p class="font-mono text-xs select-all" style="color:#FF6B00">${flag}</p>
-      <p class="text-[10px] mt-1" style="color:#6B7280">Submit this flag at <a href="http://localhost:5555" style="color:#FF6B00;text-decoration:underline">Technieum Portal</a></p>
+      <p class="text-[10px] mt-1" style="color:#6B7280">Submit this flag at <a href="#" class="portal-link" style="color:#FF6B00;text-decoration:underline">Technieum Portal</a></p>
     </div>`;
   }
 

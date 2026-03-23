@@ -56,6 +56,19 @@ class SearchRequest(BaseModel):
     filters: Optional[dict] = None
     limit: int = 10
 
+@app.get("/")
+async def root():
+    """Root endpoint — redirect hint for the lab"""
+    return {
+        "service": "ShopSec-AI API Gateway",
+        "version": "1.0.0",
+        "lab": "LAB-3: ShopSec AI Security Testbed",
+        "docs": "/docs",
+        "health": "/health",
+        "endpoints": ["/api/chat", "/api/search", "/api/products", "/api/negotiate", "/api/support"]
+    }
+
+
 # Health Check
 @app.get("/health")
 async def health_check():

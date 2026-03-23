@@ -36,12 +36,24 @@ vector_store = VectorStore()
 tool_executor = ToolExecutor()
 
 # Initialize Agents
+_orchestrator = OrchestratorAgent(client, SYSTEM_PROMPTS["orchestrator"])
+_intake = IntakeAgent(client, SYSTEM_PROMPTS["intake_agent"])
+_records = RecordsAgent(client, SYSTEM_PROMPTS["records_agent"], vector_store)
+_appointment = AppointmentAgent(client, SYSTEM_PROMPTS["appointment_agent"])
+_billing = BillingAgent(client, SYSTEM_PROMPTS["billing_agent"])
+
+# Register sub-agents with orchestrator so routing actually works
+_orchestrator.register_agent("intake", _intake)
+_orchestrator.register_agent("records", _records)
+_orchestrator.register_agent("appointment", _appointment)
+_orchestrator.register_agent("billing", _billing)
+
 agents = {
-    "orchestrator": OrchestratorAgent(client, SYSTEM_PROMPTS["orchestrator"]),
-    "intake": IntakeAgent(client, SYSTEM_PROMPTS["intake_agent"]),
-    "records": RecordsAgent(client, SYSTEM_PROMPTS["records_agent"], vector_store),
-    "appointment": AppointmentAgent(client, SYSTEM_PROMPTS["appointment_agent"]),
-    "billing": BillingAgent(client, SYSTEM_PROMPTS["billing_agent"])
+    "orchestrator": _orchestrator,
+    "intake": _intake,
+    "records": _records,
+    "appointment": _appointment,
+    "billing": _billing,
 }
 
 # Conversation Memory (VULNERABILITY: No session isolation)

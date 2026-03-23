@@ -84,18 +84,42 @@ Return ONLY the JSON, no other text."""
     
     async def _execute_transfer(self, from_account: str, to_account: str, amount: float, description: str):
         """
-        VULNERABLE: Uses SQL function without additional business rule validation
+        VULNERABLE: Trusts LLM-generated parameters; validation is present but bypassable via prompt injection.
         """
         async with AsyncSessionLocal() as session:
             try:
+                # Validate recipient account exists
+                q_dst = text("SELECT id, account_number FROM accounts WHERE account_number = :acc AND status = 'active'")
+                r_dst = await session.execute(q_dst, {"to_acc": to_account, "acc": to_account})
+                dst = r_dst.fetchone()
+                if not dst:
+                    return {
+                        "success": False,
+                        "error": f"Recipient account '{to_account}' does not exist or is inactive. Please verify the account number."
+                    }
+
+                # Validate source account has sufficient funds
+                q_src = text("SELECT balance FROM accounts WHERE account_number = :acc AND status = 'active'")
+                r_src = await session.execute(q_src, {"acc": from_account})
+                src = r_src.fetchone()
+                if not src:
+                    return {"success": False, "error": "Source account not found"}
+                if float(src.balance) < float(amount):
+                    return {
+                        "success": False,
+                        "error": f"Insufficient funds. Available: ${float(src.balance):.2f}, Requested: ${amount:.2f}"
+                    }
+
+                # Validate amount > 0
+                if float(amount) <= 0:
+                    return {"success": False, "error": "Transfer amount must be positive"}
+
                 # VULNERABILITY: No check for amount > threshold requiring approval
                 # VULNERABILITY: No rate limiting
-                # VULNERABILITY: Trusts LLM-generated parameters completely
-                
                 query = text("""
                     SELECT transfer_money(:from_acc, :to_acc, :amt, :desc)
                 """)
-                
+
                 result = await session.execute(
                     query,
                     {
@@ -105,16 +129,16 @@ Return ONLY the JSON, no other text."""
                         "desc": description
                     }
                 )
-                
+
                 await session.commit()
-                
+
                 return {
                     "success": True,
-                    "message": f"Successfully transferred ${amount} to account {to_account}",
+                    "message": f"Successfully transferred ${amount:.2f} to account {to_account}",
                     "amount": amount,
                     "to_account": to_account
                 }
-                
+
             except Exception as e:
                 await session.rollback()
                 return {"success": False, "error": str(e)}
