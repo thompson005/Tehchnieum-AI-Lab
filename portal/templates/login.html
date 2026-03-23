@@ -1,138 +1,129 @@
 {% extends "base.html" %}
-{% block title %}Sign In — Technieum AI Security Labs{% endblock %}
+{% block title %}Sign In — TECHNIEUM AI Security Labs{% endblock %}
 {% block main_class %}flex items-center justify-center min-h-[calc(100vh-64px)] px-4 py-10{% endblock %}
 
 {% block content %}
 <div class="w-full max-w-5xl flex gap-8 items-stretch">
 
-  <!-- ── Left branding panel ────────────────────────────────────────────── -->
-  <div class="hidden lg:flex flex-col justify-between rounded-2xl p-8 text-white flex-shrink-0" style="width:320px; background:linear-gradient(145deg,#FF6B00 0%,#FF8C00 50%,#FFB800 100%);">
+  <!-- Left branding panel -->
+  <div class="hidden lg:flex flex-col justify-between rounded-xl p-8 text-white flex-shrink-0 ignition-gradient" style="width:320px;">
     <div>
-      <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-6">
-        <span class="text-white font-black text-xl">T</span>
+      <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-6">
+        <span class="material-symbols-outlined text-white text-2xl">shield_lock</span>
       </div>
-      <h1 class="text-2xl font-black tracking-[0.12em] mb-3">TECHNIEUM</h1>
-      <p class="text-white/85 text-sm leading-relaxed mb-6">
+      <h1 class="font-headline text-2xl font-black tracking-tighter mb-3">TECHNIEUM</h1>
+      <p class="font-body text-white/85 text-sm leading-relaxed mb-6">
         AI Security Research Labs — hands-on training for AI red-teaming, LLM security, and prompt injection.
       </p>
-
-      <!-- Feature list -->
       <div class="space-y-2.5">
         <div class="flex items-start gap-2.5">
           <div class="w-5 h-5 bg-white/25 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
-            <svg class="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 111.414-1.414L8.414 12.172l7.879-7.879a1 1 0 011.414 0z" clip-rule="evenodd"/>
-            </svg>
+            <span class="material-symbols-outlined text-white text-sm">check</span>
           </div>
-          <span class="text-white/90 text-sm">5 labs covering OWASP LLM Top 10</span>
+          <span class="font-body text-white/90 text-sm">5 labs covering OWASP LLM Top 10</span>
         </div>
         <div class="flex items-start gap-2.5">
           <div class="w-5 h-5 bg-white/25 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
-            <svg class="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 111.414-1.414L8.414 12.172l7.879-7.879a1 1 0 011.414 0z" clip-rule="evenodd"/>
-            </svg>
+            <span class="material-symbols-outlined text-white text-sm">check</span>
           </div>
-          <span class="text-white/90 text-sm">55 flags across Easy → Expert tiers</span>
+          <span class="font-body text-white/90 text-sm">55 flags across Easy → Expert tiers</span>
         </div>
         <div class="flex items-start gap-2.5">
           <div class="w-5 h-5 bg-white/25 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
-            <svg class="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 111.414-1.414L8.414 12.172l7.879-7.879a1 1 0 011.414 0z" clip-rule="evenodd"/>
-            </svg>
+            <span class="material-symbols-outlined text-white text-sm">check</span>
           </div>
-          <span class="text-white/90 text-sm">Real-world AI platforms with live agents</span>
+          <span class="font-body text-white/90 text-sm">Real-world AI platforms with live agents</span>
         </div>
         <div class="flex items-start gap-2.5">
           <div class="w-5 h-5 bg-white/25 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
-            <svg class="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 111.414-1.414L8.414 12.172l7.879-7.879a1 1 0 011.414 0z" clip-rule="evenodd"/>
-            </svg>
+            <span class="material-symbols-outlined text-white text-sm">check</span>
           </div>
-          <span class="text-white/90 text-sm">Live scoreboard &amp; team competition</span>
+          <span class="font-body text-white/90 text-sm">Live scoreboard &amp; team competition</span>
         </div>
       </div>
     </div>
-
-    <!-- Bottom stats -->
     <div class="mt-8 pt-6 border-t border-white/20">
       <div class="grid grid-cols-2 gap-3">
-        <div class="bg-white/15 rounded-xl p-3">
-          <p class="text-white/70 text-xs mb-0.5">Difficulty Range</p>
-          <p class="text-white font-bold text-sm">Easy → Expert</p>
+        <div class="bg-white/15 rounded-lg p-3">
+          <p class="font-label text-[10px] text-white/70 uppercase mb-0.5">Difficulty Range</p>
+          <p class="font-headline text-white font-bold text-sm">Easy → Expert</p>
         </div>
-        <div class="bg-white/15 rounded-xl p-3">
-          <p class="text-white/70 text-xs mb-0.5">Max Points</p>
-          <p class="text-white font-bold text-sm">17,650 pts</p>
+        <div class="bg-white/15 rounded-lg p-3">
+          <p class="font-label text-[10px] text-white/70 uppercase mb-0.5">Max Points</p>
+          <p class="font-headline text-white font-bold text-sm">17,650 pts</p>
         </div>
       </div>
-      <p class="text-white/40 text-xs mt-4 font-mono">⚠ Authorized participants only</p>
+      <p class="font-label text-[10px] text-white/40 mt-4">// Authorized participants only</p>
     </div>
   </div>
 
-  <!-- ── Right login form ───────────────────────────────────────────────── -->
+  <!-- Right login form -->
   <div class="flex-1 max-w-md mx-auto flex flex-col justify-center">
 
-    <!-- Mobile logo -->
     <div class="text-center mb-7 lg:hidden">
-      <div class="inline-flex items-center gap-3">
-        <div class="w-10 h-10 brand-gradient rounded-xl flex items-center justify-center shadow-sm">
-          <span class="text-white font-black">T</span>
+      <span class="font-headline font-black text-xl tracking-tighter text-[#FF6A00]">TECHNIEUM</span>
+    </div>
+
+    <div class="bg-[#111217] border border-zinc-800/50 rounded-xl overflow-hidden">
+      <div class="ignition-gradient h-1 w-full"></div>
+      <div class="p-8">
+        <div class="mb-6">
+          <h2 class="font-headline text-2xl font-bold text-on-background">Welcome back</h2>
+          <p class="font-label text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Authorized personnel only // Protocol 09</p>
         </div>
-        <span class="font-black text-xl tracking-[0.15em] text-gray-900">TECHNIEUM</span>
+
+        {% if error %}
+        <div class="mb-5 px-4 py-3 rounded bg-red-900/30 border border-red-700 text-red-300 font-label text-xs">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('login') }}" class="space-y-5">
+          <div class="space-y-2">
+            <label class="font-label text-[11px] uppercase tracking-wider text-zinc-400 block ml-1" for="username">System Identifier</label>
+            <div class="relative group">
+              <span class="material-symbols-outlined absolute left-3 top-3 text-zinc-500 text-sm">alternate_email</span>
+              <input id="username" name="username" type="text" required autocomplete="username"
+                class="w-full bg-[#181A20] border-0 border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 text-on-background font-label text-sm py-3 pl-10 pr-3 transition-all placeholder-zinc-600"
+                placeholder="your_handle" />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="font-label text-[11px] uppercase tracking-wider text-zinc-400 block ml-1" for="password">Encryption Key</label>
+            <div class="relative group">
+              <span class="material-symbols-outlined absolute left-3 top-3 text-zinc-500 text-sm">key</span>
+              <input id="password" name="password" type="password" required autocomplete="current-password"
+                class="w-full bg-[#181A20] border-0 border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 text-on-background font-label text-sm py-3 pl-10 pr-3 transition-all placeholder-zinc-600"
+                placeholder="••••••••" />
+            </div>
+          </div>
+          <div class="pt-2">
+            <button type="submit" class="w-full ignition-gradient text-white font-label text-xs font-bold py-4 uppercase tracking-widest hover:shadow-[0_0_20px_rgba(255,106,0,0.4)] active:scale-95 transition-all flex items-center justify-center gap-2">
+              Access Terminal <span class="material-symbols-outlined text-sm">login</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="mt-8 flex items-center justify-between border-t border-zinc-800/30 pt-6">
+          <div class="flex items-center gap-2">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            <span class="font-label text-[10px] text-zinc-500 uppercase">System: Online</span>
+          </div>
+          <div class="font-label text-[10px] text-zinc-600">ID: 255.0.0.1</div>
+        </div>
       </div>
     </div>
 
-    <div class="card p-8">
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold text-gray-900">Welcome back</h2>
-        <p class="text-gray-500 text-sm mt-1">Sign in to your lab environment</p>
+    <div class="mt-6 text-center space-y-4">
+      <div class="flex items-center justify-center gap-2">
+        <span class="h-px w-8 bg-zinc-800"></span>
+        <p class="font-label text-[11px] text-zinc-500 uppercase tracking-widest">Or</p>
+        <span class="h-px w-8 bg-zinc-800"></span>
       </div>
-
-      {% if error %}
-      <div class="alert-error mb-5">{{ error }}</div>
-      {% endif %}
-
-      <form method="POST" action="{{ url_for('login') }}" class="space-y-4">
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="username">
-            Username
-          </label>
-          <input id="username" name="username" type="text" required autocomplete="username"
-                 class="input-field"
-                 placeholder="your_handle" />
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="password">
-            Password
-          </label>
-          <input id="password" name="password" type="password" required autocomplete="current-password"
-                 class="input-field"
-                 placeholder="••••••••" />
-        </div>
-        <div class="pt-1">
-          <button type="submit" class="btn-primary w-full py-2.5 shadow-sm" style="font-size:0.9rem;">
-            Sign In &nbsp;→
-          </button>
-        </div>
-      </form>
-
-      <div class="mt-6 pt-5 text-center" style="border-top:1px solid #F3F4F6;">
-        <p class="text-gray-500 text-sm">
-          No account yet?
-          <a href="{{ url_for('register') }}" class="font-semibold ml-1 hover:underline" style="color:#FF6B00;">
-            Register here
-          </a>
-        </p>
-      </div>
-    </div>
-
-    <!-- Status bar -->
-    <div class="mt-4 flex items-center justify-center gap-3">
-      <span class="flex items-center gap-1.5 text-xs text-gray-500">
-        <span class="status-online"></span>System Online
-      </span>
-      <span class="text-gray-300">·</span>
-      <span class="text-xs text-gray-400 font-mono">Educational use only</span>
+      <a href="{{ url_for('register') }}" class="inline-block font-headline font-bold text-sm text-[#FFC107] hover:text-[#FF6A00] transition-all">
+        Register for the CTF →
+      </a>
     </div>
   </div>
 

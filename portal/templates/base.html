@@ -1,369 +1,220 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}Technieum AI Security Labs{% endblock %}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <script>
     tailwind.config = {
+      darkMode: "class",
       theme: {
         extend: {
           colors: {
-            brand: {
-              orange: '#FF6B00',
-              amber:  '#FFB800',
-              dark:   '#CC5500',
-            }
+            "primary": "#ffb694", "surface-container": "#1e1f25",
+            "secondary-fixed-dim": "#fabd00", "on-surface": "#e3e1e9",
+            "surface-container-lowest": "#0d0e13", "primary-container": "#ff6a00",
+            "surface-container-high": "#1F222A", "surface-container-low": "#181A20",
+            "surface": "#111217", "on-primary-container": "#571f00",
+            "on-background": "#e3e1e9", "tertiary": "#ebc33e",
+            "background": "#0B0B0D", "outline-variant": "#5a4136",
+            "secondary-container": "#fabd00", "on-surface-variant": "#e2bfb0",
+            "surface-container-highest": "#34343a",
           },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-        }
-      }
+          fontFamily: { "headline": ["Inter"], "body": ["Inter"], "label": ["JetBrains Mono"] },
+          borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+        },
+      },
     }
   </script>
   <style>
-    :root {
-      --bg-page:    #F3F4F6;
-      --bg-card:    #FFFFFF;
-      --border:     #E5E7EB;
-      --text-1:     #111827;
-      --text-2:     #374151;
-      --text-muted: #6B7280;
-      --orange:     #FF6B00;
-      --amber:      #FFB800;
-      --orange-bg:  #FFF7ED;
-      --shadow-sm:  0 1px 2px rgba(0,0,0,0.05);
-      --shadow-md:  0 4px 12px rgba(0,0,0,0.08);
-    }
-    * { box-sizing: border-box; }
     body {
-      background-color: var(--bg-page);
-      color: var(--text-1);
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
+      background-color: #0B0B0D;
+      background-image: linear-gradient(to right, rgba(227,225,233,0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(227,225,233,0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
     }
-
-    /* Brand gradient */
-    .brand-gradient { background: linear-gradient(135deg, #FF6B00 0%, #FFB800 100%); }
-    .text-brand {
-      background: linear-gradient(135deg, #FF6B00, #FFB800);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .ignition-gradient { background: linear-gradient(135deg, #FF6A00 0%, #FFC107 100%); }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    .pulse-active { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34,197,94,0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(34,197,94,0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34,197,94,0); }
     }
-
-    /* Cards */
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: var(--shadow-sm);
-    }
-    .card-hover {
-      transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
-    }
-    .card-hover:hover {
-      box-shadow: var(--shadow-md);
-      border-color: #D1D5DB;
-      transform: translateY(-2px);
-    }
-
-    /* Buttons */
-    .btn-primary {
-      background: linear-gradient(135deg, #FF6B00, #E55E00);
-      color: #FFFFFF;
-      font-weight: 600;
-      font-size: 0.875rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #E55E00, #CC5200);
-      box-shadow: 0 4px 14px rgba(255,107,0,0.35);
-      transform: translateY(-1px);
-    }
-    .btn-primary:active { transform: translateY(0); }
-    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-    .btn-secondary {
-      background: var(--bg-card);
-      color: var(--text-2);
-      font-weight: 500;
-      font-size: 0.875rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .btn-secondary:hover {
-      background: #F9FAFB;
-      border-color: #D1D5DB;
-    }
-
-    /* Inputs */
-    .input-field {
-      background: #FFFFFF;
-      border: 1px solid #D1D5DB;
-      border-radius: 8px;
-      color: var(--text-1);
-      font-size: 0.875rem;
-      width: 100%;
-      padding: 10px 14px;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-      outline: none;
-    }
-    .input-field:focus {
-      border-color: var(--orange);
-      box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
-    }
-    .input-field::placeholder { color: #9CA3AF; }
-
-    /* Badges */
-    .badge { display: inline-flex; align-items: center; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em; }
-    .badge-easy   { background: #D1FAE5; color: #065F46; }
-    .badge-medium { background: #FEF3C7; color: #92400E; }
-    .badge-hard   { background: #FFEDD5; color: #9A3412; }
-    .badge-expert { background: #FEE2E2; color: #991B1B; }
-
-    /* Nav */
-    .nav-link {
-      color: var(--text-muted);
-      font-weight: 500;
-      font-size: 0.875rem;
-      padding: 6px 12px;
-      border-radius: 6px;
-      text-decoration: none;
-      transition: color 0.15s ease, background 0.15s ease;
-    }
-    .nav-link:hover { color: var(--orange); background: var(--orange-bg); }
-    .nav-link.active { color: var(--orange); background: var(--orange-bg); }
-
-    /* Status dots */
-    .status-online {
-      width: 8px; height: 8px; background: #10B981; border-radius: 50%;
-      animation: pulse-green 2.5s ease-in-out infinite;
-      flex-shrink: 0;
-    }
-    .status-offline { width: 8px; height: 8px; background: #9CA3AF; border-radius: 50%; flex-shrink: 0; }
-    .status-checking { width: 8px; height: 8px; background: #F59E0B; border-radius: 50%; flex-shrink: 0; }
-
-    @keyframes pulse-green {
-      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
-      50% { opacity: 0.85; box-shadow: 0 0 0 4px rgba(16,185,129,0); }
-    }
-
-    /* Progress bar */
-    .progress-track { height: 6px; background: #E5E7EB; border-radius: 4px; overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; background: linear-gradient(90deg, #FF6B00, #FFB800); }
-
-    /* Divider */
-    .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
-
-    /* Table */
-    .data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-    .data-table thead th {
-      text-align: left; padding: 10px 16px;
-      color: var(--text-muted); font-size: 0.7rem; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.06em;
-      border-bottom: 1px solid var(--border);
-      background: #F9FAFB;
-    }
-    .data-table tbody tr { border-bottom: 1px solid #F3F4F6; transition: background 0.1s; }
-    .data-table tbody tr:hover { background: #FAFAFA; }
-    .data-table tbody td { padding: 12px 16px; color: var(--text-2); vertical-align: middle; }
-
-    /* Tag chip */
-    .tag { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: #F3F4F6; color: var(--text-muted); }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg-page); }
-    ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
-
-    /* Alert banners */
-    .alert-success { background: #F0FDF4; border: 1px solid #BBF7D0; color: #15803D; border-radius: 8px; padding: 12px 16px; font-size: 0.875rem; font-weight: 500; }
-    .alert-error   { background: #FFF1F2; border: 1px solid #FECDD3; color: #BE123C; border-radius: 8px; padding: 12px 16px; font-size: 0.875rem; font-weight: 500; }
-
-    /* Section header */
-    .section-header { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 12px; }
-
-    /* Stat card accent line */
-    .stat-card-accent { height: 3px; border-radius: 2px; margin-bottom: 14px; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #0B0B0D; }
+    ::-webkit-scrollbar-thumb { background: #1F222A; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #FF6A00; }
   </style>
   {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="font-body text-on-background min-h-screen selection:bg-primary-container selection:text-on-primary-container">
 
-  <!-- ── Navigation ─────────────────────────────────────────────────────── -->
-  <nav style="background:#FFFFFF; border-bottom:1px solid #E5E7EB; box-shadow:0 1px 3px rgba(0,0,0,0.05);" class="sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-
-        <!-- Brand -->
-        <a href="{{ url_for('dashboard') if session.get('user_id') else url_for('login') }}"
-           class="flex items-center gap-3 no-underline select-none">
-          <div class="w-9 h-9 brand-gradient rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
-            <span class="text-white font-black text-sm">T</span>
-          </div>
-          <div class="flex flex-col leading-none">
-            <span class="font-black text-sm tracking-[0.15em] text-gray-900">TECHNIEUM</span>
-            <span class="text-xs font-medium text-gray-400 mt-0.5">AI Security Labs</span>
-          </div>
-        </a>
-
-        <!-- Centre nav links -->
-        {% if session.get('user_id') %}
-        <div class="hidden md:flex items-center gap-1">
-          <a href="{{ url_for('dashboard') }}"
-             class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
-            Dashboard
-          </a>
-          <a href="{{ url_for('scoreboard') }}"
-             class="nav-link {% if request.endpoint == 'scoreboard' %}active{% endif %}">
-            Scoreboard
-          </a>
+  <!-- Header -->
+  <header class="bg-[#111217] fixed top-0 w-full flex justify-between items-center px-6 h-16 z-50 border-b border-zinc-800/30">
+    <div class="flex items-center gap-8">
+      <a href="{{ url_for('dashboard') if session.get('user_id') else url_for('login') }}" class="text-xl font-bold tracking-tighter text-[#FF6A00]">TECHNIEUM AI SECURITY LABS</a>
+      {% if session.get('user_id') %}
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}text-[#FF6A00] font-bold border-b-2 border-orange-600{% else %}text-zinc-400 hover:text-zinc-200{% endif %} font-label text-xs uppercase tracking-widest">Dashboard</a>
+        <a href="{{ url_for('scoreboard') }}" class="{% if request.endpoint == 'scoreboard' %}text-[#FF6A00] font-bold border-b-2 border-orange-600{% else %}text-zinc-400 hover:text-zinc-200{% endif %} font-label text-xs uppercase tracking-widest">Scoreboard</a>
+      </nav>
+      {% endif %}
+    </div>
+    <div class="flex items-center gap-4">
+      {% if session.get('user_id') %}
+      <button onclick="openFlagModal()" class="ignition-gradient text-white font-label text-[10px] font-bold px-3 py-2 uppercase tracking-widest hover:shadow-[0_0_15px_rgba(255,106,0,0.4)] transition-all">Submit Flag</button>
+      <span class="material-symbols-outlined text-zinc-400 hover:text-orange-500 cursor-pointer">notifications</span>
+      <div class="flex items-center gap-2 pl-3 border-l border-zinc-800">
+        <div class="w-7 h-7 ignition-gradient rounded-sm flex items-center justify-center text-white text-xs font-black">
+          {{ (session.get('display_name') or session.get('username') or 'U')[0].upper() }}
         </div>
-        {% endif %}
-
-        <!-- Right side -->
-        <div class="flex items-center gap-3">
-          {% if session.get('user_id') %}
-          <button onclick="openFlagModal()"
-                  class="btn-primary px-4 py-2 shadow-sm text-sm"
-                  style="border-radius:8px;">
-            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"/>
-            </svg>
-            Submit Flag
-          </button>
-
-          <div class="flex items-center gap-2.5 pl-3" style="border-left:1px solid #E5E7EB;">
-            <div class="w-8 h-8 brand-gradient rounded-full flex items-center justify-center text-white text-xs font-black shadow-sm flex-shrink-0">
-              {{ (session.get('display_name') or session.get('username') or 'U')[0].upper() }}
-            </div>
-            <div class="hidden sm:block leading-none">
-              <p class="text-sm font-semibold text-gray-800">{{ session.get('display_name') or session.get('username') }}</p>
-              <a href="{{ url_for('logout') }}" class="text-xs text-gray-400 hover:text-red-500 transition-colors">Sign out</a>
-            </div>
-          </div>
-          {% else %}
-          <a href="{{ url_for('login') }}" class="btn-primary px-4 py-2" style="border-radius:8px;">Sign In</a>
-          {% endif %}
+        <div class="hidden sm:block leading-none">
+          <p class="font-label text-xs font-semibold text-on-background">{{ session.get('display_name') or session.get('username') }}</p>
+          <a href="{{ url_for('logout') }}" class="font-label text-[10px] text-zinc-500 hover:text-red-400 transition-colors">Sign out</a>
         </div>
+      </div>
+      {% else %}
+      <a href="{{ url_for('login') }}" class="ignition-gradient text-white font-label text-[10px] font-bold px-3 py-2 uppercase tracking-widest">Sign In</a>
+      {% endif %}
+    </div>
+  </header>
 
+  {% if session.get('user_id') %}
+  <!-- Sidebar -->
+  <aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-[#0B0B0D] border-r border-zinc-800/30 flex flex-col py-4 z-40 hidden md:flex">
+    <div class="px-6 mb-8">
+      <div class="flex items-center gap-3 mb-1">
+        <span class="material-symbols-outlined text-orange-600" style="font-variation-settings:'FILL' 1;">monitoring</span>
+        <span class="font-headline font-black text-lg text-orange-600">COMMAND DECK</span>
+      </div>
+      <p class="font-label text-[10px] text-zinc-500 uppercase tracking-widest" id="session-timer">Active Session: 00:00:00</p>
+    </div>
+    <nav class="flex-1 px-3 space-y-1">
+      <a href="{{ url_for('dashboard') }}" class="flex items-center gap-3 px-3 py-3 {% if request.endpoint == 'dashboard' %}text-orange-600 bg-orange-600/10 border-r-2 border-orange-600{% else %}text-zinc-500 hover:bg-zinc-800/50 hover:text-orange-400{% endif %} transition-all font-label text-xs uppercase tracking-wider">
+        <span class="material-symbols-outlined">science</span> Labs
+      </a>
+      <a href="#" class="flex items-center gap-3 px-3 py-3 text-zinc-500 hover:bg-zinc-800/50 hover:text-orange-400 transition-all font-label text-xs uppercase tracking-wider">
+        <span class="material-symbols-outlined">hub</span> Network
+      </a>
+      <a href="{{ url_for('scoreboard') }}" class="flex items-center gap-3 px-3 py-3 {% if request.endpoint == 'scoreboard' %}text-orange-600 bg-orange-600/10 border-r-2 border-orange-600{% else %}text-zinc-500 hover:bg-zinc-800/50 hover:text-orange-400{% endif %} transition-all font-label text-xs uppercase tracking-wider">
+        <span class="material-symbols-outlined">psychology</span> Intelligence
+      </a>
+    </nav>
+    <div class="px-3 mt-auto space-y-4">
+      <button onclick="openFlagModal()" class="w-full ignition-gradient text-white font-label text-[10px] font-bold py-3 uppercase tracking-widest hover:shadow-[0_0_15px_rgba(255,106,0,0.4)] transition-all">New Instance</button>
+      <div class="pt-4 border-t border-zinc-800/30 space-y-1">
+        <a href="#" class="flex items-center gap-3 px-3 py-2 text-zinc-500 hover:text-zinc-200 font-label text-[10px] uppercase"><span class="material-symbols-outlined text-sm">settings</span>Settings</a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 text-zinc-500 hover:text-zinc-200 font-label text-[10px] uppercase"><span class="material-symbols-outlined text-sm">help_center</span>Support</a>
       </div>
     </div>
-  </nav>
+  </aside>
+  {% endif %}
 
-  <!-- ── Flash messages ────────────────────────────────────────────────── -->
+  <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-    <div class="max-w-7xl mx-auto px-4 pt-4">
-      {% for category, message in messages %}
-      <div class="mb-2 {% if category == 'error' %}alert-error{% else %}alert-success{% endif %}">
-        {{ message }}
+    <div class="{% if session.get('user_id') %}md:ml-64{% endif %} pt-16 px-4">
+      <div class="max-w-7xl mx-auto pt-4">
+        {% for category, message in messages %}
+        <div class="mb-2 px-4 py-3 rounded font-label text-xs {% if category == 'error' %}bg-red-900/30 border border-red-700 text-red-300{% else %}bg-green-900/30 border border-green-700 text-green-300{% endif %}">
+          {{ message }}
+        </div>
+        {% endfor %}
       </div>
-      {% endfor %}
     </div>
     {% endif %}
   {% endwith %}
 
-  <!-- ── Main content ──────────────────────────────────────────────────── -->
-  <main class="{% block main_class %}max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8{% endblock %}">
+  <!-- Main content -->
+  <main class="{% if session.get('user_id') %}md:ml-64{% endif %} pt-16 {% block main_class %}max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8{% endblock %}">
     {% block content %}{% endblock %}
   </main>
 
-  <!-- ── Footer ────────────────────────────────────────────────────────── -->
-  <footer style="background:#FFFFFF; border-top:1px solid #E5E7EB; margin-top:48px;">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+  <!-- Footer -->
+  <footer class="{% if session.get('user_id') %}md:ml-64{% endif %} border-t border-zinc-800/30 mt-12">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
       <div class="flex items-center gap-2">
-        <div class="w-5 h-5 brand-gradient rounded flex items-center justify-center flex-shrink-0">
-          <span class="text-white font-black" style="font-size:9px;">T</span>
-        </div>
-        <span class="text-xs text-gray-500">
-          © 2025 <span class="font-semibold text-gray-700">Technieum</span>
-          &nbsp;·&nbsp; Authorized security training only
-        </span>
+        <span class="text-[#FF6A00] font-black text-sm">TECHNIEUM</span>
+        <span class="font-label text-[10px] text-zinc-500">· Authorized security training only</span>
       </div>
       <div class="flex items-center gap-4">
-        <span class="text-xs font-mono text-gray-400">AI Security Research Labs v1.0</span>
-        <span class="flex items-center gap-1.5 text-xs text-gray-500">
-          <span class="status-online"></span>Portal Online
+        <span class="font-label text-[10px] text-zinc-500">AI Security Research Labs v1.0</span>
+        <span class="flex items-center gap-1.5 font-label text-[10px] text-zinc-500">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>Portal Online
         </span>
       </div>
     </div>
   </footer>
 
-  <!-- ── Flag Submission Modal ─────────────────────────────────────────── -->
-  <div id="flagModal"
-       class="fixed inset-0 z-50 hidden items-center justify-center"
-       style="background:rgba(0,0,0,0.35); backdrop-filter:blur(4px);">
-    <div class="card w-full max-w-md mx-4" style="box-shadow:0 20px 60px rgba(0,0,0,0.18); border-radius:16px;">
+  <!-- Flag Submission Modal -->
+  <div id="flagModal" class="fixed inset-0 z-[100] hidden items-center justify-center" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);">
+    <div class="bg-[#111217] border border-zinc-800 w-full max-w-md mx-4 rounded-xl overflow-hidden">
+      <div class="ignition-gradient h-1 w-full"></div>
       <div class="p-6">
-        <!-- Modal header -->
         <div class="flex items-center justify-between mb-5">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 brand-gradient rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
-              <svg class="w-5 h-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"/>
-              </svg>
-            </div>
+            <span class="material-symbols-outlined text-orange-600" style="font-variation-settings:'FILL' 1;">flag</span>
             <div>
-              <h3 class="font-bold text-gray-900 text-base">Submit Flag</h3>
-              <p class="text-gray-500 text-xs mt-0.5">Paste your captured flag below</p>
+              <h3 class="font-headline font-bold text-sm text-on-background">Submit Flag</h3>
+              <p class="font-label text-[10px] text-zinc-500">Paste your captured TECHNIEUM flag</p>
             </div>
           </div>
-          <button onclick="closeFlagModal()"
-                  class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+          <button onclick="closeFlagModal()" class="text-zinc-500 hover:text-zinc-200">
+            <span class="material-symbols-outlined text-sm">close</span>
           </button>
         </div>
-
-        <!-- Input -->
-        <input id="flagInput"
-               type="text"
-               placeholder="TECHNIEUM{...}"
-               class="input-field font-mono mb-3"
-               style="letter-spacing:0.02em;" />
-
-        <!-- Result message -->
-        <div id="flagResult" class="mb-4 hidden"></div>
-
-        <!-- Actions -->
+        <input id="flagInput" type="text" placeholder="TECHNIEUM{...}"
+          class="w-full bg-[#0d0e13] border-b border-zinc-700 focus:border-orange-600 focus:ring-0 font-label text-sm py-3 px-3 text-orange-400 placeholder-zinc-700 mb-3"/>
+        <div id="flagResult" class="mb-4 hidden font-label text-xs px-3 py-2 rounded"></div>
         <div class="flex gap-3">
-          <button onclick="submitFlag()" id="submitBtn"
-                  class="btn-primary flex-1 py-2.5 shadow-sm">
-            Submit Flag
-          </button>
-          <button onclick="closeFlagModal()"
-                  class="btn-secondary flex-1 py-2.5">
-            Cancel
-          </button>
+          <button onclick="submitFlag()" id="submitBtn" class="flex-1 ignition-gradient text-white font-label text-[10px] font-bold py-3 uppercase tracking-widest hover:shadow-[0_0_15px_rgba(255,106,0,0.4)] transition-all">Submit Protocol</button>
+          <button onclick="closeFlagModal()" class="flex-1 py-3 border border-zinc-700 text-zinc-400 hover:text-zinc-200 font-label text-[10px] uppercase transition-all">Cancel</button>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Mobile bottom nav -->
+  <nav class="md:hidden fixed bottom-0 left-0 w-full bg-[#111217] flex justify-around items-center h-16 border-t border-zinc-800/30 z-50">
+    <a href="{{ url_for('dashboard') if session.get('user_id') else url_for('login') }}" class="flex flex-col items-center gap-1 {% if request.endpoint == 'dashboard' %}text-orange-600{% else %}text-zinc-500{% endif %}">
+      <span class="material-symbols-outlined text-xl">science</span>
+      <span class="text-[9px] uppercase font-label">Labs</span>
+    </a>
+    <a href="{{ url_for('scoreboard') if session.get('user_id') else '#' }}" class="flex flex-col items-center gap-1 {% if request.endpoint == 'scoreboard' %}text-orange-600{% else %}text-zinc-500{% endif %}">
+      <span class="material-symbols-outlined text-xl">emoji_events</span>
+      <span class="text-[9px] uppercase font-label">Scores</span>
+    </a>
+    {% if session.get('user_id') %}
+    <button onclick="openFlagModal()" class="flex flex-col items-center gap-1 text-zinc-500">
+      <span class="material-symbols-outlined text-xl">flag</span>
+      <span class="text-[9px] uppercase font-label">Flag</span>
+    </button>
+    {% endif %}
+    <a href="#" class="flex flex-col items-center gap-1 text-zinc-500">
+      <span class="material-symbols-outlined text-xl">settings</span>
+      <span class="text-[9px] uppercase font-label">Settings</span>
+    </a>
+  </nav>
+
   {% block scripts %}{% endblock %}
 
   <script>
+    // Session timer
+    let sessionStart = Date.now();
+    function updateTimer() {
+      const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
+      const h = String(Math.floor(elapsed/3600)).padStart(2,'0');
+      const m = String(Math.floor((elapsed%3600)/60)).padStart(2,'0');
+      const s = String(elapsed%60).padStart(2,'0');
+      const el = document.getElementById('session-timer');
+      if (el) el.textContent = `Active Session: ${h}:${m}:${s}`;
+    }
+    setInterval(updateTimer, 1000);
+
     function openFlagModal() {
       const modal = document.getElementById('flagModal');
       modal.classList.remove('hidden');
@@ -372,7 +223,7 @@
       document.getElementById('flagResult').classList.add('hidden');
       document.getElementById('flagInput').value = '';
       const btn = document.getElementById('submitBtn');
-      btn.textContent = 'Submit Flag';
+      btn.textContent = 'Submit Protocol';
       btn.disabled = false;
     }
 
@@ -387,12 +238,12 @@
       const resultEl = document.getElementById('flagResult');
       const btn = document.getElementById('submitBtn');
       if (!flag) {
-        resultEl.className = 'mb-4 alert-error';
+        resultEl.className = 'mb-4 font-label text-xs px-3 py-2 rounded bg-red-900/30 border border-red-700 text-red-300';
         resultEl.textContent = 'Please enter a flag.';
         resultEl.classList.remove('hidden');
         return;
       }
-      btn.textContent = 'Submitting…';
+      btn.textContent = 'Submitting...';
       btn.disabled = true;
       try {
         const res = await fetch('/api/submit-flag', {
@@ -403,20 +254,20 @@
         const data = await res.json();
         resultEl.classList.remove('hidden');
         if (data.success) {
-          resultEl.className = 'mb-4 alert-success';
-          resultEl.innerHTML = `<strong>✓ Flag accepted!</strong> +${data.points} pts &nbsp;·&nbsp; ${data.name}`;
+          resultEl.className = 'mb-4 font-label text-xs px-3 py-2 rounded bg-green-900/30 border border-green-700 text-green-300';
+          resultEl.textContent = `Flag accepted! +${data.points} pts · ${data.name}`;
           setTimeout(() => { closeFlagModal(); location.reload(); }, 1800);
         } else {
-          resultEl.className = 'mb-4 alert-error';
-          resultEl.textContent = '✗ ' + (data.error || 'Invalid flag');
-          btn.textContent = 'Submit Flag';
+          resultEl.className = 'mb-4 font-label text-xs px-3 py-2 rounded bg-red-900/30 border border-red-700 text-red-300';
+          resultEl.textContent = data.error || 'Invalid flag';
+          btn.textContent = 'Submit Protocol';
           btn.disabled = false;
         }
       } catch (e) {
-        resultEl.className = 'mb-4 alert-error';
-        resultEl.textContent = 'Network error — check connection and try again.';
+        resultEl.className = 'mb-4 font-label text-xs px-3 py-2 rounded bg-red-900/30 border border-red-700 text-red-300';
+        resultEl.textContent = 'Network error — check connection.';
         resultEl.classList.remove('hidden');
-        btn.textContent = 'Submit Flag';
+        btn.textContent = 'Submit Protocol';
         btn.disabled = false;
       }
     }

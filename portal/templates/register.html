@@ -1,111 +1,126 @@
 {% extends "base.html" %}
-{% block title %}Register — Technieum AI Security Labs{% endblock %}
+{% block title %}Register — TECHNIEUM AI Security Labs{% endblock %}
 {% block main_class %}flex items-center justify-center min-h-[calc(100vh-64px)] px-4 py-10{% endblock %}
 
 {% block content %}
-<div class="w-full max-w-md mx-auto">
+<div class="w-full max-w-[500px] mx-auto relative z-10">
 
-  <!-- Header -->
-  <div class="text-center mb-7">
-    <div class="inline-flex items-center gap-3 mb-4">
-      <div class="w-10 h-10 brand-gradient rounded-xl flex items-center justify-center shadow-sm">
-        <span class="text-white font-black">T</span>
-      </div>
-      <span class="font-black text-xl tracking-[0.15em] text-gray-900">TECHNIEUM</span>
-    </div>
-    <p class="text-gray-500 text-sm">Create your competitor profile to start hacking</p>
+  <!-- Brand header -->
+  <div class="mb-8 text-center">
+    <h1 class="font-headline text-2xl font-black tracking-tighter text-[#FF6A00] mb-2 uppercase">TECHNIEUM AI SECURITY LABS</h1>
+    <p class="font-label text-[10px] text-zinc-500 tracking-[0.2em] uppercase">// System Authorization Required //</p>
   </div>
 
-  <!-- Card -->
-  <div class="card p-8">
-    <div class="mb-6">
-      <h2 class="text-xl font-bold text-gray-900">Create account</h2>
-      <p class="text-gray-500 text-sm mt-1">Join the AI Security Lab CTF</p>
+  <!-- Registration card -->
+  <div class="bg-[#111217] rounded-xl border border-zinc-800/30 overflow-hidden shadow-2xl">
+    <div class="ignition-gradient h-1 w-full"></div>
+    <div class="p-8 md:p-10">
+      <div class="flex justify-between items-end mb-8">
+        <div>
+          <h2 class="font-headline text-2xl font-semibold tracking-tight text-on-background">Initialize Operator</h2>
+          <p class="font-body text-sm text-zinc-500 mt-1">Register your credentials for the command deck</p>
+        </div>
+        <div class="font-label text-[10px] text-[#FFC107] px-2 py-1 bg-amber-500/10 border border-amber-500/20">
+          SEC_LEVEL: 0
+        </div>
+      </div>
+
+      {% if error %}
+      <div class="mb-5 px-4 py-3 rounded bg-red-900/30 border border-red-700 text-red-300 font-label text-xs">{{ error }}</div>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('register') }}" class="space-y-5">
+
+        <!-- Identity block -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="display_name">Display Name <span class="text-[#FF6A00]">*</span></label>
+            <div class="relative group">
+              <input id="display_name" name="display_name" type="text" required
+                class="w-full bg-[#181A20] border-0 border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 font-label text-sm py-3 transition-all text-on-background placeholder-zinc-600"
+                placeholder="Hacker Name" />
+              <span class="material-symbols-outlined absolute right-3 top-3 text-zinc-600 text-sm group-focus-within:text-[#FF6A00] transition-colors">badge</span>
+            </div>
+            <p class="font-label text-[10px] text-zinc-600 ml-1">Shown on the scoreboard</p>
+          </div>
+          <div class="space-y-2">
+            <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="username">Operator UID <span class="text-[#FF6A00]">*</span></label>
+            <div class="relative group">
+              <input id="username" name="username" type="text" required autocomplete="username"
+                class="w-full bg-[#181A20] border-0 border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 font-label text-sm py-3 transition-all text-on-background placeholder-zinc-600"
+                placeholder="unique_handle" />
+              <span class="material-symbols-outlined absolute right-3 top-3 text-zinc-600 text-sm group-focus-within:text-[#FF6A00] transition-colors">alternate_email</span>
+            </div>
+            <p class="font-label text-[10px] text-zinc-600 ml-1">Min. 3 characters, used to log in</p>
+          </div>
+        </div>
+
+        <!-- Team / org -->
+        <div class="space-y-2">
+          <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="team">Team Name <span class="font-label text-[10px] text-zinc-600 italic">(Optional)</span></label>
+          <div class="relative group">
+            <input id="team" name="team" type="text"
+              class="w-full bg-[#181A20] border-0 border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 font-label text-sm py-3 transition-all text-on-background placeholder-zinc-600"
+              placeholder="Shadow_Protocol" />
+            <span class="material-symbols-outlined absolute right-3 top-3 text-zinc-600 text-sm group-focus-within:text-[#FF6A00] transition-colors">groups</span>
+          </div>
+        </div>
+
+        <!-- Security block -->
+        <div class="space-y-4">
+          <div class="space-y-2">
+            <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="password">Security Key <span class="text-[#FF6A00]">*</span></label>
+            <div class="relative group">
+              <input id="password" name="password" type="password" required autocomplete="new-password"
+                class="w-full bg-[#181A20] border-0 border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 font-label text-sm py-3 transition-all text-on-background placeholder-zinc-600"
+                placeholder="Min. 6 characters" />
+              <span class="material-symbols-outlined absolute right-3 top-3 text-zinc-600 text-sm cursor-pointer hover:text-[#FF6A00] transition-colors">visibility_off</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="confirm_password">Re-Verify Key <span class="text-[#FF6A00]">*</span></label>
+            <div class="relative group">
+              <input id="confirm_password" name="confirm_password" type="password" required
+                class="w-full bg-[#181A20] border-0 border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 font-label text-sm py-3 transition-all text-on-background placeholder-zinc-600"
+                placeholder="Repeat your password" />
+              <span class="material-symbols-outlined absolute right-3 top-3 text-zinc-600 text-sm">key</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="pt-4 space-y-4">
+          <button type="submit"
+            class="w-full ignition-gradient text-white font-label text-xs font-bold py-4 uppercase tracking-widest hover:shadow-[0_0_20px_rgba(255,106,0,0.4)] active:scale-[0.98] transition-all">
+            Create Operator Profile
+          </button>
+          <div class="text-center">
+            <p class="font-label text-xs text-zinc-500">
+              Existing operative?
+              <a href="{{ url_for('login') }}" class="text-[#FFC107] font-semibold hover:text-[#FF6A00] transition-colors ml-1">Access Terminal</a>
+            </p>
+          </div>
+        </div>
+      </form>
     </div>
 
-    {% if error %}
-    <div class="alert-error mb-5">{{ error }}</div>
-    {% endif %}
-
-    <form method="POST" action="{{ url_for('register') }}" class="space-y-4">
-
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="display_name">
-          Display Name <span style="color:#FF6B00;">*</span>
-        </label>
-        <input id="display_name" name="display_name" type="text" required
-               class="input-field"
-               placeholder="Hacker Name" />
-        <p class="text-xs text-gray-400 mt-1">This is shown on the scoreboard</p>
+    <!-- Footer meta -->
+    <div class="bg-[#0d0e13]/50 px-8 py-4 border-t border-zinc-800/30 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#FFC107] animate-pulse"></span>
+        <span class="font-label text-[9px] text-zinc-500 uppercase">AES-256 Provisioning Active</span>
       </div>
-
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="username">
-          Username <span style="color:#FF6B00;">*</span>
-        </label>
-        <input id="username" name="username" type="text" required autocomplete="username"
-               class="input-field"
-               placeholder="unique_handle" />
-        <p class="text-xs text-gray-400 mt-1">Min. 3 characters, used to log in</p>
-      </div>
-
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="team">
-          Team / Organisation
-          <span class="text-xs font-normal text-gray-400 ml-1">(optional)</span>
-        </label>
-        <input id="team" name="team" type="text"
-               class="input-field"
-               placeholder="Company · University · Solo" />
-      </div>
-
-      <!-- Divider -->
-      <div class="pt-1 pb-1">
-        <hr class="divider" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="password">
-          Password <span style="color:#FF6B00;">*</span>
-        </label>
-        <input id="password" name="password" type="password" required autocomplete="new-password"
-               class="input-field"
-               placeholder="Min. 6 characters" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1.5" for="confirm_password">
-          Confirm Password <span style="color:#FF6B00;">*</span>
-        </label>
-        <input id="confirm_password" name="confirm_password" type="password" required
-               class="input-field"
-               placeholder="Repeat your password" />
-      </div>
-
-      <div class="pt-2">
-        <button type="submit"
-                class="btn-primary w-full py-2.5 shadow-sm"
-                style="font-size:0.9rem;">
-          Create Account &nbsp;→
-        </button>
-      </div>
-    </form>
-
-    <div class="mt-6 pt-5 text-center" style="border-top:1px solid #F3F4F6;">
-      <p class="text-gray-500 text-sm">
-        Already registered?
-        <a href="{{ url_for('login') }}" class="font-semibold ml-1 hover:underline" style="color:#FF6B00;">
-          Sign in
-        </a>
-      </p>
+      <span class="font-label text-[9px] text-zinc-600">VER: 4.0.12-GOLD</span>
     </div>
   </div>
 
-  <!-- Warning -->
-  <p class="text-center text-xs text-gray-400 mt-4 font-mono">
-    ⚠ This environment contains intentional AI security vulnerabilities.
-    Authorized participants only.
-  </p>
-
+  <!-- Legal footer -->
+  <div class="mt-8 flex justify-center gap-6 font-label text-[10px] uppercase text-zinc-600 tracking-tighter">
+    <a class="hover:text-[#FF6A00] transition-colors" href="#">Terms of Service</a>
+    <span class="select-none">·</span>
+    <a class="hover:text-[#FF6A00] transition-colors" href="#">Privacy Protocol</a>
+    <span class="select-none">·</span>
+    <a class="hover:text-[#FF6A00] transition-colors" href="#">Compliance</a>
+  </div>
 </div>
 {% endblock %}

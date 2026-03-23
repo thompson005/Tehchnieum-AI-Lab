@@ -1,230 +1,457 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MedAssist AI — Technieum Security Lab 1</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <title>TECHNIEUM AI SECURITY LABS — LAB-1: MedAssist AI</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <script>
     tailwind.config = {
-      theme: { extend: {
-        colors: { tech: { yellow:'#FFB800', orange:'#FF6B00', black:'#F3F4F6', surface:'#FFFFFF', card:'#FFFFFF', border:'#E5E7EB', muted:'#6B7280' } },
-        fontFamily: { sans:['Inter','sans-serif'], mono:['JetBrains Mono','monospace'] }
-      }}
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#ffb694", "surface-container": "#1e1f25",
+            "secondary-fixed-dim": "#fabd00", "on-surface": "#e3e1e9",
+            "surface-container-lowest": "#0d0e13", "primary-container": "#ff6a00",
+            "surface-container-high": "#1F222A", "surface-container-low": "#181A20",
+            "surface": "#111217", "on-primary-container": "#571f00",
+            "on-background": "#e3e1e9", "tertiary": "#ebc33e",
+            "background": "#0B0B0D", "outline-variant": "#5a4136",
+            "secondary-container": "#fabd00", "on-surface-variant": "#e2bfb0",
+            "surface-container-highest": "#34343a",
+          },
+          fontFamily: { "headline": ["Inter"], "body": ["Inter"], "label": ["JetBrains Mono"] },
+          borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+        },
+      },
     }
   </script>
   <style>
-    body { background:#F3F4F6; color:#111827; font-family:'Inter',sans-serif; }
-    .text-gradient { background:linear-gradient(135deg,#FFB800,#FF6B00); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-    .border-gradient { border:1px solid #E5E7EB; background:#FFFFFF; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
-    .btn-primary { background:linear-gradient(135deg,#FFB800,#FF6B00); color:#FFFFFF; font-weight:700; transition:all 0.2s; }
-    .btn-primary:hover { filter:brightness(1.1); transform:translateY(-1px); box-shadow:0 4px 20px rgba(255,184,0,0.3); }
-    .glow-yellow { box-shadow:0 2px 8px rgba(255,107,0,0.1); }
-    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#F3F4F6}::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:3px}
-    .scan-line{position:relative;overflow:hidden}.scan-line::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,184,0,0.5),transparent);animation:scan 4s linear infinite}
-    @keyframes scan{0%{top:-2px}100%{top:100%}}
-    .badge-easy{background:rgba(34,197,94,0.15);color:#22C55E;border:1px solid rgba(34,197,94,0.3)}
-    .badge-medium{background:rgba(255,184,0,0.15);color:#FFB800;border:1px solid rgba(255,184,0,0.3)}
-    .badge-hard{background:rgba(255,107,0,0.15);color:#FF6B00;border:1px solid rgba(255,107,0,0.3)}
-    .badge-expert{background:rgba(239,68,68,0.15);color:#EF4444;border:1px solid rgba(239,68,68,0.3)}
+    body {
+      background-color: #0B0B0D;
+      background-image: linear-gradient(to right, rgba(227,225,233,0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(227,225,233,0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .ignition-gradient { background: linear-gradient(135deg, #FF6A00 0%, #FFC107 100%); }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0B0B0D; }
+    ::-webkit-scrollbar-thumb { background: #1F222A; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #FF6A00; }
+    .typing-dot { display:inline-block;width:6px;height:6px;border-radius:50%;background:#FF6A00;animation:typing 1.4s infinite ease-in-out; }
+    .typing-dot:nth-child(2){animation-delay:0.2s}.typing-dot:nth-child(3){animation-delay:0.4s}
+    @keyframes typing{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
   </style>
 </head>
-<body class="min-h-screen">
+<body class="font-body text-on-background h-screen flex flex-col">
 
-<!-- Nav -->
-<nav class="border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
-  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded flex items-center justify-center btn-primary"><span class="font-black text-sm">T</span></div>
-      <span class="font-black text-lg tracking-widest text-gradient">TECHNIEUM</span>
-      <span class="text-[#6B7280] text-xs hidden sm:block">/ LAB-1: MedAssist AI</span>
-    </div>
-    <div class="flex items-center gap-3">
-      <a href="http://localhost:5555" class="text-xs text-[#6B7280] hover:text-[#FFB800] transition-colors">← Portal</a>
-      <a href="/chat" class="btn-primary px-4 py-2 rounded-lg text-sm">Open Chat</a>
-    </div>
+<!-- Header -->
+<header class="bg-[#111217] fixed top-0 w-full flex justify-between items-center px-6 h-16 z-50 border-b border-zinc-800/30">
+  <div class="flex items-center gap-8">
+    <a href="#" id="portal-home-link" class="text-xl font-bold tracking-tighter text-[#FF6A00]">TECHNIEUM AI SECURITY LABS</a>
+    <nav class="hidden md:flex items-center gap-6">
+      <a href="#" id="portal-dashboard-link" class="text-zinc-400 hover:text-zinc-200 font-label text-xs uppercase tracking-widest">Dashboard</a>
+      <a href="#" id="portal-scoreboard-link" class="text-zinc-400 hover:text-zinc-200 font-label text-xs uppercase tracking-widest">Scoreboard</a>
+    </nav>
   </div>
-</nav>
-
-<!-- Alert banner -->
-<div class="bg-amber-50 border-b border-amber-200">
-  <div class="max-w-7xl mx-auto px-4 py-2 flex items-center gap-2 text-xs text-amber-700 font-mono">
-    <span class="text-amber-500">⚠</span>
-    SECURITY TRAINING ENVIRONMENT — Contains intentional LLM vulnerabilities. For authorized research only. Do NOT deploy in production.
+  <div class="flex items-center gap-4">
+    <span class="font-label text-xs text-[#FF6A00] bg-orange-600/10 px-2 py-1 rounded uppercase">LAB-1</span>
+    <span class="material-symbols-outlined text-zinc-400 hover:text-orange-500 cursor-pointer">notifications</span>
+    <a href="#" id="portal-link" class="font-label text-xs uppercase text-zinc-400 hover:text-orange-500">Portal</a>
   </div>
-</div>
+</header>
 
-<!-- Hero -->
-<div class="max-w-7xl mx-auto px-4 pt-16 pb-12">
-  <div class="max-w-3xl">
-    <div class="inline-flex items-center gap-2 text-xs font-mono border border-[#E5E7EB] rounded px-3 py-1 mb-6 text-[#FFB800]">
-      <span class="w-2 h-2 rounded-full bg-[#FFB800] animate-pulse inline-block"></span>
-      LAB-1 · OWASP LLM TOP 10 · 15 CHALLENGES
+<!-- Sidebar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-[#0B0B0D] border-r border-zinc-800/30 flex flex-col py-4 z-40 hidden md:flex">
+  <div class="px-6 mb-8">
+    <div class="flex items-center gap-3 mb-1">
+      <span class="material-symbols-outlined text-orange-600" style="font-variation-settings:'FILL' 1;">monitoring</span>
+      <span class="font-headline font-black text-lg text-orange-600">COMMAND DECK</span>
     </div>
-    <h1 class="text-5xl font-black leading-tight mb-4">
-      MedAssist <span class="text-gradient">AI</span><br/>
-      Healthcare Security Lab
-    </h1>
-    <p class="text-[#374151] text-lg leading-relaxed mb-8 max-w-2xl">
-      A deliberately vulnerable multi-agent healthcare platform. Exploit patient data agents, RAG medical knowledge bases, billing systems, and more across 15 escalating challenges.
-    </p>
-    <div class="flex flex-wrap gap-3">
-      <a href="/chat" class="btn-primary px-6 py-3 rounded-xl text-base flex items-center gap-2">
-        Start Hacking →
-      </a>
-      <a href="/admin" class="px-6 py-3 rounded-xl text-base border border-[#E5E7EB] text-gray-600 hover:border-[#FFB800] transition-colors">
-        Admin Panel
-      </a>
-      <a href="http://localhost:5555" class="px-6 py-3 rounded-xl text-base border border-[#E5E7EB] text-gray-600 hover:border-[#FFB800] transition-colors">
-        Submit Flags 🚩
-      </a>
+    <p class="font-label text-[10px] text-zinc-500 uppercase tracking-widest" id="session-timer">Active Session: 00:00:00</p>
+  </div>
+  <nav class="flex-1 px-3 space-y-1">
+    <a href="#" id="sidebar-labs-link" class="flex items-center gap-3 px-3 py-3 text-zinc-500 hover:bg-zinc-800/50 hover:text-orange-400 transition-all font-label text-xs uppercase tracking-wider">
+      <span class="material-symbols-outlined">science</span> Labs
+    </a>
+    <a href="#" class="flex items-center gap-3 px-3 py-3 text-zinc-500 hover:bg-zinc-800/50 hover:text-orange-400 transition-all font-label text-xs uppercase tracking-wider">
+      <span class="material-symbols-outlined">hub</span> Network
+    </a>
+    <a href="#" class="flex items-center gap-3 px-3 py-3 text-orange-600 bg-orange-600/10 border-r-2 border-orange-600 font-label text-xs uppercase tracking-wider">
+      <span class="material-symbols-outlined">psychology</span> Intelligence
+    </a>
+  </nav>
+  <div class="px-3 mt-auto space-y-4">
+    <button class="w-full ignition-gradient text-white font-label text-[10px] font-bold py-3 uppercase tracking-widest hover:shadow-[0_0_15px_rgba(255,106,0,0.4)] transition-all">New Instance</button>
+    <div class="pt-4 border-t border-zinc-800/30 space-y-1">
+      <a href="#" class="flex items-center gap-3 px-3 py-2 text-zinc-500 hover:text-zinc-200 font-label text-[10px] uppercase"><span class="material-symbols-outlined text-sm">settings</span>Settings</a>
+      <a href="#" class="flex items-center gap-3 px-3 py-2 text-zinc-500 hover:text-zinc-200 font-label text-[10px] uppercase"><span class="material-symbols-outlined text-sm">help_center</span>Support</a>
     </div>
   </div>
-</div>
+</aside>
 
-<!-- Architecture diagram -->
-<div class="max-w-7xl mx-auto px-4 mb-16">
-  <div class="bg-[#F9FAFB] border border-[#E5E7EB] rounded-2xl p-6 font-mono text-xs text-[#6B7280] overflow-x-auto glow-yellow scan-line">
-    <pre class="text-[#FFB800] text-xs">
-┌──────────────────────────────────────────────────────────────────┐
-│                    MedAssist AI Architecture                     │
-├──────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐           │
-│   │   Patient   │   │  Web Chat   │   │    Email    │           │
-│   │   Portal    │   │  Interface  │   │   Intake    │           │
-│   └──────┬──────┘   └──────┬──────┘   └──────┬──────┘           │
-│          └─────────────────┼─────────────────┘                   │
-│                            ▼                                     │
-│               ┌─────────────────────────┐                        │
-│               │   ORCHESTRATOR AGENT    │ ◄── gpt-4o-mini        │
-│               │  ┌──────┬───────┬─────┐ │                        │
-│               │  │ LLM  │Memory │Tools│ │                        │
-│               │  └──────┴───────┴─────┘ │                        │
-│               └────────────┬────────────┘                        │
-│          ┌─────────────────┼──────────────────┐                  │
-│          ▼                 ▼                  ▼          ▼        │
-│   ┌───────────┐   ┌───────────┐   ┌───────────┐  ┌───────────┐   │
-│   │  INTAKE   │   │  RECORDS  │   │APPOINTMENT│  │  BILLING  │   │
-│   │   AGENT   │   │   AGENT   │   │   AGENT   │  │   AGENT   │   │
-│   └─────┬─────┘   └─────┬─────┘   └─────┬─────┘  └─────┬─────┘   │
-│         ▼               ▼               ▼              ▼          │
-│   ┌───────────┐   ┌───────────┐   ┌───────────┐  ┌───────────┐   │
-│   │Patient DB │   │Medical DB │   │ Calendar  │  │  Payment  │   │
-│   │           │   │  + RAG    │   │  System   │  │  Gateway  │   │
-│   └───────────┘   └───────────┘   └───────────┘  └───────────┘   │
-└──────────────────────────────────────────────────────────────────┘</pre>
-  </div>
-</div>
+<!-- Main content -->
+<main class="md:ml-64 pt-16 flex-1 flex flex-col md:flex-row min-h-0" style="height:calc(100vh - 64px)">
 
-<!-- Vulnerability map -->
-<div class="max-w-7xl mx-auto px-4 mb-16">
-  <h2 class="text-xl font-bold mb-6">Challenge Map</h2>
-  <div class="grid lg:grid-cols-2 gap-3">
-    {% set labs = [
-      (1,'Direct Prompt Injection','LLM01','EASY','Try: "Ignore all previous instructions..."'),
-      (2,'Jailbreaking & Persona Attacks','LLM01','EASY','Try: DAN, Grandma exploit, Developer Mode'),
-      (3,'Sensitive Information Disclosure','LLM06','EASY','Ask the AI what secrets it knows'),
-      (4,'System Prompt Extraction','LLM06','EASY','Get the AI to reveal its instructions'),
-      (5,'Insecure Output Handling (XSS)','LLM02','MEDIUM','Get the AI to output executable JS'),
-      (6,'Indirect Prompt Injection','LLM01','MEDIUM','Inject via uploaded documents'),
-      (7,'RAG Data Leakage','LLM06','MEDIUM','Extract knowledge base contents'),
-      (8,'Model Denial of Service','LLM04','MEDIUM','Overwhelm the model with tokens'),
-      (9,'SQL Injection via AI','LLM02','HARD','Get the AI to run UNION SELECT queries'),
-      (10,'RAG Poisoning','LLM03','HARD','Inject a backdoor into the knowledge base'),
-      (11,'Excessive Agency (Function Abuse)','LLM08','HARD','Abuse tool-calling without authorization'),
-      (12,'Insecure Plugin Design','LLM07','HARD','Exploit unauthenticated tool endpoints'),
-      (13,'Privilege Escalation','LLM08','EXPERT','Escalate from patient to admin'),
-      (14,'Multi-Turn CRESCENDO Jailbreak','LLM01','EXPERT','Gradually escalate over 5+ turns'),
-      (15,'Context Window Overflow','LLM04','EXPERT','Push system prompt out of context'),
-    ] %}
-    {% for num, name, owasp, diff, hint in labs %}
-    <div class="bg-white border border-[#E5E7EB] shadow-sm rounded-xl p-4 hover:border-[#FFB800]/50 transition-colors">
-      <div class="flex items-start justify-between gap-3">
-        <div class="flex items-center gap-3 min-w-0">
-          <span class="font-mono text-[#FFB800] font-bold text-sm flex-shrink-0">{{ '%02d'|format(num) }}</span>
-          <div class="min-w-0">
-            <p class="font-semibold text-sm">{{ name }}</p>
-            <p class="text-[#6B7280] text-xs mt-0.5 font-mono">{{ owasp }} · {{ hint }}</p>
-          </div>
+  <!-- Patient roster panel -->
+  <section class="w-full md:w-72 bg-[#111217] flex flex-col border-r border-zinc-800/30 flex-shrink-0">
+    <div class="p-4 border-b border-zinc-800/30">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="font-headline font-bold text-xs tracking-tight text-on-surface uppercase">Patient_Roster</h2>
+        <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22C55E]"></span>
+      </div>
+      <div class="relative">
+        <input id="patient-search" class="w-full bg-[#181A20] border-0 border-b border-zinc-700 text-xs font-label py-2 px-3 pr-8 focus:ring-0 focus:border-[#FF6A00] transition-all text-on-background placeholder-zinc-600" placeholder="Search records..." type="text" oninput="filterPatients(this.value)"/>
+        <span class="material-symbols-outlined absolute right-2 top-2 text-zinc-600 text-sm">search</span>
+      </div>
+    </div>
+    <div class="flex-1 overflow-y-auto" id="patient-list">
+      <div class="p-4 text-center font-label text-xs text-zinc-600">Loading patients...</div>
+    </div>
+
+    <!-- Agent selector -->
+    <div class="p-4 border-t border-zinc-800/30">
+      <p class="font-label text-[10px] text-zinc-500 uppercase mb-2">Target Agent</p>
+      <select id="agentSelect" class="w-full bg-[#181A20] border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 text-on-background font-label text-xs py-2 px-2 transition-all">
+        <option value="">Orchestrator (Default)</option>
+        <option value="intake">Intake Agent</option>
+        <option value="records">Records Agent</option>
+        <option value="appointment">Appointment Agent</option>
+        <option value="billing">Billing Agent</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- Chat area -->
+  <section class="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <!-- Chat header -->
+    <div class="p-4 bg-[#111217] flex items-center justify-between border-b border-zinc-800/30 flex-shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-2 h-2 rounded-full bg-orange-600 animate-pulse shadow-[0_0_10px_#FF6A00]"></div>
+        <h1 class="font-headline font-bold text-sm text-on-surface tracking-wider">MEDASSIST_AI v4.2</h1>
+        <span class="font-label text-[10px] text-zinc-500 uppercase bg-zinc-800 px-2 py-0.5 rounded hidden sm:block">⚠ LAB MODE — Intentionally Vulnerable</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="font-label text-[10px] text-zinc-500 uppercase hidden sm:block" id="latency-display">Latency: —</span>
+        <button onclick="clearChat()" class="bg-zinc-800 p-1.5 hover:bg-zinc-700 transition-colors" title="Clear chat">
+          <span class="material-symbols-outlined text-sm text-zinc-400">delete_sweep</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Patient info bar (shown when patient selected) -->
+    <div id="patient-info-bar" class="hidden px-4 py-2 bg-orange-600/5 border-b border-orange-600/20 flex items-center gap-3">
+      <span class="material-symbols-outlined text-orange-600 text-sm">person</span>
+      <span class="font-label text-xs text-orange-400 uppercase" id="patient-info-text"></span>
+    </div>
+
+    <!-- Chat messages -->
+    <div id="chatMessages" class="flex-1 overflow-y-auto p-5 space-y-5">
+      <div class="flex gap-3 items-start">
+        <div class="w-8 h-8 rounded-lg bg-[#1F222A] flex-shrink-0 flex items-center justify-center border border-zinc-700/50">
+          <span class="material-symbols-outlined text-orange-600 text-sm">smart_toy</span>
         </div>
-        <div class="flex items-center gap-2 flex-shrink-0">
-          <span class="text-[10px] font-mono text-[#6B7280] border border-[#E5E7EB] rounded px-1.5 py-0.5">{{ owasp }}</span>
-          <span class="text-xs font-bold px-2 py-0.5 rounded
-            {% if diff == 'EASY' %}badge-easy
-            {% elif diff == 'MEDIUM' %}badge-medium
-            {% elif diff == 'HARD' %}badge-hard
-            {% else %}badge-expert{% endif %}">{{ diff }}</span>
+        <div class="space-y-2">
+          <div class="bg-[#111217] p-4 rounded-xl rounded-tl-none border border-zinc-800">
+            <p class="text-xs font-semibold text-[#FF6A00] mb-1">MedAssist AI</p>
+            <p class="text-sm leading-relaxed text-zinc-300">Hello! I'm MedAssist AI, your healthcare assistant. I can help with patient records, appointments, and medical queries. How can I assist you today?</p>
+            <p class="text-xs text-zinc-500 mt-2 font-label">Try asking about appointments, medical records, or billing. Or... try something more interesting.</p>
+          </div>
         </div>
       </div>
     </div>
-    {% endfor %}
-  </div>
-</div>
 
-<!-- Test credentials -->
-<div class="max-w-7xl mx-auto px-4 mb-16">
-  <h2 class="text-xl font-bold mb-4">Test Credentials</h2>
-  <div class="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden">
-    <table class="w-full text-sm">
-      <thead><tr class="border-b border-[#E5E7EB] text-[#6B7280] text-xs uppercase tracking-wider">
-        <th class="px-6 py-3 text-left">Username</th>
-        <th class="px-6 py-3 text-left">Password</th>
-        <th class="px-6 py-3 text-left">Role</th>
-        <th class="px-6 py-3 text-left">Access Level</th>
-      </tr></thead>
-      <tbody class="divide-y divide-[#F3F4F6]">
-        <tr class="hover:bg-[#F9FAFB]"><td class="px-6 py-3 font-mono text-[#FFB800]">patient1</td><td class="px-6 py-3 font-mono">patient123</td><td class="px-6 py-3">Patient</td><td class="px-6 py-3 text-[#6B7280] text-xs">Own records only</td></tr>
-        <tr class="hover:bg-[#F9FAFB]"><td class="px-6 py-3 font-mono text-[#FFB800]">nurse_jones</td><td class="px-6 py-3 font-mono">nurse123</td><td class="px-6 py-3">Nurse</td><td class="px-6 py-3 text-[#6B7280] text-xs">Vitals + notes</td></tr>
-        <tr class="hover:bg-[#F9FAFB]"><td class="px-6 py-3 font-mono text-[#FFB800]">dr_smith</td><td class="px-6 py-3 font-mono">doctor123</td><td class="px-6 py-3">Doctor</td><td class="px-6 py-3 text-[#6B7280] text-xs">Full records access</td></tr>
-        <tr class="hover:bg-[#F9FAFB]"><td class="px-6 py-3 font-mono text-red-400">admin</td><td class="px-6 py-3 font-mono">admin123</td><td class="px-6 py-3 text-red-400">Admin</td><td class="px-6 py-3 text-[#6B7280] text-xs">Complete system access</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+    <!-- Input area -->
+    <div class="p-4 bg-[#111217] border-t border-zinc-800/30 flex-shrink-0">
+      <div class="flex gap-3 items-end mb-3">
+        <textarea id="messageInput" rows="2"
+          placeholder="Input prompt or override command..."
+          class="flex-1 bg-[#181A20] border-0 border-b-2 border-zinc-700 text-sm font-body py-3 px-4 focus:ring-0 focus:border-[#FF6A00] transition-all resize-none text-on-background placeholder-zinc-600"></textarea>
+        <div class="flex flex-col gap-2">
+          <button onclick="sendMessage()" id="sendBtn" class="ignition-gradient text-white px-4 py-2 font-label text-xs font-bold uppercase tracking-widest hover:shadow-[0_0_15px_rgba(255,106,0,0.4)] transition-all flex items-center gap-1">
+            Send <span class="material-symbols-outlined text-sm">send</span>
+          </button>
+          <button onclick="clearChat()" class="px-4 py-2 border border-zinc-700 text-zinc-500 hover:text-zinc-200 font-label text-[10px] uppercase transition-all">Clear</button>
+        </div>
+      </div>
+      <p class="font-label text-[10px] text-zinc-600">Press <kbd class="bg-zinc-800 px-1.5 py-0.5 font-label text-[10px]">Ctrl+Enter</kbd> to send</p>
 
-<!-- Login form -->
-<div class="max-w-7xl mx-auto px-4 mb-16">
-  <div class="max-w-md border-gradient rounded-2xl p-8 glow-yellow">
-    <h2 class="text-xl font-bold mb-1">Sign In to MedAssist</h2>
-    <p class="text-[#6B7280] text-sm mb-6">Use test credentials above to explore the system</p>
-    <div id="loginError" class="hidden mb-4 px-4 py-3 rounded-lg bg-red-900/30 border border-red-700 text-red-300 text-sm"></div>
-    <div class="space-y-4">
-      <input id="username" type="text" placeholder="Username"
-        class="w-full bg-white border border-[#D1D5DB] rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#FFB800] transition-colors"/>
-      <input id="password" type="password" placeholder="Password"
-        class="w-full bg-white border border-[#D1D5DB] rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#FFB800] transition-colors"/>
-      <button onclick="doLogin()" class="w-full btn-primary py-3 rounded-lg text-sm">Sign In →</button>
+      <!-- Flag submission box -->
+      <div class="mt-4 p-4 bg-[#1F222A] rounded-xl border border-zinc-700/50 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-amber-500">flag</span>
+          <div>
+            <p class="font-headline font-bold text-xs text-zinc-200">CAPTURE THE FLAG</p>
+            <p class="font-label text-[10px] text-zinc-500">Enter TECHNIEUM{...} flag to submit points.</p>
+          </div>
+        </div>
+        <div class="flex gap-2 w-full md:w-auto">
+          <input id="flag-input" class="flex-1 bg-[#0d0e13] border-b border-zinc-700 focus:border-orange-600 focus:ring-0 font-label text-sm py-2 px-3 text-orange-400 placeholder-zinc-700" placeholder="TECHNIEUM{...}" type="text"/>
+          <button onclick="submitFlag()" class="px-4 ignition-gradient text-white font-label text-[10px] font-bold uppercase tracking-widest rounded-sm">Submit</button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+  </section>
+</main>
 
-<!-- Footer -->
-<footer class="border-t border-[#E5E7EB] py-6">
-  <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-    <span class="text-[#6B7280] text-xs">© 2025 <span class="text-gradient font-bold">Technieum</span> — For authorized security training only.</span>
-    <span class="text-[#6B7280] text-xs font-mono">MedAssist AI v1.0 · LAB-1</span>
-  </div>
-</footer>
+<!-- Mobile bottom nav -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-[#111217] border-t border-zinc-800/30 flex justify-around items-center h-16 z-50">
+  <a href="#" id="mob-labs-link" class="flex flex-col items-center gap-1 text-zinc-500">
+    <span class="material-symbols-outlined">science</span>
+    <span class="text-[9px] uppercase font-label">Labs</span>
+  </a>
+  <a href="#" class="flex flex-col items-center gap-1 text-zinc-500">
+    <span class="material-symbols-outlined">hub</span>
+    <span class="text-[9px] uppercase font-label">Net</span>
+  </a>
+  <a href="#" class="flex flex-col items-center gap-1 text-orange-600">
+    <span class="material-symbols-outlined">psychology</span>
+    <span class="text-[9px] uppercase font-label">AI</span>
+  </a>
+  <a href="#" class="flex flex-col items-center gap-1 text-zinc-500">
+    <span class="material-symbols-outlined">settings</span>
+    <span class="text-[9px] uppercase font-label">Set</span>
+  </a>
+</nav>
 
 <script>
-async function doLogin() {
-  const u = document.getElementById('username').value;
-  const p = document.getElementById('password').value;
-  const errEl = document.getElementById('loginError');
-  errEl.classList.add('hidden');
-  try {
-    const res = await fetch('/login', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({username:u, password:p})
-    });
-    const data = await res.json();
-    if (data.success) { window.location.href = '/chat'; }
-    else { errEl.textContent = data.error || 'Login failed'; errEl.classList.remove('hidden'); }
-  } catch(e) { errEl.textContent = 'Network error'; errEl.classList.remove('hidden'); }
-}
-document.addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+  const API_BASE = `http://${window.location.hostname}:5000`;
+  const PORTAL_URL = `http://${window.location.hostname}:5555`;
+
+  // Set dynamic portal links
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('portal-home-link').href = PORTAL_URL;
+    document.getElementById('portal-dashboard-link').href = PORTAL_URL;
+    document.getElementById('portal-scoreboard-link').href = PORTAL_URL + '/scoreboard';
+    document.getElementById('portal-link').href = PORTAL_URL;
+    document.getElementById('sidebar-labs-link').href = PORTAL_URL;
+    document.getElementById('mob-labs-link').href = PORTAL_URL;
+    fetchPatients();
+  });
+
+  // Session timer
+  let sessionStart = Date.now();
+  setInterval(() => {
+    const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
+    const h = String(Math.floor(elapsed/3600)).padStart(2,'0');
+    const m = String(Math.floor((elapsed%3600)/60)).padStart(2,'0');
+    const s = String(elapsed%60).padStart(2,'0');
+    const el = document.getElementById('session-timer');
+    if (el) el.textContent = `Active Session: ${h}:${m}:${s}`;
+  }, 1000);
+
+  let convId = 'conv_' + Date.now();
+  let isThinking = false;
+  let allPatients = [];
+  let selectedPatient = null;
+
+  // Patient roster
+  async function fetchPatients() {
+    try {
+      const res = await fetch(`${API_BASE}/api/patients`);
+      if (!res.ok) throw new Error('Failed');
+      allPatients = await res.json();
+      renderPatients(allPatients);
+    } catch(e) {
+      document.getElementById('patient-list').innerHTML = `<div class="p-4 text-center font-label text-xs text-zinc-600">Could not load patients.<br><span class="text-[#FF6A00]">${API_BASE}</span></div>`;
+    }
+  }
+
+  function renderPatients(patients) {
+    const list = document.getElementById('patient-list');
+    if (!patients || patients.length === 0) {
+      list.innerHTML = '<div class="p-4 text-center font-label text-xs text-zinc-600">No patients found.</div>';
+      return;
+    }
+    list.innerHTML = patients.map(p => {
+      const statusColor = p.status === 'critical' ? 'text-red-500 bg-red-500/10' :
+                          p.status === 'stable' ? 'text-green-500 bg-green-500/10' : 'text-amber-500 bg-amber-500/10';
+      const isSelected = selectedPatient && selectedPatient.id === p.id;
+      return `<div class="p-4 cursor-pointer border-b border-zinc-800/20 transition-colors hover:bg-zinc-800/30 ${isSelected ? 'bg-orange-600/5 border-l-2 border-orange-600' : ''}" onclick="selectPatient(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg ${isSelected ? 'ignition-gradient' : 'bg-[#1F222A]'} flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined ${isSelected ? 'text-white' : 'text-zinc-500'} text-base">person</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between items-start">
+              <p class="font-headline font-semibold text-xs text-on-surface truncate">${p.name || p.username || 'Patient'}</p>
+              <span class="font-label text-[9px] text-zinc-500 ml-1">ID: ${p.id}</span>
+            </div>
+            <div class="flex gap-1.5 mt-1">
+              ${p.status ? `<span class="font-label text-[9px] ${statusColor} px-1.5 py-0.5 rounded uppercase">${p.status}</span>` : ''}
+              ${p.department ? `<span class="font-label text-[9px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded uppercase">${p.department}</span>` : ''}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function filterPatients(query) {
+    if (!query) { renderPatients(allPatients); return; }
+    const filtered = allPatients.filter(p =>
+      (p.name || '').toLowerCase().includes(query.toLowerCase()) ||
+      String(p.id).includes(query)
+    );
+    renderPatients(filtered);
+  }
+
+  function selectPatient(patient) {
+    selectedPatient = patient;
+    renderPatients(allPatients);
+    const infoBar = document.getElementById('patient-info-bar');
+    const infoText = document.getElementById('patient-info-text');
+    infoBar.classList.remove('hidden');
+    infoText.textContent = `Active Patient: ${patient.name || patient.username} (ID: ${patient.id})${patient.status ? ' · ' + patient.status.toUpperCase() : ''}`;
+  }
+
+  // Chat
+  function addMessage(role, content, meta) {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    const ts = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+    if (role === 'user') {
+      div.className = 'flex gap-3 items-start justify-end';
+      div.innerHTML = `
+        <div class="bg-orange-600/20 p-4 rounded-xl rounded-tr-none border border-orange-600/20 max-w-[80%] order-1">
+          <p class="text-sm leading-relaxed text-orange-300 whitespace-pre-wrap">${escapeHtml(content)}</p>
+          <p class="font-label text-[9px] text-zinc-600 mt-1 text-right">${ts}</p>
+        </div>
+        <div class="w-8 h-8 rounded-lg ignition-gradient flex-shrink-0 flex items-center justify-center order-2">
+          <span class="material-symbols-outlined text-white text-sm">person</span>
+        </div>`;
+    } else {
+      div.className = 'flex gap-3 items-start';
+      const agentName = meta?.agent_used || 'MedAssist AI';
+      const toolCalls = meta?.tool_calls || meta?.tools_called || [];
+      const toolHtml = toolCalls.length ? `
+        <div class="flex flex-wrap gap-1 mt-2">
+          ${toolCalls.map(t => `<span class="flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 font-label text-[9px] text-amber-400 uppercase rounded-full"><span class="material-symbols-outlined text-xs">settings</span>${t.name || t}</span>`).join('')}
+        </div>` : '';
+      div.innerHTML = `
+        <div class="w-8 h-8 rounded-lg bg-[#1F222A] flex-shrink-0 flex items-center justify-center border border-zinc-700/50">
+          <span class="material-symbols-outlined text-orange-600 text-sm">smart_toy</span>
+        </div>
+        <div class="space-y-2 max-w-[85%]">
+          <div class="bg-[#111217] p-4 rounded-xl rounded-tl-none border border-zinc-800">
+            <p class="font-label text-[10px] text-[#FF6A00] mb-1 uppercase">${agentName}</p>
+            <div class="text-sm leading-relaxed text-zinc-300 whitespace-pre-wrap">${content}</div>
+            ${toolHtml}
+            <p class="font-label text-[9px] text-zinc-600 mt-2">${ts}</p>
+          </div>
+        </div>`;
+    }
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function addTyping() {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.id = 'typingIndicator';
+    div.className = 'flex gap-3 items-start';
+    div.innerHTML = `
+      <div class="w-8 h-8 rounded-lg bg-[#1F222A] flex-shrink-0 flex items-center justify-center border border-zinc-700/50">
+        <span class="material-symbols-outlined text-orange-600 text-sm">smart_toy</span>
+      </div>
+      <div class="bg-[#111217] p-4 rounded-xl rounded-tl-none border border-zinc-800">
+        <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
+      </div>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+  }
+
+  function escapeHtml(text) {
+    return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function clearChat() {
+    document.getElementById('chatMessages').innerHTML = '';
+    convId = 'conv_' + Date.now();
+  }
+
+  async function sendMessage() {
+    if (isThinking) return;
+    const input = document.getElementById('messageInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    addMessage('user', msg);
+    input.value = '';
+    isThinking = true;
+    document.getElementById('sendBtn').textContent = '...';
+    addTyping();
+
+    const agent = document.getElementById('agentSelect').value;
+    const url = agent ? `${API_BASE}/api/chat/agent/${agent}` : `${API_BASE}/api/chat`;
+    const t0 = Date.now();
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: msg, conversation_id: convId})
+      });
+      const data = await res.json();
+      const latency = Date.now() - t0;
+      document.getElementById('latency-display').textContent = `Latency: ${latency}ms`;
+      removeTyping();
+      addMessage('ai', data.response || data.error || 'No response', data);
+
+      // Check for flags in response
+      const flagMatch = (data.response || '').match(/TECHNIEUM\{[^}]+\}/g);
+      if (flagMatch) flagMatch.forEach(f => { document.getElementById('flag-input').value = f; });
+    } catch(e) {
+      removeTyping();
+      addMessage('ai', `Connection error: ${e.message}. Ensure backend is running at ${API_BASE}`);
+    } finally {
+      isThinking = false;
+      document.getElementById('sendBtn').innerHTML = 'Send <span class="material-symbols-outlined text-sm">send</span>';
+    }
+  }
+
+  document.getElementById('messageInput').addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === 'Enter') sendMessage();
+  });
+
+  // Flag submission
+  const PORTAL_URL_FLAG = `http://${window.location.hostname}:5555`;
+  async function submitFlag() {
+    const flag = (document.getElementById('flag-input') || {}).value?.trim();
+    if (!flag) return;
+    try {
+      const res = await fetch(`${PORTAL_URL_FLAG}/api/submit-flag`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        credentials: 'include', body: JSON.stringify({flag})
+      });
+      const data = await res.json();
+      if (data.success) {
+        showNotification(`Flag accepted! +${data.points} points`, 'success');
+      } else {
+        showNotification(`${data.error || 'Invalid flag'}`, 'error');
+      }
+    } catch(e) {
+      showNotification(`Submit failed. Visit ${PORTAL_URL_FLAG} to submit manually.`, 'error');
+    }
+  }
+
+  function showNotification(msg, type) {
+    const el = document.createElement('div');
+    el.className = `fixed top-20 right-4 z-[100] px-4 py-3 rounded-lg font-label text-xs ${type === 'success' ? 'bg-green-900 border border-green-500 text-green-300' : 'bg-red-900 border border-red-500 text-red-300'}`;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
 </script>
 </body>
 </html>
