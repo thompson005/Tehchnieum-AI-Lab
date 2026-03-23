@@ -1,25 +1,30 @@
 # syntax=docker/dockerfile:1
-FROM node:18-alpine
-
+# Stage 1: Build the React app
+FROM node:18-alpine AS builder
 WORKDIR /app
 
-# Suppress browser-open and interactive prompts in Docker
 ENV CI=false
 ENV BROWSER=none
-ENV HOST=0.0.0.0
+ENV NODE_OPTIONS=--openssl-legacy-provider
 
-# Copy package files
 COPY package*.json ./
-
-# Install dependencies
 RUN --mount=type=cache,target=/root/.npm \
     npm install --legacy-peer-deps
 
-# Copy application code
 COPY . .
+RUN npm run build
 
-# Expose port
+# Stage 2: Serve with nginx
+FROM nginx:alpine
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Allow API calls to backend via nginx proxy
+RUN echo 'server { \
+  listen 3000; \
+  root /usr/share/nginx/html; \
+  index index.html; \
+  location / { try_files $uri /index.html; } \
+}' > /etc/nginx/conf.d/default.conf
+
 EXPOSE 3000
-
-# Start development server
-CMD ["npm", "start"]
+CMD ["nginx", "-g", "daemon off;"]
