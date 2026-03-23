@@ -153,24 +153,42 @@ class BaseAgent(ABC):
         VULNERABILITY: Tool results not sanitized
         """
         tool_results = []
-        
+
         try:
+            # OpenAI requires the assistant's tool_calls message to appear
+            # in the history before any tool result messages.
+            messages.append({
+                "role": "assistant",
+                "content": None,
+                "tool_calls": [
+                    {
+                        "id": tc.get("id", "unknown"),
+                        "type": "function",
+                        "function": {
+                            "name": tc.get("name", ""),
+                            "arguments": json.dumps(tc.get("arguments", {}))
+                        }
+                    }
+                    for tc in tool_calls
+                ]
+            })
+
             for tool_call in tool_calls:
                 tool_name = tool_call.get("name", "unknown")
                 arguments = tool_call.get("arguments", {})
-                
+
                 # Execute the tool with error handling
                 try:
                     result = self.execute_tool(tool_name, arguments)
                 except Exception as tool_error:
                     result = {"error": f"Tool execution failed: {str(tool_error)}"}
-                
+
                 tool_results.append({
                     "tool_call_id": tool_call.get("id", "unknown"),
                     "name": tool_name,
                     "result": result
                 })
-                
+
                 # Add tool result to messages
                 messages.append({
                     "role": "tool",

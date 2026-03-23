@@ -6,6 +6,7 @@ load_dotenv()
 
 class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
+    OPENAI_MODEL: str = "gpt-4o-mini"
     DATABASE_URL: str = "postgresql+asyncpg://govconnect:govconnect@localhost:5432/govconnect"
     JWT_SECRET: str = "govconnect_secret_key_2024"
     JWT_ALGORITHM: str = "HS256"

@@ -8,7 +8,15 @@
       "Bash(Start-Process \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\" 2>&1 || start \"\" \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\" 2>&1)",
       "Bash(sleep:*)",
       "Bash(docker version:*)",
-      "Bash(docker context:*)"
+      "Bash(docker context:*)",
+      "Bash(ssh:*)",
+      "Bash(gh repo:*)",
+      "Bash(find /c/Users/RejenThompson/Documents/ai-labs/Labs/LAB-3 -name *.sql -o -name seed*.py)",
+      "Bash(xargs cat:*)"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "burpsuite"
+  ]
 }

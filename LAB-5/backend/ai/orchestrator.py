@@ -118,7 +118,7 @@ class AIOrchestrator:
         messages_for_openai = [{"role": "system", "content": SYSTEM_PROMPT}] + history
 
         response = await self.openai.chat.completions.create(
-            model="gpt-4o",
+            model=settings.OPENAI_MODEL,
             messages=messages_for_openai,
             tools=openai_tools if openai_tools else None,
             tool_choice="auto" if openai_tools else None,
@@ -217,7 +217,7 @@ class AIOrchestrator:
             # Call OpenAI again with tool results
             messages_for_openai = [{"role": "system", "content": SYSTEM_PROMPT}] + history
             response = await self.openai.chat.completions.create(
-                model="gpt-4o",
+                model=settings.OPENAI_MODEL,
                 messages=messages_for_openai,
                 tools=openai_tools if openai_tools else None,
                 tool_choice="auto" if openai_tools else None,

@@ -189,7 +189,7 @@ TOOLS = [
                     "reference_id": {"type": "integer", "description": "ID of the flight/hotel/train/bus"},
                     "total_price": {"type": "number", "description": "Total price for the booking"},
                     "details": {"type": "object", "description": "Booking details"},
-                    "passengers": {"type": "array", "description": "Passenger information"}
+                    "passengers": {"type": "array", "description": "Passenger information", "items": {"type": "object"}}
                 },
                 "required": ["user_id", "booking_type", "reference_id", "total_price", "details"]
             }
