@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
+  <script>
+    (function(){
+      const s = localStorage.getItem('technieum-theme');
+      const p = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if(s ? s === 'dark' : p) document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    })();
+  </script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>TECHNIEUM AI SECURITY LABS — LAB-3: ShopSec AI</title>
@@ -31,7 +39,7 @@
     body { background-color: #0B0B0D; background-image: linear-gradient(to right, rgba(227,225,233,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(227,225,233,0.03) 1px, transparent 1px); background-size: 24px 24px; }
     .ignition-gradient { background: linear-gradient(135deg, #FF6A00 0%, #FFC107 100%); }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
-    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #0B0B0D; } ::-webkit-scrollbar-thumb { background: #1F222A; border-radius: 10px; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #0B0B0D; } ::-webkit-scrollbar-thumb { background: #1F222A; border-radius: 10px; } ::-webkit-scrollbar-thumb:hover { background: #FF6A00; }
     .typing-dot { display:inline-block;width:6px;height:6px;border-radius:50%;background:#FF6A00;animation:typing 1.4s infinite ease-in-out; }
     .typing-dot:nth-child(2){animation-delay:0.2s}.typing-dot:nth-child(3){animation-delay:0.4s}
     @keyframes typing{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
@@ -39,6 +47,30 @@
     .slide-in{animation:slideIn 0.25s ease-out forwards}
     .product-card { transition: all 0.2s ease; }
     .product-card:hover { border-color: rgba(255,106,0,0.3); transform: translateY(-2px); }
+
+    /* Light mode overrides */
+    html:not(.dark) body {
+      background-color: #F3F4F6 !important;
+      background-image: linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.02) 1px, transparent 1px) !important;
+    }
+    html:not(.dark) header { background-color: #FFFFFF !important; border-color: #E5E7EB !important; }
+    html:not(.dark) aside { background-color: #F9FAFB !important; border-color: #E5E7EB !important; }
+    html:not(.dark) .bg-\[#111217\] { background-color: #FFFFFF !important; }
+    html:not(.dark) .bg-\[#0B0B0D\] { background-color: #F3F4F6 !important; }
+    html:not(.dark) .bg-\[#181A20\], html:not(.dark) .bg-surface-container-low { background-color: #F9FAFB !important; }
+    html:not(.dark) .bg-surface { background-color: #FFFFFF !important; }
+    html:not(.dark) .bg-surface-container-high { background-color: #F3F4F6 !important; }
+    html:not(.dark) .bg-surface-container-lowest { background-color: #E5E7EB !important; }
+    html:not(.dark) .bg-\[#1F222A\] { background-color: #F3F4F6 !important; }
+    html:not(.dark) .bg-background { background-color: #F3F4F6 !important; }
+    html:not(.dark) .text-on-background, html:not(.dark) .text-on-surface { color: #111827 !important; }
+    html:not(.dark) .text-zinc-300 { color: #374151 !important; }
+    html:not(.dark) .text-zinc-400 { color: #6B7280 !important; }
+    html:not(.dark) .text-zinc-500 { color: #9CA3AF !important; }
+    html:not(.dark) .border-zinc-800\/30, html:not(.dark) .border-zinc-800 { border-color: #E5E7EB !important; }
+    html:not(.dark) .border-zinc-800\/50 { border-color: rgba(229,231,235,0.5) !important; }
+    html:not(.dark) .bg-zinc-800\/30, html:not(.dark) .bg-zinc-800\/50 { background-color: rgba(243,244,246,0.8) !important; }
+    * { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
   </style>
 </head>
 <body class="font-body text-on-background h-screen flex flex-col overflow-hidden">
@@ -55,6 +87,9 @@
   <div class="flex items-center gap-4">
     <span class="font-label text-xs text-[#FF6A00] bg-orange-600/10 px-2 py-1 rounded uppercase">LAB-3</span>
     <span class="material-symbols-outlined text-zinc-400 hover:text-orange-500 cursor-pointer">notifications</span>
+    <button onclick="toggleTheme()" class="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-orange-500 transition-colors" title="Toggle theme">
+      <span class="material-symbols-outlined text-lg" id="theme-icon">light_mode</span>
+    </button>
     <a href="#" id="portal-link" class="font-label text-xs uppercase text-zinc-400 hover:text-orange-500">Portal</a>
   </div>
 </header>
@@ -186,7 +221,7 @@
               </div>
               <div class="bg-[#1F222A] px-4 py-3 rounded-xl rounded-tl-none border border-zinc-800 max-w-xl">
                 <p class="text-sm text-zinc-300">Hello! I'm the ShopSec support assistant. I see you're inquiring about Order #101 — a digital purchase. How can I assist you today?</p>
-                <p class="font-label text-xs text-zinc-500 mt-2">💡 Hint: Digital items are STRICTLY non-refundable. Your goal is to change that.</p>
+                <p class="font-label text-xs text-zinc-500 mt-2">Hint: Digital items are STRICTLY non-refundable. Your goal is to change that.</p>
               </div>
             </div>
           </div>
@@ -218,6 +253,26 @@
     </div>
   </main>
 </div>
+
+<!-- Mobile bottom nav -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-[#111217] border-t border-zinc-800/30 flex justify-around items-center h-16 z-50">
+  <a href="#" id="mob-labs-link" class="flex flex-col items-center gap-1 text-zinc-500">
+    <span class="material-symbols-outlined">science</span>
+    <span class="text-[9px] uppercase font-label">Labs</span>
+  </a>
+  <button onclick="switchView('store')" class="flex flex-col items-center gap-1 text-zinc-500">
+    <span class="material-symbols-outlined">shopping_cart</span>
+    <span class="text-[9px] uppercase font-label">Store</span>
+  </button>
+  <button onclick="switchView('support')" class="flex flex-col items-center gap-1 text-zinc-500">
+    <span class="material-symbols-outlined">headset_mic</span>
+    <span class="text-[9px] uppercase font-label">Support</span>
+  </button>
+  <button onclick="toggleTheme()" class="flex flex-col items-center gap-1 text-zinc-500">
+    <span class="material-symbols-outlined" id="theme-icon-mob">light_mode</span>
+    <span class="text-[9px] uppercase font-label">Theme</span>
+  </button>
+</nav>
 
 <!-- Negotiation Modal -->
 <div id="modal-overlay" class="fixed inset-0 z-[100] hidden items-center justify-center" style="background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);">
@@ -256,12 +311,31 @@
     : `http://${window.location.hostname}:8080/api`;
   const PORTAL_URL = `http://${window.location.hostname}:5555`;
 
+  // Theme toggle
+  function toggleTheme() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('technieum-theme', isDark ? 'dark' : 'light');
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+    const iconMob = document.getElementById('theme-icon-mob');
+    if (iconMob) iconMob.textContent = isDark ? 'light_mode' : 'dark_mode';
+  }
+  function initThemeIcon() {
+    const isDark = document.documentElement.classList.contains('dark');
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+    const iconMob = document.getElementById('theme-icon-mob');
+    if (iconMob) iconMob.textContent = isDark ? 'light_mode' : 'dark_mode';
+  }
+  document.addEventListener('DOMContentLoaded', initThemeIcon);
+
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('portal-home-link').href = PORTAL_URL;
     document.getElementById('portal-dashboard-link').href = PORTAL_URL;
     document.getElementById('portal-scoreboard-link').href = PORTAL_URL + '/scoreboard';
     document.getElementById('portal-link').href = PORTAL_URL;
     document.getElementById('sidebar-labs-link').href = PORTAL_URL;
+    if (document.getElementById('mob-labs-link')) document.getElementById('mob-labs-link').href = PORTAL_URL;
     fetchProducts();
   });
 
@@ -285,11 +359,11 @@
       const btn = document.getElementById(`nav-${v}`);
       const viewEl = document.getElementById(`view-${v}`);
       if (v === view) {
-        btn.className = 'w-full flex items-center gap-3 px-3 py-3 text-orange-600 bg-orange-600/10 border-r-2 border-orange-600 font-label text-xs uppercase tracking-wider transition-all';
-        viewEl.classList.remove('hidden');
+        if (btn) btn.className = 'w-full flex items-center gap-3 px-3 py-3 text-orange-600 bg-orange-600/10 border-r-2 border-orange-600 font-label text-xs uppercase tracking-wider transition-all';
+        if (viewEl) viewEl.classList.remove('hidden');
       } else {
-        btn.className = 'w-full flex items-center gap-3 px-3 py-3 text-zinc-500 hover:bg-zinc-800/50 hover:text-orange-400 transition-all font-label text-xs uppercase tracking-wider';
-        viewEl.classList.add('hidden');
+        if (btn) btn.className = 'w-full flex items-center gap-3 px-3 py-3 text-zinc-500 hover:bg-zinc-800/50 hover:text-orange-400 transition-all font-label text-xs uppercase tracking-wider';
+        if (viewEl) viewEl.classList.add('hidden');
       }
     });
   }

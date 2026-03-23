@@ -1,17 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0B0B0D;
+  --surface: #111217;
+  --surface-low: #181A20;
+  --surface-high: #1F222A;
+  --surface-lowest: #0d0e13;
+  --text: #E3E1E9;
+  --text-muted: #71717A;
+  --primary: #FF6A00;
+  --secondary: #FFC107;
+  --border: rgba(63, 63, 70, 0.3);
+  --border-solid: #27272a;
+}
+
+html.light {
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --surface-low: #F9FAFB;
+  --surface-high: #F3F4F6;
+  --surface-lowest: #E5E7EB;
+  --text: #111827;
+  --text-muted: #6B7280;
+  --border: #E5E7EB;
+  --border-solid: #E5E7EB;
+}
+
 body {
-  margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+html.dark body {
+  background-image:
+    linear-gradient(to right, rgba(227,225,233,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(227,225,233,0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.ignition-gradient { background: linear-gradient(135deg, #FF6A00 0%, #FFC107 100%); }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1F222A; border-radius: 4px; }
+html.dark ::-webkit-scrollbar-thumb:hover { background: #FF6A00; }
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
 }

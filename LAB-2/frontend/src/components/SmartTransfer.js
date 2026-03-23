@@ -32,86 +32,104 @@ export default function SmartTransfer({ onTransferComplete }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex items-center mb-4">
-        <div className="w-10 h-10 rounded-full flex items-center justify-center mr-3" style={{ background: 'linear-gradient(135deg,#FF6B00,#FFB800)' }}>
-          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+    <div style={{
+      background: 'var(--surface)', border: '1px solid var(--border)',
+      borderRadius: '0.75rem', padding: '1.5rem',
+    }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+        <div style={{
+          width: '2.25rem', height: '2.25rem', borderRadius: '0.5rem',
+          background: 'linear-gradient(135deg,#FF6A00,#FFC107)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <svg width="16" height="16" fill="none" stroke="#000" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
+              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
           </svg>
         </div>
         <div>
-          <h3 className="text-lg font-bold text-gray-900">Smart Transfer</h3>
-          <p className="text-sm text-gray-600">Natural language money transfers</p>
+          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)', marginBottom: '0.1rem' }}>Smart Transfer</h3>
+          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>Natural language money transfers</p>
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tell me what you want to transfer
+          <label style={{
+            display: 'block', fontSize: '0.65rem', fontFamily: 'JetBrains Mono, monospace',
+            fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em',
+            color: 'var(--text-muted)', marginBottom: '0.4rem',
+          }}>
+            Transfer Instruction
           </label>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="e.g., Send $50 to account 1001234568 for dinner"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-            rows="3"
             disabled={loading}
+            rows={3}
+            style={{
+              width: '100%', background: 'var(--surface-low)',
+              border: 'none', borderBottom: '1px solid var(--border-solid)',
+              padding: '0.65rem 0.25rem', fontSize: '0.82rem', color: 'var(--text)',
+              outline: 'none', resize: 'none', fontFamily: 'Inter, sans-serif',
+              transition: 'border-color 0.2s', boxSizing: 'border-box',
+            }}
+            onFocus={e => e.target.style.borderBottomColor = '#FF6A00'}
+            onBlur={e => e.target.style.borderBottomColor = 'var(--border-solid)'}
           />
         </div>
 
         <button
           onClick={handleTransfer}
           disabled={loading || !message.trim()}
-          className="w-full text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg,#FF6B00,#FFB800)' }}
+          style={{
+            width: '100%', background: 'linear-gradient(135deg,#FF6A00,#FFC107)',
+            border: 'none', cursor: loading || !message.trim() ? 'not-allowed' : 'pointer',
+            padding: '0.7rem 1rem', color: '#000', fontWeight: 700,
+            fontSize: '0.75rem', fontFamily: 'JetBrains Mono, monospace',
+            textTransform: 'uppercase', letterSpacing: '0.06em',
+            opacity: loading || !message.trim() ? 0.55 : 1,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+            transition: 'opacity 0.15s',
+          }}
+          onMouseOver={e => { if (!loading && message.trim()) e.currentTarget.style.opacity = '0.88'; }}
+          onMouseOut={e => { if (!loading && message.trim()) e.currentTarget.style.opacity = '1'; }}
         >
           {loading ? (
             <>
-              <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  fill="none"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
+              <svg style={{ animation: 'spin 0.8s linear infinite' }} width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
               Processing...
             </>
-          ) : (
-            'Execute Transfer'
-          )}
+          ) : 'Execute Transfer'}
         </button>
 
         {result && (
-          <div
-            className={`p-4 rounded-lg ${result.success
-              ? 'bg-green-50 border border-green-200'
-              : 'bg-red-50 border border-red-200'
-              }`}
-          >
-            <p
-              className={`text-sm font-medium ${result.success ? 'text-green-800' : 'text-red-800'
-                }`}
-            >
-              {result.success ? 'Success: ' : 'Error: '}
+          <div style={{
+            padding: '0.875rem 1rem', borderRadius: '0.5rem',
+            ...(result.success
+              ? { background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)' }
+              : { background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }),
+          }}>
+            <p style={{
+              fontSize: '0.82rem', fontWeight: 500,
+              color: result.success ? '#22C55E' : '#F87171',
+            }}>
+              {result.success ? '✓ ' : '✗ '}
               {result.message || result.error}
             </p>
           </div>
         )}
 
-        <p className="text-xs text-gray-500 text-center">
+        <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textAlign: 'center', fontFamily: 'JetBrains Mono, monospace' }}>
           Note: AI-powered feature. Verify details before confirming.
         </p>
       </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

@@ -1,189 +1,260 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
+  <script>
+    (function(){
+      const s = localStorage.getItem('technieum-theme');
+      const p = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if(s ? s === 'dark' : p) document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    })();
+  </script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Panel — MedAssist AI</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <script>
     tailwind.config = {
-      theme: { extend: {
-        colors: { tech: { yellow:'#FFB800', orange:'#FF6B00', black:'#F3F4F6', surface:'#FFFFFF', card:'#FFFFFF', border:'#E5E7EB', muted:'#6B7280' } },
-        fontFamily: { sans:['Inter','sans-serif'], mono:['JetBrains Mono','monospace'] }
-      }}
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#ffb694", "surface-container": "#1e1f25",
+            "secondary-fixed-dim": "#fabd00", "on-surface": "#e3e1e9",
+            "surface-container-lowest": "#0d0e13", "primary-container": "#ff6a00",
+            "surface-container-high": "#1F222A", "surface-container-low": "#181A20",
+            "surface": "#111217", "on-primary-container": "#571f00",
+            "on-background": "#e3e1e9", "tertiary": "#ebc33e",
+            "background": "#0B0B0D", "outline-variant": "#5a4136",
+            "secondary-container": "#fabd00", "surface-container-highest": "#34343a",
+          },
+          fontFamily: { "headline": ["Inter"], "body": ["Inter"], "label": ["JetBrains Mono"] },
+          borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+        },
+      },
     }
   </script>
   <style>
-    body{background:#F3F4F6;color:#111827;font-family:'Inter',sans-serif}
-    .text-gradient{background:linear-gradient(135deg,#FFB800,#FF6B00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .border-gradient{border:1px solid transparent;background:linear-gradient(#FFFFFF,#FFFFFF) padding-box,linear-gradient(135deg,#FFB800,#FF6B00) border-box}
-    .btn-primary{background:linear-gradient(135deg,#FFB800,#FF6B00);color:#FFFFFF;font-weight:700;transition:all 0.2s}
-    .btn-primary:hover{filter:brightness(1.1)}
-    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#F3F4F6}::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:3px}
+    body {
+      background-color: #0B0B0D;
+      background-image: linear-gradient(to right, rgba(227,225,233,0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(227,225,233,0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: #e3e1e9;
+      font-family: 'Inter', sans-serif;
+    }
+    .ignition-gradient { background: linear-gradient(135deg, #FF6A00 0%, #FFC107 100%); }
+    .text-gradient { background: linear-gradient(135deg, #FFC107, #FF6A00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #0B0B0D; } ::-webkit-scrollbar-thumb { background: #1F222A; border-radius: 10px; } ::-webkit-scrollbar-thumb:hover { background: #FF6A00; }
+
+    /* Light mode overrides */
+    html:not(.dark) body {
+      background-color: #F3F4F6 !important;
+      background-image: linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.02) 1px, transparent 1px) !important;
+      color: #111827 !important;
+    }
+    html:not(.dark) header { background-color: #FFFFFF !important; border-color: #E5E7EB !important; }
+    html:not(.dark) .bg-\[#111217\] { background-color: #FFFFFF !important; }
+    html:not(.dark) .bg-\[#181A20\] { background-color: #F9FAFB !important; }
+    html:not(.dark) .bg-\[#0B0B0D\] { background-color: #F3F4F6 !important; }
+    html:not(.dark) .bg-\[#0d0e13\] { background-color: #F9FAFB !important; }
+    html:not(.dark) .bg-\[#1F222A\] { background-color: #F3F4F6 !important; }
+    html:not(.dark) .text-on-background, html:not(.dark) .text-on-surface, html:not(.dark) .text-zinc-200 { color: #111827 !important; }
+    html:not(.dark) .text-zinc-300 { color: #374151 !important; }
+    html:not(.dark) .text-zinc-400 { color: #6B7280 !important; }
+    html:not(.dark) .text-zinc-500 { color: #9CA3AF !important; }
+    html:not(.dark) .border-zinc-800\/30, html:not(.dark) .border-zinc-800, html:not(.dark) .border-zinc-700 { border-color: #E5E7EB !important; }
+    html:not(.dark) .bg-zinc-800 { background-color: #E5E7EB !important; }
+    html:not(.dark) .bg-zinc-800\/60 { background-color: rgba(229,231,235,0.6) !important; }
+    * { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
   </style>
 </head>
-<body class="min-h-screen">
+<body class="font-body min-h-screen text-on-background">
 
-<!-- Nav -->
-<nav class="border-b border-[#E5E7EB] bg-white sticky top-0 z-50">
-  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
-    <div class="flex items-center gap-3">
+<!-- Header -->
+<header class="bg-[#111217] border-b border-zinc-800/30 sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
+    <div class="flex items-center gap-4">
       <a href="/" class="flex items-center gap-2">
-        <div class="w-7 h-7 rounded btn-primary flex items-center justify-center"><span class="font-black text-xs">T</span></div>
-        <span class="font-black tracking-widest text-gradient text-sm">TECHNIEUM</span>
+        <span class="font-headline font-black text-sm tracking-tighter text-[#FF6A00]">TECHNIEUM AI SECURITY LABS</span>
       </a>
-      <span class="text-[#E5E7EB]">|</span>
-      <span class="text-red-600 text-xs font-mono font-bold">⚠ ADMIN PANEL</span>
+      <span class="text-zinc-700">|</span>
+      <span class="font-label text-xs text-red-500 uppercase tracking-wider">⚠ Admin Panel</span>
     </div>
     <div class="flex items-center gap-3">
-      <a href="/chat" class="text-xs border border-[#E5E7EB] text-[#6B7280] hover:border-[#FFB800] hover:text-[#FFB800] px-3 py-1.5 rounded-lg transition-colors">← Chat</a>
-      <a href="http://localhost:5555" class="text-xs border border-[#FFB800]/50 text-[#FFB800] hover:bg-[#FFB800]/10 px-3 py-1.5 rounded-lg transition-colors">🚩 Submit Flag</a>
+      <button onclick="toggleTheme()" class="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-orange-500 transition-colors" title="Toggle theme">
+        <span class="material-symbols-outlined text-lg" id="theme-icon">light_mode</span>
+      </button>
+      <a href="/chat" class="font-label text-xs uppercase text-zinc-400 hover:text-zinc-200 border border-zinc-800 px-3 py-1.5 transition-all">← Chat</a>
+      <a href="http://localhost:5555" class="font-label text-xs uppercase text-[#FF6A00] bg-orange-600/10 border border-orange-600/30 px-3 py-1.5 hover:bg-orange-600/20 transition-all">
+        <span class="material-symbols-outlined text-xs">flag</span> Submit Flag
+      </a>
     </div>
   </div>
-</nav>
+</header>
 
 <!-- Warning banner -->
-<div class="bg-amber-50 border-b border-amber-200">
-  <div class="max-w-7xl mx-auto px-4 py-2 text-xs text-amber-800 font-mono">
-    ⚠ ADMIN ACCESS — Highly privileged endpoint. Authentication bypass is a lab objective.
-    Try: <code class="bg-amber-100 px-1 rounded">X-API-Key: admin_secret_123</code> header for elevated access.
+<div class="bg-amber-500/5 border-b border-amber-500/20">
+  <div class="max-w-7xl mx-auto px-6 py-2 flex items-center gap-2">
+    <span class="material-symbols-outlined text-amber-500 text-base">warning</span>
+    <p class="font-label text-xs text-amber-600/80">ADMIN ACCESS — Highly privileged endpoint. Authentication bypass is a lab objective. Try: <code class="bg-amber-500/10 text-amber-500 px-1.5 py-0.5 font-label">X-API-Key: admin_secret_123</code> header for elevated access.</p>
   </div>
 </div>
 
-<div class="max-w-7xl mx-auto px-4 py-8">
+<div class="max-w-7xl mx-auto px-6 py-8">
 
   <!-- Header -->
   <div class="mb-8">
-    <h1 class="text-2xl font-black mb-1 text-gray-900">Admin <span class="text-gradient">Control Panel</span></h1>
-    <p class="text-[#6B7280] text-sm">MedAssist AI — System Administration Interface</p>
+    <p class="font-label text-[10px] text-zinc-500 uppercase tracking-widest mb-1">// System Administration</p>
+    <h1 class="font-headline text-2xl font-black mb-1 text-on-background">Admin <span class="text-gradient">Control Panel</span></h1>
+    <p class="font-body text-zinc-500 text-sm">MedAssist AI — System Administration Interface</p>
   </div>
 
   <!-- Stats cards -->
   <div class="grid sm:grid-cols-4 gap-4 mb-8" id="statsCards">
-    <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-sm">
-      <p class="text-[#6B7280] text-xs uppercase tracking-wider mb-1">Users</p>
-      <p class="text-2xl font-black text-[#FFB800]" id="statUsers">—</p>
+    <div class="bg-[#111217] border border-zinc-800/30 rounded-xl p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="material-symbols-outlined text-orange-600 text-base">group</span>
+        <p class="text-zinc-500 font-label text-[10px] uppercase tracking-wider">Users</p>
+      </div>
+      <p class="text-2xl font-black text-[#FF6A00] font-headline" id="statUsers">—</p>
     </div>
-    <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-sm">
-      <p class="text-[#6B7280] text-xs uppercase tracking-wider mb-1">Patients</p>
-      <p class="text-2xl font-black text-gray-900" id="statPatients">—</p>
+    <div class="bg-[#111217] border border-zinc-800/30 rounded-xl p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="material-symbols-outlined text-zinc-500 text-base">person</span>
+        <p class="text-zinc-500 font-label text-[10px] uppercase tracking-wider">Patients</p>
+      </div>
+      <p class="text-2xl font-black text-on-surface font-headline" id="statPatients">—</p>
     </div>
-    <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-sm">
-      <p class="text-[#6B7280] text-xs uppercase tracking-wider mb-1">Agents</p>
-      <p class="text-2xl font-black text-gray-900" id="statAgents">5</p>
+    <div class="bg-[#111217] border border-zinc-800/30 rounded-xl p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="material-symbols-outlined text-zinc-500 text-base">smart_toy</span>
+        <p class="text-zinc-500 font-label text-[10px] uppercase tracking-wider">Agents</p>
+      </div>
+      <p class="text-2xl font-black text-on-surface font-headline" id="statAgents">5</p>
     </div>
-    <div class="bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-sm">
-      <p class="text-[#6B7280] text-xs uppercase tracking-wider mb-1">Model</p>
-      <p class="text-sm font-black text-[#FF6B00] font-mono" id="statModel">gpt-4o-mini</p>
+    <div class="bg-[#111217] border border-zinc-800/30 rounded-xl p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="material-symbols-outlined text-zinc-500 text-base">model_training</span>
+        <p class="text-zinc-500 font-label text-[10px] uppercase tracking-wider">Model</p>
+      </div>
+      <p class="text-sm font-black text-[#FF6A00] font-label" id="statModel">gpt-4o-mini</p>
     </div>
   </div>
 
   <div class="grid lg:grid-cols-2 gap-6">
 
     <!-- SQL Query Executor -->
-    <div class="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm">
-      <div class="px-5 py-4 border-b border-[#E5E7EB] flex items-center gap-2">
+    <div class="bg-[#111217] border border-zinc-800/30 rounded-xl overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-800/30 flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-red-500"></span>
-        <h2 class="font-bold text-sm text-gray-900">SQL Query Executor</h2>
-        <span class="ml-auto text-xs text-red-600 font-mono">VULNERABLE</span>
+        <h2 class="font-headline font-bold text-sm text-on-surface">SQL Query Executor</h2>
+        <span class="ml-auto font-label text-[9px] uppercase px-1.5 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20">VULNERABLE</span>
       </div>
       <div class="p-5">
         <textarea id="sqlQuery" rows="4"
-          class="w-full bg-white border border-[#D1D5DB] rounded-xl px-4 py-3 font-mono text-xs text-[#FF6B00] focus:outline-none focus:border-[#FFB800] transition-colors resize-none mb-3"
+          class="w-full bg-[#181A20] border border-zinc-800 rounded-lg px-4 py-3 font-label text-xs text-[#FF6A00] focus:outline-none focus:border-[#FF6A00] transition-colors resize-none mb-3 placeholder-zinc-600"
           placeholder="SELECT * FROM users&#10;SELECT * FROM patients&#10;SELECT username,password,role FROM users"></textarea>
         <div class="flex gap-2 mb-3">
           <input id="sqlApiKey" type="text" placeholder="X-API-Key header value"
-            class="flex-1 bg-white border border-[#D1D5DB] rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:border-[#FFB800] transition-colors text-gray-900"/>
-          <button onclick="runSQL()" class="btn-primary px-4 py-2 rounded-lg text-xs">Execute</button>
+            class="flex-1 bg-[#181A20] border border-zinc-800 rounded-lg px-3 py-2 font-label text-xs focus:outline-none focus:border-[#FF6A00] transition-colors text-on-background placeholder-zinc-600"/>
+          <button onclick="runSQL()" class="ignition-gradient px-4 py-2 text-white font-label text-xs font-bold uppercase tracking-widest hover:shadow-[0_0_10px_rgba(255,106,0,0.3)] transition-all">Execute</button>
         </div>
-        <div id="sqlResult" class="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 font-mono text-xs text-[#FF6B00] min-h-16 overflow-x-auto whitespace-pre-wrap">
+        <div id="sqlResult" class="bg-[#0d0e13] border border-zinc-800 rounded-lg p-3 font-label text-xs text-[#FF6A00] min-h-16 overflow-x-auto whitespace-pre-wrap">
           Results appear here...
         </div>
       </div>
     </div>
 
     <!-- System Command Runner -->
-    <div class="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm">
-      <div class="px-5 py-4 border-b border-[#E5E7EB] flex items-center gap-2">
+    <div class="bg-[#111217] border border-zinc-800/30 rounded-xl overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-800/30 flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-red-500"></span>
-        <h2 class="font-bold text-sm text-gray-900">System Command Runner</h2>
-        <span class="ml-auto text-xs text-red-600 font-mono">RCE SURFACE</span>
+        <h2 class="font-headline font-bold text-sm text-on-surface">System Command Runner</h2>
+        <span class="ml-auto font-label text-[9px] uppercase px-1.5 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20">RCE SURFACE</span>
       </div>
       <div class="p-5">
         <textarea id="sysCmd" rows="4"
-          class="w-full bg-white border border-[#D1D5DB] rounded-xl px-4 py-3 font-mono text-xs text-green-700 focus:outline-none focus:border-[#FFB800] transition-colors resize-none mb-3"
+          class="w-full bg-[#181A20] border border-zinc-800 rounded-lg px-4 py-3 font-label text-xs text-green-500 focus:outline-none focus:border-[#FF6A00] transition-colors resize-none mb-3 placeholder-zinc-600"
           placeholder="whoami&#10;cat .env&#10;ls -la"></textarea>
         <div class="flex gap-2 mb-3">
           <input id="cmdApiKey" type="text" placeholder="X-API-Key header value"
-            class="flex-1 bg-white border border-[#D1D5DB] rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:border-[#FFB800] transition-colors text-gray-900"/>
-          <button onclick="runCmd()" class="btn-primary px-4 py-2 rounded-lg text-xs">Execute</button>
+            class="flex-1 bg-[#181A20] border border-zinc-800 rounded-lg px-3 py-2 font-label text-xs focus:outline-none focus:border-[#FF6A00] transition-colors text-on-background placeholder-zinc-600"/>
+          <button onclick="runCmd()" class="ignition-gradient px-4 py-2 text-white font-label text-xs font-bold uppercase tracking-widest hover:shadow-[0_0_10px_rgba(255,106,0,0.3)] transition-all">Execute</button>
         </div>
-        <div id="cmdResult" class="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 font-mono text-xs text-green-700 min-h-16 overflow-x-auto whitespace-pre-wrap">
+        <div id="cmdResult" class="bg-[#0d0e13] border border-zinc-800 rounded-lg p-3 font-label text-xs text-green-500 min-h-16 overflow-x-auto whitespace-pre-wrap">
           Output appears here...
         </div>
       </div>
     </div>
 
     <!-- System Config -->
-    <div class="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm">
-      <div class="px-5 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
-        <h2 class="font-bold text-sm text-gray-900">System Configuration</h2>
-        <button onclick="fetchConfig()" class="text-xs border border-[#E5E7EB] text-[#6B7280] hover:border-[#FFB800] hover:text-[#FFB800] px-3 py-1 rounded transition-colors">Refresh</button>
+    <div class="bg-[#111217] border border-zinc-800/30 rounded-xl overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-800/30 flex items-center justify-between">
+        <h2 class="font-headline font-bold text-sm text-on-surface">System Configuration</h2>
+        <button onclick="fetchConfig()" class="font-label text-[10px] uppercase text-zinc-400 hover:text-orange-500 border border-zinc-800 px-3 py-1.5 transition-all">
+          <span class="material-symbols-outlined text-xs">refresh</span> Refresh
+        </button>
       </div>
       <div class="p-5">
-        <div id="configData" class="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 font-mono text-xs text-[#FF6B00] min-h-32 overflow-x-auto whitespace-pre-wrap">
+        <div id="configData" class="bg-[#0d0e13] border border-zinc-800 rounded-lg p-3 font-label text-xs text-[#FF6A00] min-h-32 overflow-x-auto whitespace-pre-wrap">
           Click Refresh to load...
         </div>
       </div>
     </div>
 
     <!-- System Prompt Viewer -->
-    <div class="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm">
-      <div class="px-5 py-4 border-b border-[#E5E7EB]">
-        <h2 class="font-bold text-sm text-gray-900">System Prompt Viewer</h2>
-        <p class="text-xs text-[#6B7280] mt-0.5">Lab goal: extract these without using this page</p>
+    <div class="bg-[#111217] border border-zinc-800/30 rounded-xl overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-800/30">
+        <h2 class="font-headline font-bold text-sm text-on-surface">System Prompt Viewer</h2>
+        <p class="font-label text-[10px] text-zinc-500 mt-0.5">Lab goal: extract these without using this page</p>
       </div>
       <div class="p-5">
         <div class="flex gap-2 mb-3">
-          <select id="agentSelect" class="flex-1 bg-white border border-[#D1D5DB] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#FFB800] text-gray-900">
+          <select id="agentSelect" class="flex-1 bg-[#181A20] border border-zinc-800 rounded-lg px-3 py-2 font-label text-xs focus:outline-none focus:border-[#FF6A00] text-on-background">
             <option value="orchestrator">Orchestrator</option>
             <option value="intake">Intake Agent</option>
             <option value="records">Records Agent</option>
             <option value="appointment">Appointment Agent</option>
             <option value="billing">Billing Agent</option>
           </select>
-          <button onclick="fetchPrompt()" class="btn-primary px-4 py-2 rounded-lg text-xs">View</button>
+          <button onclick="fetchPrompt()" class="ignition-gradient px-4 py-2 text-white font-label text-xs font-bold uppercase tracking-widest hover:shadow-[0_0_10px_rgba(255,106,0,0.3)] transition-all">View</button>
         </div>
-        <div id="promptData" class="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3 font-mono text-xs text-[#374151] min-h-32 overflow-y-auto max-h-64 whitespace-pre-wrap">
+        <div id="promptData" class="bg-[#0d0e13] border border-zinc-800 rounded-lg p-3 font-label text-xs text-zinc-400 min-h-32 overflow-y-auto max-h-64 whitespace-pre-wrap">
           Select an agent and click View...
         </div>
       </div>
     </div>
 
     <!-- API Endpoints -->
-    <div class="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden lg:col-span-2 shadow-sm">
-      <div class="px-5 py-4 border-b border-[#E5E7EB]">
-        <h2 class="font-bold text-sm text-gray-900">Attack Surface — API Endpoints</h2>
+    <div class="bg-[#111217] border border-zinc-800/30 rounded-xl overflow-hidden lg:col-span-2">
+      <div class="px-5 py-4 border-b border-zinc-800/30 flex items-center gap-2">
+        <span class="material-symbols-outlined text-orange-600 text-base">api</span>
+        <h2 class="font-headline font-bold text-sm text-on-surface">Attack Surface — API Endpoints</h2>
       </div>
       <div class="p-5">
         <div class="overflow-x-auto">
-          <table class="w-full text-xs font-mono">
-            <thead><tr class="border-b border-[#E5E7EB] text-[#6B7280]">
-              <th class="text-left pb-2 pr-4">Method</th>
-              <th class="text-left pb-2 pr-4">Endpoint</th>
-              <th class="text-left pb-2">Vulnerability</th>
-            </tr></thead>
-            <tbody class="divide-y divide-[#F3F4F6]">
-              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-green-600">GET</td><td class="py-2 pr-4 text-[#FF6B00]">/api/patients</td><td class="py-2 text-[#6B7280]">No auth — lists all patients</td></tr>
-              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-green-600">GET</td><td class="py-2 pr-4 text-[#FF6B00]">/api/patients/&lt;id&gt;</td><td class="py-2 text-[#6B7280]">IDOR — exposes SSN</td></tr>
-              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-blue-600">POST</td><td class="py-2 pr-4 text-[#FF6B00]">/api/rag/upload</td><td class="py-2 text-[#6B7280]">No auth — RAG poisoning</td></tr>
-              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-blue-600">POST</td><td class="py-2 pr-4 text-[#FF6B00]">/api/rag/query</td><td class="py-2 text-[#6B7280]">Data leakage via verbose results</td></tr>
-              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-red-600">POST</td><td class="py-2 pr-4 text-red-600">/api/admin/execute</td><td class="py-2 text-red-600">RCE + arbitrary SQL (key required)</td></tr>
-              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-green-600">GET</td><td class="py-2 pr-4 text-[#FF6B00]">/api/admin/config</td><td class="py-2 text-[#6B7280]">Exposes internal configuration</td></tr>
-              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-green-600">GET</td><td class="py-2 pr-4 text-[#FF6B00]">/api/admin/system-prompt</td><td class="py-2 text-[#6B7280]">Exposes all agent system prompts</td></tr>
-              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-green-600">GET</td><td class="py-2 pr-4 text-[#FF6B00]">/api/debug/info</td><td class="py-2 text-[#6B7280]">Env vars + installed packages</td></tr>
-              <tr class="hover:bg-[#F9FAFB]"><td class="py-2 pr-4 text-blue-600">POST</td><td class="py-2 pr-4 text-[#FF6B00]">/login</td><td class="py-2 text-[#6B7280]">SQL injection via username field</td></tr>
+          <table class="w-full font-label text-xs">
+            <thead>
+              <tr class="border-b border-zinc-800/30 text-zinc-500">
+                <th class="text-left pb-3 pr-4 uppercase tracking-widest text-[10px]">Method</th>
+                <th class="text-left pb-3 pr-4 uppercase tracking-widest text-[10px]">Endpoint</th>
+                <th class="text-left pb-3 uppercase tracking-widest text-[10px]">Vulnerability</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-800/20">
+              <tr class="hover:bg-zinc-800/20 transition-colors"><td class="py-2.5 pr-4 text-green-500">GET</td><td class="py-2.5 pr-4 text-[#FF6A00]">/api/patients</td><td class="py-2.5 text-zinc-500">No auth — lists all patients</td></tr>
+              <tr class="hover:bg-zinc-800/20 transition-colors"><td class="py-2.5 pr-4 text-green-500">GET</td><td class="py-2.5 pr-4 text-[#FF6A00]">/api/patients/&lt;id&gt;</td><td class="py-2.5 text-zinc-500">IDOR — exposes SSN</td></tr>
+              <tr class="hover:bg-zinc-800/20 transition-colors"><td class="py-2.5 pr-4 text-blue-400">POST</td><td class="py-2.5 pr-4 text-[#FF6A00]">/api/rag/upload</td><td class="py-2.5 text-zinc-500">No auth — RAG poisoning</td></tr>
+              <tr class="hover:bg-zinc-800/20 transition-colors"><td class="py-2.5 pr-4 text-blue-400">POST</td><td class="py-2.5 pr-4 text-[#FF6A00]">/api/rag/query</td><td class="py-2.5 text-zinc-500">Data leakage via verbose results</td></tr>
+              <tr class="hover:bg-zinc-800/20 transition-colors"><td class="py-2.5 pr-4 text-red-500">POST</td><td class="py-2.5 pr-4 text-red-400">/api/admin/execute</td><td class="py-2.5 text-red-400">RCE + arbitrary SQL (key required)</td></tr>
+              <tr class="hover:bg-zinc-800/20 transition-colors"><td class="py-2.5 pr-4 text-green-500">GET</td><td class="py-2.5 pr-4 text-[#FF6A00]">/api/admin/config</td><td class="py-2.5 text-zinc-500">Exposes internal configuration</td></tr>
+              <tr class="hover:bg-zinc-800/20 transition-colors"><td class="py-2.5 pr-4 text-green-500">GET</td><td class="py-2.5 pr-4 text-[#FF6A00]">/api/admin/system-prompt</td><td class="py-2.5 text-zinc-500">Exposes all agent system prompts</td></tr>
+              <tr class="hover:bg-zinc-800/20 transition-colors"><td class="py-2.5 pr-4 text-green-500">GET</td><td class="py-2.5 pr-4 text-[#FF6A00]">/api/debug/info</td><td class="py-2.5 text-zinc-500">Env vars + installed packages</td></tr>
+              <tr class="hover:bg-zinc-800/20 transition-colors"><td class="py-2.5 pr-4 text-blue-400">POST</td><td class="py-2.5 pr-4 text-[#FF6A00]">/login</td><td class="py-2.5 text-zinc-500">SQL injection via username field</td></tr>
             </tbody>
           </table>
         </div>
@@ -194,82 +265,95 @@
 </div>
 
 <!-- Footer -->
-<footer class="border-t border-[#E5E7EB] py-4 mt-8">
-  <div class="max-w-7xl mx-auto px-4 text-center text-xs text-[#6B7280] font-mono">
+<footer class="border-t border-zinc-800/30 py-4 mt-8">
+  <div class="max-w-7xl mx-auto px-6 text-center font-label text-[10px] text-zinc-600 uppercase tracking-widest">
     Powered by <span class="text-gradient font-bold">Technieum</span> · LAB-1 Admin Interface
   </div>
 </footer>
 
 <script>
-async function runSQL() {
-  const query = document.getElementById('sqlQuery').value.trim();
-  const apiKey = document.getElementById('sqlApiKey').value.trim();
-  const out = document.getElementById('sqlResult');
-  out.textContent = 'Executing...';
-  try {
-    const res = await fetch('/api/admin/execute', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json', 'X-API-Key': apiKey},
-      body: JSON.stringify({type: 'sql', command: query})
-    });
-    const data = await res.json();
-    out.textContent = JSON.stringify(data, null, 2);
-  } catch(e) { out.textContent = 'Error: ' + e.message; }
-}
+  // Theme toggle
+  function toggleTheme() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('technieum-theme', isDark ? 'dark' : 'light');
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+  }
+  function initThemeIcon() {
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
+  }
+  document.addEventListener('DOMContentLoaded', initThemeIcon);
 
-async function runCmd() {
-  const cmd = document.getElementById('sysCmd').value.trim();
-  const apiKey = document.getElementById('cmdApiKey').value.trim();
-  const out = document.getElementById('cmdResult');
-  out.textContent = 'Executing...';
-  try {
-    const res = await fetch('/api/admin/execute', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json', 'X-API-Key': apiKey},
-      body: JSON.stringify({type: 'system', command: cmd})
-    });
-    const data = await res.json();
-    out.textContent = data.stdout || data.stderr || JSON.stringify(data, null, 2);
-  } catch(e) { out.textContent = 'Error: ' + e.message; }
-}
+  async function runSQL() {
+    const query = document.getElementById('sqlQuery').value.trim();
+    const apiKey = document.getElementById('sqlApiKey').value.trim();
+    const out = document.getElementById('sqlResult');
+    out.textContent = 'Executing...';
+    try {
+      const res = await fetch('/api/admin/execute', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-API-Key': apiKey},
+        body: JSON.stringify({type: 'sql', command: query})
+      });
+      const data = await res.json();
+      out.textContent = JSON.stringify(data, null, 2);
+    } catch(e) { out.textContent = 'Error: ' + e.message; }
+  }
 
-async function fetchConfig() {
-  const out = document.getElementById('configData');
-  try {
-    const res = await fetch('/api/admin/config');
-    const data = await res.json();
-    out.textContent = JSON.stringify(data, null, 2);
-  } catch(e) { out.textContent = 'Error: ' + e.message; }
-}
+  async function runCmd() {
+    const cmd = document.getElementById('sysCmd').value.trim();
+    const apiKey = document.getElementById('cmdApiKey').value.trim();
+    const out = document.getElementById('cmdResult');
+    out.textContent = 'Executing...';
+    try {
+      const res = await fetch('/api/admin/execute', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-API-Key': apiKey},
+        body: JSON.stringify({type: 'system', command: cmd})
+      });
+      const data = await res.json();
+      out.textContent = data.stdout || data.stderr || JSON.stringify(data, null, 2);
+    } catch(e) { out.textContent = 'Error: ' + e.message; }
+  }
 
-async function fetchPrompt() {
-  const agent = document.getElementById('agentSelect').value;
-  const out = document.getElementById('promptData');
-  try {
-    const res = await fetch(`/api/admin/system-prompt?agent=${agent}`);
-    const data = await res.json();
-    out.textContent = data.system_prompt || JSON.stringify(data, null, 2);
-  } catch(e) { out.textContent = 'Error: ' + e.message; }
-}
+  async function fetchConfig() {
+    const out = document.getElementById('configData');
+    try {
+      const res = await fetch('/api/admin/config');
+      const data = await res.json();
+      out.textContent = JSON.stringify(data, null, 2);
+    } catch(e) { out.textContent = 'Error: ' + e.message; }
+  }
 
-// Load stats
-async function loadStats() {
-  try {
-    const [pRes, hRes] = await Promise.all([
-      fetch('/api/patients'),
-      fetch('/api/health')
-    ]);
-    const patients = await pRes.json();
-    document.getElementById('statPatients').textContent = patients.patients?.length || '?';
-    const sql_res = await fetch('/api/admin/execute', {
-      method: 'POST', headers: {'Content-Type': 'application/json', 'X-API-Key': 'admin_secret_123'},
-      body: JSON.stringify({type: 'sql', command: 'SELECT COUNT(*) FROM users'})
-    });
-    const sql_data = await sql_res.json();
-    if (sql_data.results) document.getElementById('statUsers').textContent = sql_data.results[0][0];
-  } catch(e) {}
-}
-loadStats();
+  async function fetchPrompt() {
+    const agent = document.getElementById('agentSelect').value;
+    const out = document.getElementById('promptData');
+    try {
+      const res = await fetch(`/api/admin/system-prompt?agent=${agent}`);
+      const data = await res.json();
+      out.textContent = data.system_prompt || JSON.stringify(data, null, 2);
+    } catch(e) { out.textContent = 'Error: ' + e.message; }
+  }
+
+  // Load stats
+  async function loadStats() {
+    try {
+      const [pRes, hRes] = await Promise.all([
+        fetch('/api/patients'),
+        fetch('/api/health')
+      ]);
+      const patients = await pRes.json();
+      document.getElementById('statPatients').textContent = patients.patients?.length || '?';
+      const sql_res = await fetch('/api/admin/execute', {
+        method: 'POST', headers: {'Content-Type': 'application/json', 'X-API-Key': 'admin_secret_123'},
+        body: JSON.stringify({type: 'sql', command: 'SELECT COUNT(*) FROM users'})
+      });
+      const sql_data = await sql_res.json();
+      if (sql_data.results) document.getElementById('statUsers').textContent = sql_data.results[0][0];
+    } catch(e) {}
+  }
+  loadStats();
 </script>
 </body>
 </html>

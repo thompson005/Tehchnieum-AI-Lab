@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -8,6 +9,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { isDark, toggleTheme } = useTheme();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,119 +28,202 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex" style={{ background: '#F3F4F6', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', background: 'var(--bg)', fontFamily: 'Inter, sans-serif', position: 'relative' }}>
+      {/* Theme toggle */}
+      <button
+        onClick={toggleTheme}
+        title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+        style={{
+          position: 'absolute', top: '1rem', right: '1rem', zIndex: 10,
+          background: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: '0.375rem', padding: '0.4rem 0.65rem',
+          cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1rem',
+          transition: 'all 0.2s',
+        }}
+        onMouseOver={e => e.currentTarget.style.color = '#FF6A00'}
+        onMouseOut={e => e.currentTarget.style.color = 'var(--text-muted)'}
+      >
+        {isDark ? '☀' : '🌙'}
+      </button>
+
       {/* Left panel — branding */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12"
-        style={{ background: 'linear-gradient(160deg, #FF6B00 0%, #FFB800 100%)' }}>
+      <div
+        className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12"
+        style={{ background: 'linear-gradient(160deg, #FF6A00 0%, #FFC107 100%)' }}
+      >
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center font-black text-white text-sm"
-              style={{ background: 'rgba(255,255,255,0.2)' }}>T</div>
-            <span className="font-black tracking-widest text-sm text-white">TECHNIEUM</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.5rem' }}>
+            <div style={{
+              width: '2.25rem', height: '2.25rem', borderRadius: '0.5rem',
+              background: 'rgba(0,0,0,0.15)', display: 'flex', alignItems: 'center',
+              justifyContent: 'center', fontWeight: 900, color: '#fff', fontSize: '0.85rem',
+            }}>T</div>
+            <span style={{ fontWeight: 900, letterSpacing: '0.15em', fontSize: '0.85rem', color: '#fff' }}>TECHNIEUM</span>
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.7rem' }}>AI Security Research Labs · LAB-2</p>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.7rem', fontFamily: 'JetBrains Mono, monospace' }}>
+            AI Security Research Labs · LAB-2
+          </p>
         </div>
+
         <div>
-          <div className="mb-8">
-            <div className="font-mono text-xs mb-4" style={{ color: 'rgba(255,255,255,0.9)', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '0.75rem', padding: '1rem' }}>
-              <p style={{ color: 'rgba(255,255,255,0.6)' }}>// Architecture</p>
-              <p className="mt-2">React → FastAPI</p>
-              <p>Eva Bot (RAG + ChromaDB)</p>
-              <p>Smart Transfer Agent</p>
-              <p>Loan Underwriter (PDF)</p>
-              <p>PostgreSQL + Redis</p>
-            </div>
+          <div style={{
+            fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem',
+            color: 'rgba(255,255,255,0.9)', background: 'rgba(0,0,0,0.12)',
+            border: '1px solid rgba(255,255,255,0.2)', borderRadius: '0.75rem',
+            padding: '1rem', marginBottom: '2rem',
+          }}>
+            <p style={{ color: 'rgba(255,255,255,0.55)', marginBottom: '0.5rem' }}>// Architecture</p>
+            <p>React → FastAPI</p>
+            <p>Eva Bot (RAG + ChromaDB)</p>
+            <p>Smart Transfer Agent</p>
+            <p>Loan Underwriter (PDF)</p>
+            <p>PostgreSQL + Redis</p>
           </div>
-          <h1 className="text-4xl font-black mb-3 text-white" style={{ lineHeight: 1.1 }}>
-            SecureBank<br/>
-            <span style={{ color: 'rgba(255,255,255,0.85)' }}>AI Security Lab</span>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: '#fff', lineHeight: 1.1, marginBottom: '0.75rem' }}>
+            SecureBank<br />
+            <span style={{ color: 'rgba(255,255,255,0.8)' }}>AI Security Lab</span>
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.9rem', lineHeight: 1.6 }}>
+          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.9rem', lineHeight: 1.65 }}>
             A production-grade banking simulation. Exploit AI agents, RAG systems, and payment flows across 4 escalating scenarios.
           </p>
         </div>
-        <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.7rem', fontFamily: 'JetBrains Mono, monospace' }}>
+
+        <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.68rem', fontFamily: 'JetBrains Mono, monospace' }}>
           ⚠ Intentionally vulnerable — authorized training only
         </div>
       </div>
 
-      {/* Right panel — login */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12" style={{ background: '#F3F4F6' }}>
-        <div className="w-full max-w-md">
+      {/* Right panel — login form */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '3rem 1.5rem' }}>
+        <div style={{ width: '100%', maxWidth: '26rem' }}>
+
           {/* Mobile brand */}
-          <div className="lg:hidden text-center mb-8">
-            <p className="font-black tracking-widest text-lg"
-              style={{ background: 'linear-gradient(135deg,#FF6B00,#FFB800)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              TECHNIEUM
-            </p>
-            <p style={{ color: '#6B7280', fontSize: '0.75rem' }}>SecureBank AI · LAB-2</p>
+          <div className="lg:hidden" style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <p style={{
+              fontWeight: 900, letterSpacing: '0.15em', fontSize: '1.25rem',
+              background: 'linear-gradient(135deg,#FF6A00,#FFC107)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            }}>TECHNIEUM</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '0.25rem' }}>SecureBank AI · LAB-2</p>
           </div>
 
-          <div style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '1.25rem', padding: '2rem', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
-            <h2 className="text-xl font-bold mb-1" style={{ color: '#111827' }}>Sign In</h2>
-            <p style={{ color: '#6B7280', fontSize: '0.85rem', marginBottom: '1.5rem' }}>Access your SecureBank account</p>
+          {/* Card */}
+          <div style={{
+            background: 'var(--surface)', border: '1px solid var(--border)',
+            borderRadius: '1.25rem', overflow: 'hidden',
+            boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.4)' : '0 4px 16px rgba(0,0,0,0.06)',
+          }}>
+            {/* Orange top bar */}
+            <div style={{ height: '3px', background: 'linear-gradient(135deg,#FF6A00,#FFC107)' }} />
 
-            {error && (
-              <div className="mb-4 px-4 py-3 rounded-lg text-sm font-medium"
-                style={{ background: '#FEF2F2', border: '1px solid #FECACA', color: '#DC2626' }}>
-                {error}
+            <div style={{ padding: '2rem' }}>
+              {/* System status */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '1.5rem' }}>
+                <span style={{ width: '0.5rem', height: '0.5rem', borderRadius: '50%', background: '#22C55E', display: 'inline-block', boxShadow: '0 0 6px #22C55E' }} />
+                <span style={{ fontSize: '0.65rem', fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  SYSTEM ONLINE · ACCESS TERMINAL
+                </span>
               </div>
-            )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#6B7280' }}>
-                  Username
-                </label>
-                <input
-                  type="text" required value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="your_username"
-                  style={{ width: '100%', background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '0.5rem', padding: '0.75rem 1rem', fontSize: '0.875rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }}
-                  onFocus={e => e.target.style.borderColor = '#FF6B00'}
-                  onBlur={e => e.target.style.borderColor = '#E5E7EB'}
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: '#6B7280' }}>
-                  Password
-                </label>
-                <input
-                  type="password" required value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  style={{ width: '100%', background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '0.5rem', padding: '0.75rem 1rem', fontSize: '0.875rem', color: '#111827', outline: 'none', boxSizing: 'border-box' }}
-                  onFocus={e => e.target.style.borderColor = '#FF6B00'}
-                  onBlur={e => e.target.style.borderColor = '#E5E7EB'}
-                />
-              </div>
-              <button
-                type="submit" disabled={loading}
-                style={{ width: '100%', background: 'linear-gradient(135deg,#FF6B00,#FFB800)', color: '#FFFFFF', fontWeight: 700, padding: '0.75rem 1rem', borderRadius: '0.5rem', border: 'none', cursor: 'pointer', fontSize: '0.875rem', marginTop: '0.5rem', opacity: loading ? 0.7 : 1 }}>
-                {loading ? 'Signing in...' : 'Access Account →'}
-              </button>
-            </form>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text)', marginBottom: '0.25rem' }}>Sign In</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>Access your SecureBank account</p>
 
-            <div className="mt-6 pt-5" style={{ borderTop: '1px solid #E5E7EB' }}>
-              <p className="text-xs mb-2" style={{ color: '#6B7280' }}>Test credentials:</p>
-              <div className="space-y-1">
-                {[['john.doe','SecureBank123!','Customer'],['attacker','SecureBank123!','Attacker (Start here)']].map(([u,p,role]) => (
-                  <button key={u} onClick={() => { setUsername(u); setPassword(p); }}
-                    className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors"
-                    style={{ background: '#F9FAFB', border: '1px solid #E5E7EB', color: '#374151', cursor: 'pointer' }}
-                    onMouseOver={e => e.currentTarget.style.borderColor = '#FF6B00'}
-                    onMouseOut={e => e.currentTarget.style.borderColor = '#E5E7EB'}>
-                    <span className="font-mono" style={{ color: '#FF6B00' }}>{u}</span>
-                    <span style={{ color: '#6B7280' }}>{role}</span>
-                  </button>
-                ))}
+              {error && (
+                <div style={{
+                  marginBottom: '1rem', padding: '0.75rem 1rem', borderRadius: '0.5rem',
+                  background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+                  color: '#F87171', fontSize: '0.85rem',
+                }}>
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.68rem', fontFamily: 'JetBrains Mono, monospace', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+                    Username
+                  </label>
+                  <input
+                    type="text" required value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="your_username"
+                    style={{
+                      width: '100%', background: 'var(--surface-low)',
+                      border: 'none', borderBottom: '1px solid var(--border-solid)',
+                      padding: '0.65rem 0', fontSize: '0.875rem', color: 'var(--text)',
+                      outline: 'none', boxSizing: 'border-box',
+                      fontFamily: 'JetBrains Mono, monospace', transition: 'border-color 0.2s',
+                    }}
+                    onFocus={e => e.target.style.borderBottomColor = '#FF6A00'}
+                    onBlur={e => e.target.style.borderBottomColor = 'var(--border-solid)'}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.68rem', fontFamily: 'JetBrains Mono, monospace', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+                    Password
+                  </label>
+                  <input
+                    type="password" required value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    style={{
+                      width: '100%', background: 'var(--surface-low)',
+                      border: 'none', borderBottom: '1px solid var(--border-solid)',
+                      padding: '0.65rem 0', fontSize: '0.875rem', color: 'var(--text)',
+                      outline: 'none', boxSizing: 'border-box',
+                      fontFamily: 'JetBrains Mono, monospace', transition: 'border-color 0.2s',
+                    }}
+                    onFocus={e => e.target.style.borderBottomColor = '#FF6A00'}
+                    onBlur={e => e.target.style.borderBottomColor = 'var(--border-solid)'}
+                  />
+                </div>
+                <button
+                  type="submit" disabled={loading}
+                  style={{
+                    width: '100%', background: 'linear-gradient(135deg,#FF6A00,#FFC107)',
+                    color: '#000', fontWeight: 700, padding: '0.75rem 1rem',
+                    border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                    fontSize: '0.8rem', fontFamily: 'JetBrains Mono, monospace',
+                    textTransform: 'uppercase', letterSpacing: '0.08em',
+                    opacity: loading ? 0.7 : 1, marginTop: '0.25rem',
+                    transition: 'opacity 0.2s',
+                  }}
+                  onMouseOver={e => { if (!loading) e.currentTarget.style.opacity = '0.88'; }}
+                  onMouseOut={e => { if (!loading) e.currentTarget.style.opacity = '1'; }}
+                >
+                  {loading ? 'Authenticating...' : 'ACCESS TERMINAL →'}
+                </button>
+              </form>
+
+              <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border)' }}>
+                <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontFamily: 'JetBrains Mono, monospace' }}>
+                  // Test credentials:
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  {[['john.doe', 'SecureBank123!', 'Customer'], ['attacker', 'SecureBank123!', 'Attacker (Start here)']].map(([u, p, role]) => (
+                    <button
+                      key={u}
+                      onClick={() => { setUsername(u); setPassword(p); }}
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        padding: '0.5rem 0.75rem', background: 'var(--surface-low)',
+                        border: '1px solid var(--border)', borderRadius: '0.375rem',
+                        cursor: 'pointer', transition: 'border-color 0.15s',
+                      }}
+                      onMouseOver={e => e.currentTarget.style.borderColor = '#FF6A00'}
+                      onMouseOut={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                    >
+                      <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', color: '#FF6A00' }}>{u}</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{role}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="mt-4 text-center">
-            <a href="http://localhost:5555" className="text-xs font-semibold"
-              style={{ color: '#FF6B00', textDecoration: 'none' }}>
+          <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+            <a href="http://localhost:5555" style={{ fontSize: '0.75rem', fontWeight: 600, color: '#FF6A00', textDecoration: 'none' }}>
               ← Back to Technieum Portal
             </a>
           </div>

@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
+  <script>
+    (function(){
+      const s = localStorage.getItem('technieum-theme');
+      const p = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if(s ? s === 'dark' : p) document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    })();
+  </script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chat — TECHNIEUM LAB-1: MedAssist AI</title>
@@ -35,6 +43,28 @@
     .typing-dot { display:inline-block;width:6px;height:6px;border-radius:50%;background:#FF6A00;animation:typing 1.4s infinite ease-in-out; }
     .typing-dot:nth-child(2){animation-delay:0.2s}.typing-dot:nth-child(3){animation-delay:0.4s}
     @keyframes typing{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+
+    /* Light mode overrides */
+    html:not(.dark) body {
+      background-color: #F3F4F6 !important;
+      background-image: linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.02) 1px, transparent 1px) !important;
+    }
+    html:not(.dark) header { background-color: #FFFFFF !important; border-color: #E5E7EB !important; }
+    html:not(.dark) aside { background-color: #F9FAFB !important; border-color: #E5E7EB !important; }
+    html:not(.dark) .bg-\[#111217\] { background-color: #FFFFFF !important; }
+    html:not(.dark) .bg-\[#0B0B0D\] { background-color: #F3F4F6 !important; }
+    html:not(.dark) .bg-\[#181A20\], html:not(.dark) .bg-surface-container-low { background-color: #F9FAFB !important; }
+    html:not(.dark) .bg-surface { background-color: #FFFFFF !important; }
+    html:not(.dark) .bg-surface-container-high { background-color: #F3F4F6 !important; }
+    html:not(.dark) .bg-surface-container-lowest { background-color: #E5E7EB !important; }
+    html:not(.dark) .text-on-background, html:not(.dark) .text-on-surface { color: #111827 !important; }
+    html:not(.dark) .text-zinc-300 { color: #374151 !important; }
+    html:not(.dark) .text-zinc-400 { color: #6B7280 !important; }
+    html:not(.dark) .text-zinc-500 { color: #9CA3AF !important; }
+    html:not(.dark) .border-zinc-800\/30, html:not(.dark) .border-zinc-800 { border-color: #E5E7EB !important; }
+    html:not(.dark) .border-zinc-800\/50 { border-color: rgba(229,231,235,0.5) !important; }
+    html:not(.dark) .bg-zinc-800\/30, html:not(.dark) .bg-zinc-800\/50 { background-color: rgba(243,244,246,0.8) !important; }
+    * { transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
   </style>
 </head>
 <body class="font-body text-on-background h-screen flex flex-col">
@@ -43,13 +73,16 @@
 <header class="bg-[#111217] fixed top-0 w-full flex justify-between items-center px-6 h-16 z-50 border-b border-zinc-800/30 flex-shrink-0">
   <div class="flex items-center gap-4">
     <a href="/" class="flex items-center gap-2">
-      <span class="font-headline font-black text-sm tracking-tighter text-[#FF6A00]">TECHNIEUM</span>
+      <span class="font-headline font-black text-sm tracking-tighter text-[#FF6A00]">TECHNIEUM AI SECURITY LABS</span>
     </a>
     <span class="text-zinc-700">|</span>
     <span class="font-label text-xs text-zinc-400">LAB-1: MedAssist AI</span>
     <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block"></span>
   </div>
   <div class="flex items-center gap-3">
+    <button onclick="toggleTheme()" class="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-orange-500 transition-colors" title="Toggle theme">
+      <span class="material-symbols-outlined text-lg" id="theme-icon">light_mode</span>
+    </button>
     <a href="#" id="portal-link" class="font-label text-xs uppercase text-[#FF6A00] bg-orange-600/10 px-2 py-1 hover:bg-orange-600/20 transition-all">Submit Flag</a>
     <a href="/admin" class="font-label text-xs uppercase text-zinc-500 hover:text-zinc-200 border border-zinc-800 px-2 py-1 transition-all">Admin</a>
   </div>
@@ -133,6 +166,18 @@
 
   <!-- Chat area -->
   <div class="flex-1 flex flex-col min-w-0">
+    <!-- Chat header bar -->
+    <div class="px-5 py-3 bg-[#111217] border-b border-zinc-800/30 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-2 h-2 rounded-full bg-orange-600 animate-pulse shadow-[0_0_8px_#FF6A00]"></div>
+        <span class="font-headline font-bold text-sm text-on-surface tracking-wider">MEDASSIST_AI v4.2</span>
+        <span class="font-label text-[10px] text-zinc-500 uppercase bg-zinc-800/60 px-2 py-0.5 rounded hidden sm:block">⚠ Intentionally Vulnerable</span>
+      </div>
+      <button onclick="clearChat()" class="bg-zinc-800 p-1.5 hover:bg-zinc-700 transition-colors" title="Clear chat">
+        <span class="material-symbols-outlined text-sm text-zinc-400">delete_sweep</span>
+      </button>
+    </div>
+
     <div id="chatMessages" class="flex-1 overflow-y-auto p-5 space-y-4">
       <div class="flex gap-3 items-start">
         <div class="w-8 h-8 rounded-lg bg-[#1F222A] flex-shrink-0 flex items-center justify-center border border-zinc-700/50">
@@ -185,6 +230,19 @@
 <script>
   const API_BASE = `http://${window.location.hostname}:5000`;
   const PORTAL_URL = `http://${window.location.hostname}:5555`;
+
+  // Theme toggle
+  function toggleTheme() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('technieum-theme', isDark ? 'dark' : 'light');
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+  }
+  function initThemeIcon() {
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
+  }
+  document.addEventListener('DOMContentLoaded', initThemeIcon);
 
   document.getElementById('portal-link').href = PORTAL_URL;
 

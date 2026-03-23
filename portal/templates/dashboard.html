@@ -3,24 +3,37 @@
 
 {% block extra_head %}
 <style>
-  .lab-card { transition: all 0.2s ease; }
+  /* Lab card hover lift */
+  .lab-card { transition: all 0.25s ease; }
   .lab-card:hover { transform: translateY(-2px); }
+
+  /* Status indicator dots */
   .status-checking { display: inline-block; width: 7px; height: 7px; background: #FFC107; border-radius: 50%; }
-  .status-online { display: inline-block; width: 7px; height: 7px; background: #22C55E; border-radius: 50%; animation: blink 2s ease-in-out infinite; }
-  .status-offline { display: inline-block; width: 7px; height: 7px; background: #71717A; border-radius: 50%; }
+  .status-online   { display: inline-block; width: 7px; height: 7px; background: #22C55E; border-radius: 50%; animation: blink 2s ease-in-out infinite; }
+  .status-offline  { display: inline-block; width: 7px; height: 7px; background: #71717A; border-radius: 50%; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* Stat card glow line */
+  .stat-glow::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: #FF6A00;
+    box-shadow: 0 0 10px rgba(255,106,0,0.5);
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-{% set total_pts = namespace(v=0) %}
+{% set total_pts   = namespace(v=0) %}
 {% set total_flags = namespace(v=0) %}
 {% for lab_id, lab_scores in per_lab.items() %}
-  {% set total_pts.v = total_pts.v + lab_scores.points %}
-  {% set total_flags.v = total_flags.v + lab_scores.count %}
+  {% set total_pts.v   = total_pts.v   + lab_scores.points %}
+  {% set total_flags.v = total_flags.v + lab_scores.count  %}
 {% endfor %}
 
-<!-- Page header -->
+<!-- ─── Page header ─── -->
 <div class="pt-8 pb-6">
   <p class="font-label text-[10px] text-zinc-500 uppercase tracking-widest mb-2">// Operator Dashboard</p>
   <h1 class="font-headline text-3xl font-black tracking-tighter text-on-background">
@@ -29,170 +42,328 @@
   <p class="font-label text-xs text-zinc-500 mt-1">Select a lab, exploit vulnerabilities, and submit captured flags for points.</p>
 </div>
 
-<!-- Stats row -->
+<!-- ─── Hero Stats Grid ─── -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-  <div class="bg-[#181A20] p-6 rounded-xl border-t-2 border-[#FF6A00] relative overflow-hidden">
-    <div class="absolute top-0 left-0 w-full h-[2px] shadow-[0_0_10px_rgba(255,106,0,0.5)]"></div>
+
+  <!-- Total Score -->
+  <div class="bg-[#181A20] p-6 rounded-xl relative overflow-hidden stat-glow group">
     <div class="flex justify-between items-start mb-4">
       <span class="font-label text-[10px] uppercase text-zinc-500 tracking-widest">Total Score</span>
-      <span class="material-symbols-outlined text-[#FF6A00]/40">trophy</span>
+      <span class="material-symbols-outlined text-[#FF6A00]/40 group-hover:text-[#FF6A00]/70 transition-colors">trophy</span>
     </div>
     <div class="font-headline text-3xl font-bold tracking-tight text-on-background">{{ total_pts.v }}</div>
     <div class="font-label text-[10px] text-[#FF6A00] mt-1 uppercase tracking-tighter">points earned</div>
   </div>
 
-  <div class="bg-[#181A20] p-6 rounded-xl border-t-2 border-[#FF6A00] relative overflow-hidden">
+  <!-- Flags Captured -->
+  <div class="bg-[#181A20] p-6 rounded-xl relative overflow-hidden stat-glow group">
     <div class="flex justify-between items-start mb-4">
       <span class="font-label text-[10px] uppercase text-zinc-500 tracking-widest">Flags Captured</span>
-      <span class="material-symbols-outlined text-[#FF6A00]/40">flag</span>
+      <span class="material-symbols-outlined text-[#FF6A00]/40 group-hover:text-[#FF6A00]/70 transition-colors">flag</span>
     </div>
     <div class="font-headline text-3xl font-bold tracking-tight text-on-background">{{ total_flags.v }}/55</div>
     <div class="w-full bg-zinc-800 h-1 mt-3 rounded-full overflow-hidden">
-      <div class="ignition-gradient h-full" style="width:{{ ((total_flags.v / 55) * 100)|int }}%"></div>
+      <div class="ignition-gradient h-full shadow-[0_0_8px_rgba(255,106,0,0.3)]" style="width:{{ ((total_flags.v / 55) * 100)|int }}%"></div>
     </div>
   </div>
 
-  <div class="bg-[#181A20] p-6 rounded-xl border-t-2 border-[#FF6A00] relative overflow-hidden">
+  <!-- Global Rank -->
+  <div class="bg-[#181A20] p-6 rounded-xl relative overflow-hidden stat-glow group">
     <div class="flex justify-between items-start mb-4">
       <span class="font-label text-[10px] uppercase text-zinc-500 tracking-widest">Global Rank</span>
-      <span class="material-symbols-outlined text-[#FF6A00]/40">leaderboard</span>
+      <span class="material-symbols-outlined text-[#FF6A00]/40 group-hover:text-[#FF6A00]/70 transition-colors">leaderboard</span>
     </div>
     <div class="font-headline text-3xl font-bold tracking-tight text-on-background">#{{ rank }}</div>
     <div class="font-label text-[10px] text-zinc-500 mt-1 uppercase tracking-tighter">of {{ total_players }} players</div>
   </div>
 
-  <div class="bg-[#181A20] p-6 rounded-xl border-t-2 border-[#FF6A00] relative overflow-hidden">
+  <!-- Labs Active -->
+  <div class="bg-[#181A20] p-6 rounded-xl relative overflow-hidden stat-glow group">
     <div class="flex justify-between items-start mb-4">
       <span class="font-label text-[10px] uppercase text-zinc-500 tracking-widest">Labs Active</span>
-      <span class="material-symbols-outlined text-[#FF6A00]/40">check_circle</span>
+      <span class="material-symbols-outlined text-[#FF6A00]/40 group-hover:text-[#FF6A00]/70 transition-colors">check_circle</span>
     </div>
     <div class="font-headline text-3xl font-bold tracking-tight text-on-background">{{ per_lab | length }}</div>
     <div class="font-label text-[10px] text-zinc-500 mt-1 uppercase tracking-tighter">of 5 labs started</div>
   </div>
 </div>
 
-<!-- Labs section -->
-<div class="flex items-center justify-between mb-6">
-  <h2 class="font-headline text-xl font-bold tracking-tight uppercase">Available Environments</h2>
-  <div class="flex items-center gap-2">
-    <span class="font-label text-[10px] text-zinc-500 uppercase">Live Systems</span>
-    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-  </div>
-</div>
+<!-- ─── Main two-column layout: lab grid + side panel ─── -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
 
-<div class="grid md:grid-cols-2 xl:grid-cols-3 gap-5 mb-12">
-  {% for lab_id, meta in lab_meta.items() %}
-  {% set lab_score = per_lab.get(lab_id, {'points': 0, 'count': 0}) %}
-  {% set progress_pct = ((lab_score.count / meta.total_flags) * 100) | int %}
+  <!-- ── Left: Lab grid + Recent Captures ── -->
+  <div class="lg:col-span-2">
 
-  <div class="lab-card bg-[#181A20] rounded-xl overflow-hidden border border-zinc-800/30 hover:border-[#FF6A00]/20 group">
-    <div class="h-1 ignition-gradient w-full"></div>
-    <div class="p-5">
-      <div class="flex items-start justify-between mb-4">
-        <div class="flex items-start gap-3">
-          <div class="w-11 h-11 rounded-lg flex items-center justify-center text-2xl flex-shrink-0 bg-[#1F222A]">
-            {{ meta.icon }}
+    <!-- Available Environments heading -->
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="font-headline text-xl font-bold tracking-tight uppercase">Available Environments</h2>
+      <div class="flex items-center gap-2">
+        <span class="font-label text-[10px] text-zinc-500 uppercase">Live Systems</span>
+        <div class="w-2 h-2 rounded-full bg-green-500 pulse-active"></div>
+      </div>
+    </div>
+
+    <!-- Lab cards grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+      {% for lab_id, meta in lab_meta.items() %}
+      {% set lab_score   = per_lab.get(lab_id, {'points': 0, 'count': 0}) %}
+      {% set progress_pct = ((lab_score.count / meta.total_flags) * 100) | int %}
+
+      <div class="lab-card bg-[#181A20] rounded-xl overflow-hidden border border-transparent hover:border-[#FF6A00]/20 group transition-all duration-300 hover:bg-[#1F222A]">
+        <div class="h-1 ignition-gradient w-full"></div>
+        <div class="p-5">
+          <!-- Card header: icon + name + status badge -->
+          <div class="flex justify-between items-start mb-4">
+            <div class="flex items-start gap-3">
+              <div class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl flex-shrink-0 bg-[#1F222A]">
+                {{ meta.icon }}
+              </div>
+              <div>
+                <h3 class="font-headline font-bold text-sm text-on-background group-hover:text-[#FF6A00] transition-colors">{{ meta.name }}</h3>
+                <p class="font-label text-[10px] text-[#FF6A00] mt-0.5 uppercase">{{ meta.subtitle }}</p>
+              </div>
+            </div>
+            <span class="lab-status font-label text-[9px] uppercase font-bold px-2 py-0.5 bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center gap-1 flex-shrink-0" id="status-{{ lab_id }}">
+              <span class="status-checking"></span> Checking…
+            </span>
           </div>
-          <div>
-            <h3 class="font-headline font-bold text-sm text-on-background group-hover:text-[#FF6A00] transition-colors">{{ meta.name }}</h3>
-            <p class="font-label text-[10px] text-[#FF6A00] mt-0.5 uppercase">{{ meta.subtitle }}</p>
+
+          <!-- Description -->
+          <p class="font-body text-zinc-500 text-xs leading-relaxed mb-4 line-clamp-2">{{ meta.description }}</p>
+
+          <!-- Tags -->
+          <div class="flex flex-wrap gap-1.5 mb-4">
+            <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-zinc-800 text-zinc-400 border border-zinc-700/50">{{ meta.difficulty }}</span>
+            <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-zinc-800 text-zinc-400 border border-zinc-700/50">{{ meta.total_flags }} flags</span>
+            <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-zinc-800 text-zinc-400 border border-zinc-700/50">:{{ meta.port }}</span>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="font-label text-[10px] uppercase text-zinc-500">Progress</span>
+              <span class="font-label text-[10px] {% if progress_pct > 0 %}text-[#FF6A00]{% else %}text-zinc-500{% endif %}">
+                {{ lab_score.count }}/{{ meta.total_flags }} flags
+              </span>
+            </div>
+            <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+              <div class="ignition-gradient h-full transition-all shadow-[0_0_8px_rgba(255,106,0,0.3)]" style="width:{{ progress_pct }}%"></div>
+            </div>
+          </div>
+
+          <!-- Points + Launch button -->
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="font-label text-[10px] text-zinc-500 uppercase">Points earned</p>
+              <p class="font-headline font-bold text-base text-[#FF6A00]">{{ lab_score.points }} pts</p>
+            </div>
+            <div class="flex gap-2">
+              <a href="{{ meta.url }}" target="_blank"
+                 class="flex items-center gap-2 px-4 py-2 ignition-gradient text-white font-label text-[10px] font-bold uppercase tracking-widest hover:shadow-[0_0_15px_rgba(255,106,0,0.4)] transition-all">
+                Launch <span class="material-symbols-outlined text-sm">open_in_new</span>
+              </a>
+            </div>
           </div>
         </div>
-        <span class="lab-status font-label text-[9px] uppercase font-bold px-2 py-0.5 bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center gap-1" id="status-{{ lab_id }}">
-          <span class="status-checking"></span> Checking…
-        </span>
       </div>
+      {% endfor %}
+    </div>
 
-      <p class="font-body text-zinc-500 text-xs leading-relaxed mb-4">{{ meta.description }}</p>
-
-      <div class="flex flex-wrap gap-1.5 mb-4">
-        <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-zinc-800 text-zinc-400 border border-zinc-700/50">{{ meta.difficulty }}</span>
-        <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-zinc-800 text-zinc-400 border border-zinc-700/50">{{ meta.total_flags }} flags</span>
-        <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-zinc-800 text-zinc-400 border border-zinc-700/50">:{{ meta.port }}</span>
+    <!-- ── Recent Captures table ── -->
+    {% if user_flags %}
+    <div class="bg-[#111217] rounded-xl overflow-hidden border border-zinc-800/30">
+      <div class="flex justify-between items-center px-6 py-4 border-b border-zinc-800/50 bg-[#181A20]">
+        <h2 class="font-headline text-sm font-bold tracking-tight uppercase">Recent Captures</h2>
+        <a href="{{ url_for('scoreboard') }}" class="font-label text-[10px] uppercase text-[#FF6A00] hover:underline tracking-widest">View All</a>
       </div>
-
-      <div class="mb-4">
-        <div class="flex items-center justify-between mb-1.5">
-          <span class="font-label text-[10px] uppercase text-zinc-500">Progress</span>
-          <span class="font-label text-[10px] text-[#FF6A00]">{{ lab_score.count }}/{{ meta.total_flags }} flags</span>
-        </div>
-        <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-          <div class="ignition-gradient h-full transition-all" style="width:{{ progress_pct }}%"></div>
-        </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-zinc-800/50">
+              <th class="px-6 py-3 font-label text-[10px] uppercase text-zinc-500 tracking-widest bg-[#181A20]">Flag Name</th>
+              <th class="px-6 py-3 font-label text-[10px] uppercase text-zinc-500 tracking-widest bg-[#181A20]">Lab</th>
+              <th class="px-6 py-3 font-label text-[10px] uppercase text-zinc-500 tracking-widest bg-[#181A20]">Tier</th>
+              <th class="px-6 py-3 font-label text-[10px] uppercase text-zinc-500 tracking-widest bg-[#181A20] text-right">Points</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-800/30">
+            {% set lab_info = {
+              'lab1': {'name':'MedAssist','color':'text-red-400','bg':'bg-red-500/10','border':'border-red-500/20'},
+              'lab2': {'name':'SecureBank','color':'text-blue-400','bg':'bg-blue-500/10','border':'border-blue-500/20'},
+              'lab3': {'name':'ShopSec','color':'text-purple-400','bg':'bg-purple-500/10','border':'border-purple-500/20'},
+              'lab4': {'name':'TravelNest','color':'text-sky-400','bg':'bg-sky-500/10','border':'border-sky-500/20'},
+              'lab5': {'name':'GovConnect','color':'text-emerald-400','bg':'bg-emerald-500/10','border':'border-emerald-500/20'},
+            } %}
+            {% for f in user_flags[:8] %}
+            {% set li = lab_info.get(f.lab, {'name': f.lab, 'color':'text-zinc-400','bg':'bg-zinc-800','border':'border-zinc-700/50'}) %}
+            <tr class="hover:bg-white/5 transition-colors group">
+              <td class="px-6 py-4 font-label text-xs text-[#FF6A00]">{{ f.flag_name }}</td>
+              <td class="px-6 py-4">
+                <span class="font-label text-[10px] uppercase px-2 py-0.5 rounded {{ li.bg }} {{ li.color }} border {{ li.border }}">{{ li.name }}</span>
+              </td>
+              <td class="px-6 py-4">
+                {% if f.tier|lower == 'easy' %}
+                <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-green-500/10 text-green-400 border border-green-500/20">Easy</span>
+                {% elif f.tier|lower == 'medium' %}
+                <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20">Medium</span>
+                {% elif f.tier|lower == 'hard' %}
+                <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-orange-500/10 text-orange-400 border border-orange-500/20">Hard</span>
+                {% else %}
+                <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-red-500/10 text-red-400 border border-red-500/20">Expert</span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4 text-right font-label text-xs font-bold text-green-400">+{{ f.points }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
+    </div>
+    {% else %}
+    <!-- Empty state -->
+    <div class="bg-[#111217] rounded-xl p-8 text-center border border-zinc-800/30">
+      <div class="w-12 h-12 ignition-gradient rounded-lg flex items-center justify-center mx-auto mb-3 opacity-80">
+        <span class="material-symbols-outlined text-white text-xl">flag</span>
+      </div>
+      <h3 class="font-headline font-bold text-sm text-on-background mb-1">No captures yet</h3>
+      <p class="font-label text-xs text-zinc-500">Launch a lab above and submit your first flag to start scoring.</p>
+    </div>
+    {% endif %}
 
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="font-label text-[10px] text-zinc-500 uppercase">Points earned</p>
-          <p class="font-headline font-bold text-base text-[#FF6A00]">{{ lab_score.points }} pts</p>
+    <!-- ── Scoring guide ── -->
+    <div class="bg-[#111217] p-6 rounded-xl border border-zinc-800/30 mt-8">
+      <h3 class="font-headline font-bold text-sm uppercase tracking-widest text-zinc-400 mb-5">Point Scoring Guide</h3>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-[#181A20] p-4 rounded-lg text-center border border-green-500/20">
+          <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-green-500/10 text-green-500 border border-green-500/20">Easy</span>
+          <p class="font-headline text-3xl font-black text-green-400 mt-2">100</p>
+          <p class="font-label text-[10px] text-zinc-500 mt-1">pts per flag</p>
         </div>
-        <a href="{{ meta.url }}" target="_blank"
-           class="flex items-center gap-2 px-4 py-2 ignition-gradient text-white font-label text-[10px] font-bold uppercase tracking-widest hover:shadow-[0_0_15px_rgba(255,106,0,0.4)] transition-all">
-          Launch Lab <span class="material-symbols-outlined text-sm">open_in_new</span>
-        </a>
+        <div class="bg-[#181A20] p-4 rounded-lg text-center border border-amber-500/20">
+          <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-amber-500/10 text-amber-500 border border-amber-500/20">Medium</span>
+          <p class="font-headline text-3xl font-black text-amber-400 mt-2">250</p>
+          <p class="font-label text-[10px] text-zinc-500 mt-1">pts per flag</p>
+        </div>
+        <div class="bg-[#181A20] p-4 rounded-lg text-center border border-orange-500/20">
+          <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-orange-500/10 text-orange-500 border border-orange-500/20">Hard</span>
+          <p class="font-headline text-3xl font-black text-orange-400 mt-2">500</p>
+          <p class="font-label text-[10px] text-zinc-500 mt-1">pts per flag</p>
+        </div>
+        <div class="bg-[#181A20] p-4 rounded-lg text-center border border-red-500/20">
+          <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20">Expert</span>
+          <p class="font-headline text-3xl font-black text-red-400 mt-2">1000</p>
+          <p class="font-label text-[10px] text-zinc-500 mt-1">pts per flag</p>
+        </div>
       </div>
     </div>
   </div>
-  {% endfor %}
-</div>
 
-<!-- Scoring guide -->
-<div class="bg-[#111217] p-6 rounded-xl border border-zinc-800/30 mb-10">
-  <h3 class="font-headline font-bold text-sm uppercase tracking-widest text-zinc-400 mb-5">Point Scoring Guide</h3>
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-    <div class="bg-[#181A20] p-4 rounded-lg text-center border border-green-500/20">
-      <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-green-500/10 text-green-500 border border-green-500/20">Easy</span>
-      <p class="font-headline text-3xl font-black text-green-400 mt-2">100</p>
-      <p class="font-label text-[10px] text-zinc-500 mt-1">pts per flag</p>
-    </div>
-    <div class="bg-[#181A20] p-4 rounded-lg text-center border border-amber-500/20">
-      <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-amber-500/10 text-amber-500 border border-amber-500/20">Medium</span>
-      <p class="font-headline text-3xl font-black text-amber-400 mt-2">250</p>
-      <p class="font-label text-[10px] text-zinc-500 mt-1">pts per flag</p>
-    </div>
-    <div class="bg-[#181A20] p-4 rounded-lg text-center border border-orange-500/20">
-      <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-orange-500/10 text-orange-500 border border-orange-500/20">Hard</span>
-      <p class="font-headline text-3xl font-black text-orange-400 mt-2">500</p>
-      <p class="font-label text-[10px] text-zinc-500 mt-1">pts per flag</p>
-    </div>
-    <div class="bg-[#181A20] p-4 rounded-lg text-center border border-red-500/20">
-      <span class="font-label text-[9px] uppercase px-2 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20">Expert</span>
-      <p class="font-headline text-3xl font-black text-red-400 mt-2">1000</p>
-      <p class="font-label text-[10px] text-zinc-500 mt-1">pts per flag</p>
+  <!-- ── Right sidebar: Flag Submission + Leaderboard Snapshot ── -->
+  <div class="lg:col-span-1">
+    <div class="sticky top-24 space-y-6">
+
+      <!-- Flag Submission panel (triggers the global modal) -->
+      <div class="bg-[#1F222A] p-6 rounded-xl border border-[#FF6A00]/20 relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-[#FF6A00]/5 blur-3xl rounded-full pointer-events-none"></div>
+        <h2 class="font-headline text-sm font-bold mb-1 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#FF6A00]">terminal</span>
+          FLAG SUBMISSION
+        </h2>
+        <p class="font-label text-[10px] text-zinc-500 uppercase tracking-tighter mb-5">Enter your acquired laboratory code below</p>
+
+        <!-- Inline input that opens modal on focus/click -->
+        <div class="space-y-4">
+          <div class="space-y-2">
+            <label class="font-label text-[10px] uppercase text-zinc-400 tracking-widest ml-1">Input Sequence</label>
+            <div class="relative group">
+              <input type="text" readonly onclick="openFlagModal()" placeholder="TECHNIEUM{...}"
+                class="w-full bg-[#181A20] border-0 border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 font-label text-sm py-3 px-3 placeholder-zinc-600 text-on-background cursor-pointer transition-all"
+                title="Click to open flag submission" />
+              <div class="absolute bottom-0 left-0 h-[2px] w-0 bg-[#FF6A00] group-hover:w-full transition-all duration-500"></div>
+            </div>
+          </div>
+          <button onclick="openFlagModal()"
+            class="w-full ignition-gradient text-white font-label text-xs py-3.5 uppercase font-black tracking-[0.15em] shadow-[0_4px_20px_rgba(255,106,0,0.2)] hover:shadow-[0_4px_30px_rgba(255,106,0,0.4)] transition-all active:scale-95">
+            SUBMIT PROTOCOL
+          </button>
+          <div class="bg-[#0d0e13] p-3 rounded border border-zinc-800/30">
+            <div class="flex items-start gap-2">
+              <span class="material-symbols-outlined text-zinc-500 text-sm mt-0.5">info</span>
+              <p class="font-label text-[10px] text-zinc-500 uppercase leading-relaxed">System Note: Brute-forcing attempts will result in temporary instance lockout.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard snapshot -->
+      <div class="bg-[#111217] p-6 rounded-xl border border-zinc-800/30">
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="font-headline text-sm font-bold uppercase tracking-widest text-zinc-400">Leaderboard Snapshot</h3>
+          <a href="{{ url_for('scoreboard') }}" class="font-label text-[10px] uppercase text-[#FF6A00] hover:underline tracking-widest">Full →</a>
+        </div>
+        <div class="space-y-2">
+          {% if top_players %}
+            {% for player in top_players[:3] %}
+            {% set medal_colors = ['#FFD54F','#C0C0C0','#CD7F32'] %}
+            <div class="flex justify-between items-center bg-zinc-800/20 px-3 py-2 rounded {% if player.is_current %}bg-[#FF6A00]/10 ring-1 ring-[#FF6A00]/30{% endif %}">
+              <div class="flex items-center gap-3">
+                <span class="font-label text-[10px] font-bold" style="color:{{ medal_colors[loop.index0] }};">0{{ loop.index }}</span>
+                <span class="font-label text-xs {% if player.is_current %}text-[#FF6A00] font-bold{% else %}text-zinc-300{% endif %}">{{ player.display_name }}</span>
+              </div>
+              <span class="font-label text-xs font-bold {% if player.is_current %}text-[#FF6A00]{% else %}text-zinc-400{% endif %}">{{ player.total_points }}</span>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="text-center py-4">
+              <p class="font-label text-xs text-zinc-600">No scores yet</p>
+            </div>
+          {% endif %}
+
+          <!-- Current user position (if outside top 3) -->
+          {% if rank and rank > 3 %}
+          <div class="pt-3 border-t border-zinc-800/30">
+            <div class="flex justify-between items-center bg-[#FF6A00]/10 px-3 py-2 rounded ring-1 ring-[#FF6A00]/30">
+              <div class="flex items-center gap-3">
+                <span class="font-label text-[10px] text-[#FF6A00]">{{ rank }}</span>
+                <span class="font-label text-xs text-[#FF6A00] font-bold">YOU</span>
+              </div>
+              <span class="font-label text-xs font-bold text-[#FF6A00]">{{ total_pts.v }}</span>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
+
 {% endblock %}
 
 {% block scripts %}
 <script>
-const labs = [
-  {% for lab_id, meta in lab_meta.items() %}
-  { id: '{{ lab_id }}', url: '{{ meta.url }}' },
-  {% endfor %}
-];
+  const labs = [
+    {% for lab_id, meta in lab_meta.items() %}
+    { id: '{{ lab_id }}', url: '{{ meta.url }}' },
+    {% endfor %}
+  ];
 
-async function checkLabStatus(lab) {
-  const el = document.getElementById('status-' + lab.id);
-  if (!el) return;
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-    await fetch(`${lab.url}/health`, { signal: controller.signal, mode: 'no-cors' });
-    clearTimeout(timeout);
-    el.innerHTML = '<span class="status-online"></span> Online';
-    el.className = 'lab-status font-label text-[9px] uppercase font-bold px-2 py-0.5 bg-green-500/10 text-green-500 border border-green-500/20 flex items-center gap-1';
-  } catch (e) {
-    if (e.name === 'AbortError') {
+  async function checkLabStatus(lab) {
+    const el = document.getElementById('status-' + lab.id);
+    if (!el) return;
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3000);
+      await fetch(`${lab.url}/health`, { signal: controller.signal, mode: 'no-cors' });
+      clearTimeout(timeout);
+      el.innerHTML = '<span class="status-online"></span> Online';
+      el.className = 'lab-status font-label text-[9px] uppercase font-bold px-2 py-0.5 bg-green-500/10 text-green-500 border border-green-500/20 flex items-center gap-1 flex-shrink-0';
+    } catch (e) {
       el.innerHTML = '<span class="status-offline"></span> Offline';
-      el.className = 'lab-status font-label text-[9px] uppercase font-bold px-2 py-0.5 bg-zinc-800 text-zinc-500 border border-zinc-700/50 flex items-center gap-1';
-    } else {
-      el.innerHTML = '<span class="status-offline"></span> Offline';
-      el.className = 'lab-status font-label text-[9px] uppercase font-bold px-2 py-0.5 bg-zinc-800 text-zinc-500 border border-zinc-700/50 flex items-center gap-1';
+      el.className = 'lab-status font-label text-[9px] uppercase font-bold px-2 py-0.5 bg-zinc-800 text-zinc-500 border border-zinc-700/50 flex items-center gap-1 flex-shrink-0';
     }
   }
-}
 
-labs.forEach((lab, i) => { setTimeout(() => checkLabStatus(lab), i * 400); });
+  labs.forEach((lab, i) => { setTimeout(() => checkLabStatus(lab), i * 400); });
 </script>
 {% endblock %}

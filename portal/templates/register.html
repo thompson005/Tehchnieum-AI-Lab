@@ -2,25 +2,65 @@
 {% block title %}Register — TECHNIEUM AI Security Labs{% endblock %}
 {% block main_class %}flex items-center justify-center min-h-[calc(100vh-64px)] px-4 py-10{% endblock %}
 
+{% block extra_head %}
+<style>
+  /* Glassmorphism panel */
+  .glass-panel {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background-color: rgba(17, 18, 23, 0.85);
+  }
+  html:not(.dark) .glass-panel {
+    background-color: rgba(255, 255, 255, 0.85);
+  }
+  /* Password strength bar */
+  #strength-bar { transition: width 0.4s ease, background 0.4s ease; }
+</style>
+{% endblock %}
+
 {% block content %}
+
+<!-- ─── Background decoration glows ─── -->
+<div class="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
+  <div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-[#FF6A00]/5 blur-[120px] rounded-full"></div>
+  <div class="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-[#FFC107]/5 blur-[120px] rounded-full"></div>
+  <!-- Asymmetric technical decor (xl screens only) -->
+  <div class="absolute top-20 right-20 font-label text-[8px] text-zinc-700/20 leading-tight hidden xl:block">
+    SCANNING FOR VULNERABILITIES...<br/>
+    PORT 8080: [OPEN]<br/>
+    PORT 443: [ENCRYPTED]<br/>
+    LATENCY: 12ms
+  </div>
+  <div class="absolute bottom-20 left-20 font-label text-[8px] text-zinc-700/20 leading-tight hidden xl:block">
+    INIT_HANDSHAKE: OK<br/>
+    AUTH_PROTOCOL: TECHNIEUM_v4<br/>
+    SEED_GENERATOR: [RNG_SYSTEM]
+  </div>
+</div>
+
 <div class="w-full max-w-[500px] mx-auto relative z-10">
 
-  <!-- Brand header -->
+  <!-- ─── Brand header ─── -->
   <div class="mb-8 text-center">
     <h1 class="font-headline text-2xl font-black tracking-tighter text-[#FF6A00] mb-2 uppercase">TECHNIEUM AI SECURITY LABS</h1>
     <p class="font-label text-[10px] text-zinc-500 tracking-[0.2em] uppercase">// System Authorization Required //</p>
   </div>
 
-  <!-- Registration card -->
-  <div class="bg-[#111217] rounded-xl border border-zinc-800/30 overflow-hidden shadow-2xl">
+  <!-- ─── Registration card ─── -->
+  <div class="glass-panel rounded-xl border border-zinc-800/20 overflow-hidden shadow-[0px_0px_40px_rgba(0,0,0,0.4)]">
+
+    <!-- Ignition gradient top bar -->
     <div class="ignition-gradient h-1 w-full"></div>
+
     <div class="p-8 md:p-10">
+
+      <!-- Card header with SEC_LEVEL badge -->
       <div class="flex justify-between items-end mb-8">
         <div>
           <h2 class="font-headline text-2xl font-semibold tracking-tight text-on-background">Initialize Operator</h2>
           <p class="font-body text-sm text-zinc-500 mt-1">Register your credentials for the command deck</p>
         </div>
-        <div class="font-label text-[10px] text-[#FFC107] px-2 py-1 bg-amber-500/10 border border-amber-500/20">
+        <div class="font-label text-[10px] text-[#FFC107] px-2 py-1 bg-amber-500/10 border border-amber-500/20 flex-shrink-0">
           SEC_LEVEL: 0
         </div>
       </div>
@@ -31,10 +71,12 @@
 
       <form method="POST" action="{{ url_for('register') }}" class="space-y-5">
 
-        <!-- Identity block -->
+        <!-- ── Identity block: username + display_name side by side ── -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-2">
-            <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="display_name">Display Name <span class="text-[#FF6A00]">*</span></label>
+            <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="display_name">
+              Display Name <span class="text-[#FF6A00]">*</span>
+            </label>
             <div class="relative group">
               <input id="display_name" name="display_name" type="text" required
                 class="w-full bg-[#181A20] border-0 border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 font-label text-sm py-3 transition-all text-on-background placeholder-zinc-600"
@@ -44,20 +86,24 @@
             <p class="font-label text-[10px] text-zinc-600 ml-1">Shown on the scoreboard</p>
           </div>
           <div class="space-y-2">
-            <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="username">Operator UID <span class="text-[#FF6A00]">*</span></label>
+            <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="username">
+              Operator UID <span class="text-[#FF6A00]">*</span>
+            </label>
             <div class="relative group">
               <input id="username" name="username" type="text" required autocomplete="username"
                 class="w-full bg-[#181A20] border-0 border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 font-label text-sm py-3 transition-all text-on-background placeholder-zinc-600"
                 placeholder="unique_handle" />
               <span class="material-symbols-outlined absolute right-3 top-3 text-zinc-600 text-sm group-focus-within:text-[#FF6A00] transition-colors">alternate_email</span>
             </div>
-            <p class="font-label text-[10px] text-zinc-600 ml-1">Min. 3 characters, used to log in</p>
+            <p class="font-label text-[10px] text-zinc-600 ml-1">Min. 3 chars · used to log in</p>
           </div>
         </div>
 
-        <!-- Team / org -->
+        <!-- ── Team / org ── -->
         <div class="space-y-2">
-          <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="team">Team Name <span class="font-label text-[10px] text-zinc-600 italic">(Optional)</span></label>
+          <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="team">
+            Team Name <span class="font-label text-[10px] text-zinc-600 italic">(Optional)</span>
+          </label>
           <div class="relative group">
             <input id="team" name="team" type="text"
               class="w-full bg-[#181A20] border-0 border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 font-label text-sm py-3 transition-all text-on-background placeholder-zinc-600"
@@ -66,29 +112,53 @@
           </div>
         </div>
 
-        <!-- Security block -->
+        <!-- ── Security block ── -->
         <div class="space-y-4">
+          <!-- Password -->
           <div class="space-y-2">
-            <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="password">Security Key <span class="text-[#FF6A00]">*</span></label>
+            <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="password">
+              Security Key <span class="text-[#FF6A00]">*</span>
+            </label>
             <div class="relative group">
               <input id="password" name="password" type="password" required autocomplete="new-password"
+                oninput="updateStrength(this.value)"
                 class="w-full bg-[#181A20] border-0 border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 font-label text-sm py-3 transition-all text-on-background placeholder-zinc-600"
                 placeholder="Min. 6 characters" />
-              <span class="material-symbols-outlined absolute right-3 top-3 text-zinc-600 text-sm cursor-pointer hover:text-[#FF6A00] transition-colors">visibility_off</span>
+              <button type="button" onclick="togglePw('password','pw-eye')"
+                class="absolute right-3 top-3 text-zinc-600 hover:text-[#FF6A00] transition-colors cursor-pointer">
+                <span class="material-symbols-outlined text-sm" id="pw-eye">visibility_off</span>
+              </button>
+            </div>
+            <!-- Password strength indicator -->
+            <div class="pt-1">
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-label text-[9px] uppercase text-zinc-500" id="strength-label">Entropy Strength: —</span>
+                <span class="font-label text-[9px] uppercase text-zinc-500 tracking-widest" id="strength-pct">0%</span>
+              </div>
+              <div class="h-0.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+                <div id="strength-bar" class="h-full w-0 bg-zinc-600 rounded-full" style="width:0%"></div>
+              </div>
+              <p class="font-label text-[10px] text-zinc-600 mt-1.5 italic" id="strength-hint">Enter a password to see strength.</p>
             </div>
           </div>
+
+          <!-- Confirm password -->
           <div class="space-y-2">
-            <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="confirm_password">Re-Verify Key <span class="text-[#FF6A00]">*</span></label>
+            <label class="font-label text-[11px] uppercase text-zinc-400 block ml-1" for="confirm_password">
+              Re-Verify Key <span class="text-[#FF6A00]">*</span>
+            </label>
             <div class="relative group">
               <input id="confirm_password" name="confirm_password" type="password" required
+                oninput="checkMatch()"
                 class="w-full bg-[#181A20] border-0 border-b border-zinc-700 focus:border-[#FF6A00] focus:ring-0 font-label text-sm py-3 transition-all text-on-background placeholder-zinc-600"
                 placeholder="Repeat your password" />
-              <span class="material-symbols-outlined absolute right-3 top-3 text-zinc-600 text-sm">key</span>
+              <span class="material-symbols-outlined absolute right-3 top-3 text-zinc-600 text-sm" id="match-icon">key</span>
             </div>
+            <p class="font-label text-[10px] hidden text-red-400 ml-1" id="match-error">ERROR: Key mismatch detected.</p>
           </div>
         </div>
 
-        <!-- CTA -->
+        <!-- ── CTA ── -->
         <div class="pt-4 space-y-4">
           <button type="submit"
             class="w-full ignition-gradient text-white font-label text-xs font-bold py-4 uppercase tracking-widest hover:shadow-[0_0_20px_rgba(255,106,0,0.4)] active:scale-[0.98] transition-all">
@@ -104,7 +174,7 @@
       </form>
     </div>
 
-    <!-- Footer meta -->
+    <!-- Footer meta bar -->
     <div class="bg-[#0d0e13]/50 px-8 py-4 border-t border-zinc-800/30 flex justify-between items-center">
       <div class="flex items-center gap-2">
         <span class="w-1.5 h-1.5 rounded-full bg-[#FFC107] animate-pulse"></span>
@@ -114,7 +184,7 @@
     </div>
   </div>
 
-  <!-- Legal footer -->
+  <!-- Legal footer links -->
   <div class="mt-8 flex justify-center gap-6 font-label text-[10px] uppercase text-zinc-600 tracking-tighter">
     <a class="hover:text-[#FF6A00] transition-colors" href="#">Terms of Service</a>
     <span class="select-none">·</span>
@@ -123,4 +193,91 @@
     <a class="hover:text-[#FF6A00] transition-colors" href="#">Compliance</a>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // ── Password visibility toggle ──
+  function togglePw(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.textContent = 'visibility';
+    } else {
+      input.type = 'password';
+      icon.textContent = 'visibility_off';
+    }
+  }
+
+  // ── Password strength indicator ──
+  function updateStrength(val) {
+    let score = 0;
+    if (val.length >= 6)  score += 20;
+    if (val.length >= 10) score += 20;
+    if (/[A-Z]/.test(val)) score += 20;
+    if (/[0-9]/.test(val)) score += 20;
+    if (/[^A-Za-z0-9]/.test(val)) score += 20;
+
+    const bar   = document.getElementById('strength-bar');
+    const label = document.getElementById('strength-label');
+    const pct   = document.getElementById('strength-pct');
+    const hint  = document.getElementById('strength-hint');
+
+    bar.style.width = score + '%';
+    pct.textContent = score + '%';
+
+    if (score <= 20) {
+      bar.style.background = '#EF4444';
+      label.textContent = 'Entropy Strength: Weak';
+      label.className = 'font-label text-[9px] uppercase text-red-400';
+      hint.textContent = 'Recommendation: Use uppercase, numbers, and symbols.';
+    } else if (score <= 40) {
+      bar.style.background = '#F97316';
+      label.textContent = 'Entropy Strength: Fair';
+      label.className = 'font-label text-[9px] uppercase text-orange-400';
+      hint.textContent = 'Recommendation: Add special characters.';
+    } else if (score <= 60) {
+      bar.style.background = '#FFC107';
+      label.textContent = 'Entropy Strength: Moderate';
+      label.className = 'font-label text-[9px] uppercase text-amber-400';
+      hint.textContent = 'Recommendation: Include non-alphanumeric fragments.';
+    } else if (score <= 80) {
+      bar.style.background = '#22C55E';
+      label.textContent = 'Entropy Strength: Strong';
+      label.className = 'font-label text-[9px] uppercase text-green-400';
+      hint.textContent = 'Good entropy level.';
+    } else {
+      bar.style.background = 'linear-gradient(90deg, #FF6A00, #FFC107)';
+      label.textContent = 'Entropy Strength: Maximum';
+      label.className = 'font-label text-[9px] uppercase text-[#FF6A00]';
+      hint.textContent = 'Excellent — high-entropy key accepted.';
+    }
+
+    checkMatch();
+  }
+
+  // ── Confirm password match check ──
+  function checkMatch() {
+    const pw  = document.getElementById('password').value;
+    const cpw = document.getElementById('confirm_password').value;
+    const err = document.getElementById('match-error');
+    const ico = document.getElementById('match-icon');
+    if (cpw.length === 0) {
+      err.classList.add('hidden');
+      ico.textContent = 'key';
+      ico.className = 'material-symbols-outlined absolute right-3 top-3 text-zinc-600 text-sm';
+      return;
+    }
+    if (pw !== cpw) {
+      err.classList.remove('hidden');
+      ico.textContent = 'error';
+      ico.className = 'material-symbols-outlined absolute right-3 top-3 text-red-400 text-sm';
+    } else {
+      err.classList.add('hidden');
+      ico.textContent = 'check_circle';
+      ico.className = 'material-symbols-outlined absolute right-3 top-3 text-green-400 text-sm';
+    }
+  }
+</script>
 {% endblock %}

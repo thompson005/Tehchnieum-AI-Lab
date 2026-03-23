@@ -7,6 +7,8 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- ─── Tailwind config ─── -->
   <script>
     tailwind.config = {
       darkMode: "class",
@@ -29,45 +31,91 @@
       },
     }
   </script>
+
+  <!-- ─── Theme flash prevention — runs before paint ─── -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('technieum-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.classList.toggle('dark', saved ? saved === 'dark' : prefersDark);
+    })();
+  </script>
+
   <style>
+    /* ── Base dark body ── */
     body {
       background-color: #0B0B0D;
       background-image: linear-gradient(to right, rgba(227,225,233,0.03) 1px, transparent 1px),
                         linear-gradient(to bottom, rgba(227,225,233,0.03) 1px, transparent 1px);
       background-size: 24px 24px;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
+
+    /* ── Light mode overrides ── */
+    html:not(.dark) body {
+      background-color: #F3F4F6;
+      background-image: linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: #111827;
+    }
+    html:not(.dark) .dark-surface { background-color: #FFFFFF !important; }
+    html:not(.dark) .text-on-background { color: #111827 !important; }
+    html:not(.dark) .text-zinc-400 { color: #6B7280 !important; }
+    html:not(.dark) .text-zinc-500 { color: #9CA3AF !important; }
+    html:not(.dark) .bg-\[#111217\] { background-color: #FFFFFF !important; }
+    html:not(.dark) .bg-\[#0B0B0D\] { background-color: #F3F4F6 !important; }
+    html:not(.dark) .bg-\[#181A20\] { background-color: #F9FAFB !important; }
+    html:not(.dark) .border-zinc-800\/30 { border-color: rgba(229, 231, 235, 0.5) !important; }
+    html:not(.dark) .border-zinc-800 { border-color: #E5E7EB !important; }
+    html:not(.dark) header { background-color: #FFFFFF !important; border-color: #E5E7EB !important; }
+    html:not(.dark) aside { background-color: #F9FAFB !important; border-color: #E5E7EB !important; }
+
+    /* ── Shared utilities ── */
     .ignition-gradient { background: linear-gradient(135deg, #FF6A00 0%, #FFC107 100%); }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
     .pulse-active { animation: pulse 2s infinite; }
     @keyframes pulse {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34,197,94,0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(34,197,94,0); }
+      0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34,197,94,0.7); }
+      70%  { transform: scale(1);    box-shadow: 0 0 0 10px rgba(34,197,94,0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34,197,94,0); }
     }
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: #0B0B0D; }
     ::-webkit-scrollbar-thumb { background: #1F222A; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #FF6A00; }
+
+    /* ── Smooth theme transition ── */
+    html { transition: color-scheme 0.3s ease; }
+    *, *::before, *::after { transition: background-color 0.25s ease, border-color 0.25s ease; }
   </style>
   {% block extra_head %}{% endblock %}
 </head>
+
 <body class="font-body text-on-background min-h-screen selection:bg-primary-container selection:text-on-primary-container">
 
-  <!-- Header -->
+  <!-- ─── Header ─── -->
   <header class="bg-[#111217] fixed top-0 w-full flex justify-between items-center px-6 h-16 z-50 border-b border-zinc-800/30">
     <div class="flex items-center gap-8">
       <a href="{{ url_for('dashboard') if session.get('user_id') else url_for('login') }}" class="text-xl font-bold tracking-tighter text-[#FF6A00]">TECHNIEUM AI SECURITY LABS</a>
       {% if session.get('user_id') %}
       <nav class="hidden md:flex items-center gap-6">
-        <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}text-[#FF6A00] font-bold border-b-2 border-orange-600{% else %}text-zinc-400 hover:text-zinc-200{% endif %} font-label text-xs uppercase tracking-widest">Dashboard</a>
-        <a href="{{ url_for('scoreboard') }}" class="{% if request.endpoint == 'scoreboard' %}text-[#FF6A00] font-bold border-b-2 border-orange-600{% else %}text-zinc-400 hover:text-zinc-200{% endif %} font-label text-xs uppercase tracking-widest">Scoreboard</a>
+        <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}text-[#FF6A00] font-bold border-b-2 border-orange-600{% else %}text-zinc-400 hover:text-zinc-200{% endif %} font-label text-xs uppercase tracking-widest transition-colors duration-200">Dashboard</a>
+        <a href="{{ url_for('scoreboard') }}" class="{% if request.endpoint == 'scoreboard' %}text-[#FF6A00] font-bold border-b-2 border-orange-600{% else %}text-zinc-400 hover:text-zinc-200{% endif %} font-label text-xs uppercase tracking-widest transition-colors duration-200">Scoreboard</a>
       </nav>
       {% endif %}
     </div>
+
     <div class="flex items-center gap-4">
       {% if session.get('user_id') %}
       <button onclick="openFlagModal()" class="ignition-gradient text-white font-label text-[10px] font-bold px-3 py-2 uppercase tracking-widest hover:shadow-[0_0_15px_rgba(255,106,0,0.4)] transition-all">Submit Flag</button>
-      <span class="material-symbols-outlined text-zinc-400 hover:text-orange-500 cursor-pointer">notifications</span>
+      <span class="material-symbols-outlined text-zinc-400 hover:text-orange-500 cursor-pointer transition-colors duration-200">notifications</span>
+
+      <!-- Theme toggle -->
+      <button id="theme-toggle" onclick="toggleTheme()" class="text-zinc-400 hover:text-orange-500 transition-all duration-200" title="Toggle theme">
+        <span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
+      </button>
+
       <div class="flex items-center gap-2 pl-3 border-l border-zinc-800">
         <div class="w-7 h-7 ignition-gradient rounded-sm flex items-center justify-center text-white text-xs font-black">
           {{ (session.get('display_name') or session.get('username') or 'U')[0].upper() }}
@@ -78,13 +126,17 @@
         </div>
       </div>
       {% else %}
+      <!-- Theme toggle (unauthenticated) -->
+      <button id="theme-toggle" onclick="toggleTheme()" class="text-zinc-400 hover:text-orange-500 transition-all duration-200" title="Toggle theme">
+        <span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
+      </button>
       <a href="{{ url_for('login') }}" class="ignition-gradient text-white font-label text-[10px] font-bold px-3 py-2 uppercase tracking-widest">Sign In</a>
       {% endif %}
     </div>
   </header>
 
+  <!-- ─── Sidebar (authenticated only) ─── -->
   {% if session.get('user_id') %}
-  <!-- Sidebar -->
   <aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-[#0B0B0D] border-r border-zinc-800/30 flex flex-col py-4 z-40 hidden md:flex">
     <div class="px-6 mb-8">
       <div class="flex items-center gap-3 mb-1">
@@ -114,7 +166,7 @@
   </aside>
   {% endif %}
 
-  <!-- Flash messages -->
+  <!-- ─── Flash messages ─── -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     <div class="{% if session.get('user_id') %}md:ml-64{% endif %} pt-16 px-4">
@@ -129,12 +181,12 @@
     {% endif %}
   {% endwith %}
 
-  <!-- Main content -->
+  <!-- ─── Main content ─── -->
   <main class="{% if session.get('user_id') %}md:ml-64{% endif %} pt-16 {% block main_class %}max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8{% endblock %}">
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Footer -->
+  <!-- ─── Footer ─── -->
   <footer class="{% if session.get('user_id') %}md:ml-64{% endif %} border-t border-zinc-800/30 mt-12">
     <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
       <div class="flex items-center gap-2">
@@ -150,7 +202,7 @@
     </div>
   </footer>
 
-  <!-- Flag Submission Modal -->
+  <!-- ─── Flag Submission Modal ─── -->
   <div id="flagModal" class="fixed inset-0 z-[100] hidden items-center justify-center" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);">
     <div class="bg-[#111217] border border-zinc-800 w-full max-w-md mx-4 rounded-xl overflow-hidden">
       <div class="ignition-gradient h-1 w-full"></div>
@@ -178,7 +230,7 @@
     </div>
   </div>
 
-  <!-- Mobile bottom nav -->
+  <!-- ─── Mobile bottom nav ─── -->
   <nav class="md:hidden fixed bottom-0 left-0 w-full bg-[#111217] flex justify-around items-center h-16 border-t border-zinc-800/30 z-50">
     <a href="{{ url_for('dashboard') if session.get('user_id') else url_for('login') }}" class="flex flex-col items-center gap-1 {% if request.endpoint == 'dashboard' %}text-orange-600{% else %}text-zinc-500{% endif %}">
       <span class="material-symbols-outlined text-xl">science</span>
@@ -194,16 +246,16 @@
       <span class="text-[9px] uppercase font-label">Flag</span>
     </button>
     {% endif %}
-    <a href="#" class="flex flex-col items-center gap-1 text-zinc-500">
-      <span class="material-symbols-outlined text-xl">settings</span>
-      <span class="text-[9px] uppercase font-label">Settings</span>
-    </a>
+    <button onclick="toggleTheme()" class="flex flex-col items-center gap-1 text-zinc-500 hover:text-orange-500 transition-colors">
+      <span class="material-symbols-outlined text-xl" id="theme-icon-mobile">dark_mode</span>
+      <span class="text-[9px] uppercase font-label">Theme</span>
+    </button>
   </nav>
 
   {% block scripts %}{% endblock %}
 
   <script>
-    // Session timer
+    // ── Session timer ──
     let sessionStart = Date.now();
     function updateTimer() {
       const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
@@ -215,6 +267,7 @@
     }
     setInterval(updateTimer, 1000);
 
+    // ── Flag modal ──
     function openFlagModal() {
       const modal = document.getElementById('flagModal');
       modal.classList.remove('hidden');
@@ -226,13 +279,11 @@
       btn.textContent = 'Submit Protocol';
       btn.disabled = false;
     }
-
     function closeFlagModal() {
       const modal = document.getElementById('flagModal');
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     }
-
     async function submitFlag() {
       const flag = document.getElementById('flagInput').value.trim();
       const resultEl = document.getElementById('flagResult');
@@ -271,12 +322,35 @@
         btn.disabled = false;
       }
     }
-
     document.addEventListener('keydown', e => {
       const modal = document.getElementById('flagModal');
       if (e.key === 'Escape') closeFlagModal();
       if (e.key === 'Enter' && !modal.classList.contains('hidden')) submitFlag();
     });
+
+    // ── Theme management ──
+    function initTheme() {
+      const saved = localStorage.getItem('technieum-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = saved ? saved === 'dark' : prefersDark;
+      document.documentElement.classList.toggle('dark', isDark);
+      updateThemeIcon(isDark);
+    }
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('technieum-theme', isDark ? 'dark' : 'light');
+      updateThemeIcon(isDark);
+    }
+    function updateThemeIcon(isDark) {
+      const icon = document.getElementById('theme-icon');
+      const iconMobile = document.getElementById('theme-icon-mobile');
+      const label = isDark ? 'light_mode' : 'dark_mode';
+      if (icon) icon.textContent = label;
+      if (iconMobile) iconMobile.textContent = label;
+    }
+
+    // Initialize theme icon on load
+    initTheme();
   </script>
 </body>
 </html>

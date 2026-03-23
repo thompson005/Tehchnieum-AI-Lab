@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getToken, isAuthenticated, getUserFromToken } from '@/lib/auth';
 import { getMyProgress } from '@/lib/api';
+import { NavBar } from '@/components/NavBar';
+import { useTheme } from '@/components/ThemeProvider';
 
 interface StatCard {
   label: string;
@@ -17,18 +19,28 @@ interface ProgressData {
   submissions: { flag_id: string; points: number; submitted_at: string }[];
 }
 
+const ROLE_COLORS: Record<string, string> = {
+  admin: '#f87171',
+  supervisor: '#fb923c',
+  clerk: '#fbbf24',
+  citizen: '#4ade80',
+};
+
 export default function AdminPage() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   const [user, setUser] = useState<{ username: string; role: string } | null>(null);
   const [progress, setProgress] = useState<ProgressData | null>(null);
 
   const stats: StatCard[] = [
-    { label: 'Active Sessions', value: 42, color: '#1D4ED8' },
-    { label: 'Citizens Registered', value: 10, color: '#16A34A' },
-    { label: 'MCP Servers', value: 9, color: '#0891B2' },
-    { label: 'Flags Available', value: 14, color: '#FF6B00' },
-    { label: 'Total Points Pool', value: 4400, color: '#7C3AED' },
-    { label: 'Audit Log Entries', value: '—', color: '#EA580C' },
+    { label: 'Active Sessions', value: 42, color: '#FF6A00' },
+    { label: 'Citizens Registered', value: 10, color: '#4ade80' },
+    { label: 'MCP Servers', value: 9, color: '#FFC107' },
+    { label: 'Flags Available', value: 14, color: '#fb923c' },
+    { label: 'Total Points Pool', value: 4400, color: '#a78bfa' },
+    { label: 'Audit Log Entries', value: '—', color: '#60a5fa' },
   ];
 
   const mockSessions = [
@@ -64,119 +76,498 @@ export default function AdminPage() {
 
   if (!user) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: '#6B7280', fontSize: '14px' }}>Loading...</div>
+      <div
+        style={{
+          minHeight: '100vh',
+          backgroundColor: isDark ? '#0B0B0D' : '#F3F4F6',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: "'Inter', sans-serif",
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div
+            style={{
+              width: '16px',
+              height: '16px',
+              borderRadius: '50%',
+              border: '2px solid rgba(255,106,0,0.2)',
+              borderTopColor: '#FF6A00',
+              animation: 'spin 0.8s linear infinite',
+            }}
+          />
+          <span style={{ fontSize: '12px', fontFamily: "'JetBrains Mono', monospace", color: '#52525b' }}>
+            AUTHENTICATING...
+          </span>
+        </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
-  const roleColors: Record<string, string> = { admin: '#DC2626', supervisor: '#EA580C', clerk: '#D97706', citizen: '#16A34A' };
-  const cardStyle = { backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '10px', padding: '20px', boxShadow: '0 1px 2px rgba(0,0,0,0.04)' };
+  // Styles derived from theme
+  const bg = isDark ? '#0B0B0D' : '#F3F4F6';
+  const surface = isDark ? '#111217' : '#FFFFFF';
+  const borderColor = isDark ? 'rgba(255,255,255,0.06)' : '#E5E7EB';
+  const textPrimary = isDark ? '#E3E1E9' : '#111827';
+  const textMuted = isDark ? '#71717a' : '#6B7280';
+  const textDim = isDark ? '#52525b' : '#9CA3AF';
+
+  const roleColor = ROLE_COLORS[user.role] || '#71717a';
+  const roleBg = isDark ? `rgba(${user.role === 'admin' ? '239,68,68' : user.role === 'supervisor' ? '234,88,12' : user.role === 'clerk' ? '217,119,6' : '22,163,74'},0.12)` : '#FFF7ED';
+  const roleBorder = isDark ? `rgba(${user.role === 'admin' ? '239,68,68' : user.role === 'supervisor' ? '234,88,12' : user.role === 'clerk' ? '217,119,6' : '22,163,74'},0.25)` : '#FDBA74';
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#F3F4F6', padding: '32px 24px' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        backgroundColor: bg,
+        backgroundImage: isDark
+          ? 'linear-gradient(to right, rgba(227,225,233,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(227,225,233,0.03) 1px, transparent 1px)'
+          : 'none',
+        backgroundSize: '24px 24px',
+        fontFamily: "'Inter', sans-serif",
+      }}
+    >
+      <NavBar username={user.username} role={user.role} />
 
-        {/* Header */}
-        <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', marginBottom: '4px' }}>Admin Panel</h1>
-            <p style={{ color: '#6B7280', fontSize: '14px' }}>GovConnect AI Platform Administration</p>
-          </div>
-          <div style={{ backgroundColor: user.role === 'admin' ? '#FEF2F2' : '#FFF7ED', border: `1px solid ${user.role === 'admin' ? '#FECACA' : '#FDBA74'}`, borderRadius: '8px', padding: '10px 16px', fontSize: '13px', color: user.role === 'admin' ? '#DC2626' : '#EA580C' }}>
-            Logged in as <strong>{user.username}</strong> ({user.role})
-          </div>
-        </div>
+      <div style={{ padding: '32px 24px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
-        {/* Stats grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px', marginBottom: '32px' }}>
-          {stats.map((stat) => (
-            <div key={stat.label} style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderTop: `2px solid ${stat.color}`, borderRadius: '10px', padding: '18px', textAlign: 'center', boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
-              <div style={{ fontSize: '28px', fontWeight: '700', color: stat.color, marginBottom: '6px' }}>{stat.value}</div>
-              <div style={{ fontSize: '12px', color: '#6B7280' }}>{stat.label}</div>
+          {/* Header */}
+          <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                <h1
+                  style={{
+                    fontSize: '24px',
+                    fontWeight: '700',
+                    color: textPrimary,
+                    fontFamily: "'Inter', sans-serif",
+                    margin: 0,
+                  }}
+                >
+                  Admin Panel
+                </h1>
+                <span
+                  style={{
+                    fontSize: '9px',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color: '#FF6A00',
+                    padding: '3px 8px',
+                    backgroundColor: 'rgba(255,106,0,0.1)',
+                    border: '1px solid rgba(255,106,0,0.25)',
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  RESTRICTED
+                </span>
+              </div>
+              <p
+                style={{
+                  fontSize: '11px',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  color: textDim,
+                  letterSpacing: '0.06em',
+                  margin: 0,
+                }}
+              >
+                GovConnect AI Platform Administration
+              </p>
             </div>
-          ))}
-        </div>
+            <div
+              style={{
+                backgroundColor: roleBg,
+                border: `1px solid ${roleBorder}`,
+                borderRadius: '6px',
+                padding: '10px 16px',
+                fontSize: '12px',
+                fontFamily: "'JetBrains Mono', monospace",
+                color: roleColor,
+              }}
+            >
+              // {user.username} &nbsp;<strong>[{user.role.toUpperCase()}]</strong>
+            </div>
+          </div>
 
-        {/* Progress tracker */}
-        {progress && (
-          <div style={{ ...cardStyle, marginBottom: '24px' }}>
-            <h2 style={{ fontSize: '14px', fontWeight: '600', color: '#6B7280', marginBottom: '16px', letterSpacing: '0.05em' }}>MY LAB PROGRESS</h2>
-            <div style={{ display: 'flex', gap: '24px', marginBottom: '16px' }}>
-              <div>
-                <span style={{ fontSize: '12px', color: '#9CA3AF' }}>Total Points: </span>
-                <span style={{ fontSize: '18px', fontWeight: '700', color: '#FF6B00' }}>{progress.total_points}</span>
+          {/* Stats grid */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+              gap: '14px',
+              marginBottom: '28px',
+            }}
+          >
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                style={{
+                  backgroundColor: surface,
+                  border: `1px solid ${borderColor}`,
+                  borderTop: `2px solid ${stat.color}`,
+                  borderRadius: '8px',
+                  padding: '18px',
+                  textAlign: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: '28px',
+                    fontWeight: '700',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color: stat.color,
+                    marginBottom: '6px',
+                    lineHeight: 1,
+                  }}
+                >
+                  {stat.value}
+                </div>
+                <div
+                  style={{
+                    fontSize: '10px',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color: textMuted,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {stat.label}
+                </div>
               </div>
-              <div>
-                <span style={{ fontSize: '12px', color: '#9CA3AF' }}>Flags Captured: </span>
-                <span style={{ fontSize: '18px', fontWeight: '700', color: '#16A34A' }}>{progress.completed.length} / 14</span>
+            ))}
+          </div>
+
+          {/* Progress tracker */}
+          {progress && (
+            <div
+              style={{
+                backgroundColor: surface,
+                border: `1px solid ${borderColor}`,
+                borderRadius: '8px',
+                overflow: 'hidden',
+                marginBottom: '24px',
+              }}
+            >
+              <div
+                style={{
+                  height: '3px',
+                  background: 'linear-gradient(135deg, #FF6A00 0%, #FFC107 100%)',
+                }}
+              />
+              <div style={{ padding: '20px 24px' }}>
+                <h2
+                  style={{
+                    fontSize: '10px',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontWeight: '700',
+                    color: textMuted,
+                    marginBottom: '16px',
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  // MY LAB PROGRESS
+                </h2>
+                <div style={{ display: 'flex', gap: '32px', marginBottom: '16px' }}>
+                  <div>
+                    <span style={{ fontSize: '11px', fontFamily: "'JetBrains Mono', monospace", color: textDim }}>
+                      Total Points:{' '}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '20px',
+                        fontWeight: '700',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        color: '#FF6A00',
+                      }}
+                    >
+                      {progress.total_points}
+                    </span>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '11px', fontFamily: "'JetBrains Mono', monospace", color: textDim }}>
+                      Flags Captured:{' '}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '20px',
+                        fontWeight: '700',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        color: '#4ade80',
+                      }}
+                    >
+                      {progress.completed.length} / 14
+                    </span>
+                  </div>
+                </div>
+                {progress.submissions.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {progress.submissions.map((sub) => (
+                      <span
+                        key={sub.flag_id}
+                        style={{
+                          backgroundColor: 'rgba(74,222,128,0.08)',
+                          border: '1px solid rgba(74,222,128,0.2)',
+                          borderRadius: '3px',
+                          padding: '3px 10px',
+                          fontSize: '11px',
+                          color: '#4ade80',
+                          fontFamily: "'JetBrains Mono', monospace",
+                          letterSpacing: '0.04em',
+                        }}
+                      >
+                        {sub.flag_id} (+{sub.points}pts)
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-            {progress.submissions.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {progress.submissions.map((sub) => (
-                  <span key={sub.flag_id} style={{ backgroundColor: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '4px', padding: '4px 10px', fontSize: '11px', color: '#16A34A', fontFamily: 'monospace' }}>
-                    {sub.flag_id} (+{sub.points}pts)
-                  </span>
-                ))}
+          )}
+
+          {/* Tables grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            {/* Active Sessions */}
+            <div
+              style={{
+                backgroundColor: surface,
+                border: `1px solid ${borderColor}`,
+                borderRadius: '8px',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  padding: '12px 20px',
+                  borderBottom: `1px solid ${borderColor}`,
+                  backgroundColor: isDark ? '#181A20' : '#F9FAFB',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: '9px',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontWeight: '700',
+                    color: textMuted,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  // Active Sessions
+                </span>
+                <span
+                  style={{
+                    fontSize: '9px',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color: '#4ade80',
+                  }}
+                >
+                  {mockSessions.length} LIVE
+                </span>
               </div>
-            )}
-          </div>
-        )}
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: `1px solid ${borderColor}` }}>
+                      {['Session ID', 'User', 'Role', 'Started', 'Msgs'].map((h) => (
+                        <th
+                          key={h}
+                          style={{
+                            textAlign: 'left',
+                            padding: '8px 12px',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            color: textDim,
+                            fontWeight: '400',
+                            fontSize: '9px',
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockSessions.map((s) => (
+                      <tr
+                        key={s.id}
+                        style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.02)' : '#F9FAFB'}` }}
+                      >
+                        <td
+                          style={{
+                            padding: '8px 12px',
+                            color: '#FF6A00',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '11px',
+                          }}
+                        >
+                          {s.id}
+                        </td>
+                        <td style={{ padding: '8px 12px', color: textPrimary, fontSize: '11px' }}>{s.user}</td>
+                        <td
+                          style={{
+                            padding: '8px 12px',
+                            color: ROLE_COLORS[s.role] || textMuted,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '10px',
+                          }}
+                        >
+                          {s.role}
+                        </td>
+                        <td
+                          style={{
+                            padding: '8px 12px',
+                            color: textDim,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '10px',
+                          }}
+                        >
+                          {s.started}
+                        </td>
+                        <td style={{ padding: '8px 12px', color: textPrimary, fontSize: '11px' }}>{s.msgs}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-          {/* Active Sessions */}
-          <div style={cardStyle}>
-            <h2 style={{ fontSize: '14px', fontWeight: '600', color: '#6B7280', marginBottom: '16px', letterSpacing: '0.05em' }}>ACTIVE SESSIONS</h2>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
-                  {['Session ID', 'User', 'Role', 'Started', 'Msgs'].map((h) => (
-                    <th key={h} style={{ textAlign: 'left', padding: '6px 8px', color: '#9CA3AF', fontWeight: '600' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {mockSessions.map((s) => (
-                  <tr key={s.id} style={{ borderBottom: '1px solid #F9FAFB' }}>
-                    <td style={{ padding: '6px 8px', color: '#1D4ED8', fontFamily: 'monospace' }}>{s.id}</td>
-                    <td style={{ padding: '6px 8px', color: '#374151' }}>{s.user}</td>
-                    <td style={{ padding: '6px 8px', color: '#6B7280' }}>{s.role}</td>
-                    <td style={{ padding: '6px 8px', color: '#9CA3AF', fontFamily: 'monospace' }}>{s.started}</td>
-                    <td style={{ padding: '6px 8px', color: '#374151' }}>{s.msgs}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* User Accounts */}
+            <div
+              style={{
+                backgroundColor: surface,
+                border: `1px solid ${borderColor}`,
+                borderRadius: '8px',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  padding: '12px 20px',
+                  borderBottom: `1px solid ${borderColor}`,
+                  backgroundColor: isDark ? '#181A20' : '#F9FAFB',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: '9px',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontWeight: '700',
+                    color: textMuted,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  // User Accounts
+                </span>
+                <span
+                  style={{
+                    fontSize: '9px',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color: '#FFC107',
+                  }}
+                >
+                  {mockUsers.length} REGISTERED
+                </span>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: `1px solid ${borderColor}` }}>
+                      {['Username', 'Role', 'Citizen ID', 'Status'].map((h) => (
+                        <th
+                          key={h}
+                          style={{
+                            textAlign: 'left',
+                            padding: '8px 12px',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            color: textDim,
+                            fontWeight: '400',
+                            fontSize: '9px',
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockUsers.map((u) => (
+                      <tr
+                        key={u.username}
+                        style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.02)' : '#F9FAFB'}` }}
+                      >
+                        <td
+                          style={{
+                            padding: '8px 12px',
+                            color: textPrimary,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '11px',
+                          }}
+                        >
+                          {u.username}
+                        </td>
+                        <td style={{ padding: '8px 12px' }}>
+                          <span
+                            style={{
+                              color: ROLE_COLORS[u.role] || textMuted,
+                              fontFamily: "'JetBrains Mono', monospace",
+                              fontWeight: '700',
+                              fontSize: '10px',
+                              letterSpacing: '0.06em',
+                            }}
+                          >
+                            {u.role.toUpperCase()}
+                          </span>
+                        </td>
+                        <td
+                          style={{
+                            padding: '8px 12px',
+                            color: textDim,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '10px',
+                          }}
+                        >
+                          {u.citizen_id || '—'}
+                        </td>
+                        <td style={{ padding: '8px 12px' }}>
+                          <span
+                            style={{
+                              padding: '2px 7px',
+                              backgroundColor: u.active
+                                ? 'rgba(74,222,128,0.08)'
+                                : 'rgba(239,68,68,0.08)',
+                              border: `1px solid ${u.active ? 'rgba(74,222,128,0.2)' : 'rgba(239,68,68,0.2)'}`,
+                              color: u.active ? '#4ade80' : '#f87171',
+                              fontFamily: "'JetBrains Mono', monospace",
+                              fontSize: '9px',
+                              letterSpacing: '0.06em',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            {u.active ? 'ACTIVE' : 'DISABLED'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
 
-          {/* User management */}
-          <div style={cardStyle}>
-            <h2 style={{ fontSize: '14px', fontWeight: '600', color: '#6B7280', marginBottom: '16px', letterSpacing: '0.05em' }}>USER ACCOUNTS</h2>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #E5E7EB' }}>
-                  {['Username', 'Role', 'Citizen ID', 'Status'].map((h) => (
-                    <th key={h} style={{ textAlign: 'left', padding: '6px 8px', color: '#9CA3AF', fontWeight: '600' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {mockUsers.map((u) => (
-                  <tr key={u.username} style={{ borderBottom: '1px solid #F9FAFB' }}>
-                    <td style={{ padding: '6px 8px', color: '#374151', fontFamily: 'monospace' }}>{u.username}</td>
-                    <td style={{ padding: '6px 8px' }}>
-                      <span style={{ color: roleColors[u.role] || '#6B7280', fontWeight: '600', fontSize: '11px' }}>{u.role}</span>
-                    </td>
-                    <td style={{ padding: '6px 8px', color: '#9CA3AF', fontFamily: 'monospace' }}>{u.citizen_id || '—'}</td>
-                    <td style={{ padding: '6px 8px' }}>
-                      <span style={{ color: u.active ? '#16A34A' : '#DC2626', fontSize: '11px' }}>{u.active ? 'active' : 'disabled'}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
       </div>
     </div>
