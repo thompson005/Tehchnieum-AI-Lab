@@ -49,7 +49,7 @@ for endpoint in \
   "${BASE_URL}:5000" \
   "${BASE_URL}:3000" \
   "${BASE_URL}:8000/health" \
-  "${BASE_URL}:8080" \
+  "${BASE_URL}:8080/health" \
   "${BASE_URL}:3100" \
   "${BASE_URL}:3200" \
   "${BASE_URL}:8100/health"
