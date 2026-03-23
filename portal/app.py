@@ -133,11 +133,24 @@ def dashboard():
     # Find user rank
     rank = next((i + 1 for i, s in enumerate(scoreboard) if s["id"] == user["id"]), "-")
 
+    # Merge configured lab URLs into lab_meta so templates use the correct host
+    lab_urls = {
+        "lab1": Config.LAB1_URL,
+        "lab2": Config.LAB2_URL,
+        "lab3": Config.LAB3_URL,
+        "lab4": Config.LAB4_URL,
+        "lab5": Config.LAB5_URL,
+    }
+    lab_meta = {
+        lab_id: {**meta, "url": lab_urls.get(lab_id, f"http://localhost:{meta['port']}")}
+        for lab_id, meta in Config.LAB_META.items()
+    }
+
     return render_template(
         "dashboard.html",
         user=user,
         per_lab=per_lab,
-        lab_meta=Config.LAB_META,
+        lab_meta=lab_meta,
         rank=rank,
         total_players=len(scoreboard)
     )

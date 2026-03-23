@@ -163,7 +163,7 @@
           <p class="text-xs text-gray-400 font-medium">Points earned</p>
           <p class="font-bold text-base" style="color:{{ meta.color }};">{{ lab_score.points }} pts</p>
         </div>
-        <a href="http://localhost:{{ meta.port }}"
+        <a href="{{ meta.url }}"
            target="_blank"
            class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150"
            style="color:{{ meta.color }}; background:{{ meta.color }}15; border:1px solid {{ meta.color }}30;"
@@ -221,7 +221,7 @@
 // Check lab status by hitting each lab's health endpoint
 const labs = [
   {% for lab_id, meta in lab_meta.items() %}
-  { id: '{{ lab_id }}', port: {{ meta.port }} },
+  { id: '{{ lab_id }}', url: '{{ meta.url }}' },
   {% endfor %}
 ];
 
@@ -231,7 +231,7 @@ async function checkLabStatus(lab) {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3000);
-    const res = await fetch(`http://localhost:${lab.port}/api/health`, {
+    const res = await fetch(`${lab.url}/health`, {
       signal: controller.signal,
       mode: 'no-cors'
     });
