@@ -6,8 +6,8 @@ BRANCH=${2:-main}
 APP_DIR=${3:-/home/ubuntu/ai-labs}
 ROLLBACK_SHA=${4:-}
 
-# Keep image build/extract pressure low on single-disk EC2 hosts.
-export COMPOSE_PARALLEL_LIMIT=${COMPOSE_PARALLEL_LIMIT:-1}
+# Allow up to 3 parallel builds to reduce total deploy time on EC2.
+export COMPOSE_PARALLEL_LIMIT=${COMPOSE_PARALLEL_LIMIT:-3}
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "docker is not installed on this host" >&2

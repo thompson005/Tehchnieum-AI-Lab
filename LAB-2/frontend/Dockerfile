@@ -3,12 +3,17 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Suppress browser-open and interactive prompts in Docker
+ENV CI=false
+ENV BROWSER=none
+ENV HOST=0.0.0.0
+
 # Copy package files
 COPY package*.json ./
 
 # Install dependencies
 RUN --mount=type=cache,target=/root/.npm \
-    npm install
+    npm install --legacy-peer-deps
 
 # Copy application code
 COPY . .

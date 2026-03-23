@@ -152,9 +152,10 @@ services:
     environment:
       REACT_APP_API_URL: ${PUBLIC_BASE_URL:-http://localhost}:8000
       NODE_ENV: production
+      CI: "false"
+      BROWSER: none
     depends_on:
-      lab2-backend:
-        condition: service_healthy
+      - lab2-backend
     networks:
       - technieum
     restart: unless-stopped
@@ -754,8 +755,7 @@ services:
     environment:
       NEXT_PUBLIC_API_URL: ${PUBLIC_BASE_URL:-http://localhost}:8100
     depends_on:
-      lab5-backend:
-        condition: service_healthy
+      - lab5-backend
     networks:
       - technieum
     restart: unless-stopped
