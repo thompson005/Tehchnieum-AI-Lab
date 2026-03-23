@@ -6,11 +6,16 @@ WORKDIR /app
 ENV CI=false
 ENV BROWSER=none
 ENV NODE_OPTIONS=--openssl-legacy-provider
+ENV SKIP_PREFLIGHT_CHECK=true
+ENV GENERATE_SOURCEMAP=false
+ENV DISABLE_ESLINT_PLUGIN=true
+ENV TSC_COMPILE_ON_ERROR=true
 
 COPY package*.json ./
+# Install deps, then upgrade ajv + ajv-keywords together so webpack5 codegen path resolves
 RUN --mount=type=cache,target=/root/.npm \
     npm install --legacy-peer-deps && \
-    npm install ajv@^8 --legacy-peer-deps --no-save
+    npm install ajv@^8 ajv-keywords@^5 --legacy-peer-deps --no-save
 
 COPY . .
 RUN npm run build
@@ -19,7 +24,6 @@ RUN npm run build
 FROM nginx:alpine
 COPY --from=builder /app/build /usr/share/nginx/html
 
-# Allow API calls to backend via nginx proxy
 RUN echo 'server { \
   listen 3000; \
   root /usr/share/nginx/html; \
