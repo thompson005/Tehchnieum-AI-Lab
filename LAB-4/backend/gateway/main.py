@@ -102,7 +102,7 @@ async def logging_and_rate_limit_middleware(request: Request, call_next):
 
     # Re-attach body so downstream can read it
     async def receive():
-        return {"type": "http.request", "body": body}
+        return {"type": "http.request", "body": body, "more_body": False}
     request._receive = receive
 
     response = await call_next(request)

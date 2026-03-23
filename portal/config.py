@@ -18,7 +18,7 @@ class Config:
     # Lab URLs
     LAB1_URL = os.getenv('LAB1_URL', 'http://localhost:5000')
     LAB2_URL = os.getenv('LAB2_URL', 'http://localhost:3000')
-    LAB3_URL = os.getenv('LAB3_URL', 'http://localhost:8080')
+    LAB3_URL = os.getenv('LAB3_URL', 'http://localhost:3001')
     LAB4_URL = os.getenv('LAB4_URL', 'http://localhost:3100')
     LAB5_URL = os.getenv('LAB5_URL', 'http://localhost:3200')
 
@@ -119,7 +119,7 @@ class Config:
             "color": "#8B5CF6",
             "difficulty": "Easy → Expert",
             "total_flags": 12,
-            "port": 8080
+            "port": 3001
         },
         "lab4": {
             "name": "LAB-4: TravelNest AI",

@@ -41,7 +41,7 @@ services:
       # These URLs are rendered in the browser UI, so they must be host-accessible.
       LAB1_URL: ${PUBLIC_BASE_URL:-http://localhost}:5000
       LAB2_URL: ${PUBLIC_BASE_URL:-http://localhost}:3000
-      LAB3_URL: ${PUBLIC_BASE_URL:-http://localhost}:8080
+      LAB3_URL: ${PUBLIC_BASE_URL:-http://localhost}:3001
       LAB4_URL: ${PUBLIC_BASE_URL:-http://localhost}:3100
       LAB5_URL: ${PUBLIC_BASE_URL:-http://localhost}:3200
     volumes:
