@@ -46,9 +46,9 @@ docker compose config >/dev/null
 # Pull newer base images when available, but continue if an image is build-only.
 docker compose pull --ignore-pull-failures || true
 
-# Free up disk space before building to prevent "no space left on device" errors.
+# Free up disk space (dangling images + stopped containers) before building.
+# Note: intentionally NOT pruning volumes to preserve database data.
 docker system prune -f || true
-docker volume prune -f || true
 
 # Rebuild and apply updates.
 docker compose up -d --build --remove-orphans
