@@ -29,11 +29,11 @@ export default function LoginPage() {
   };
 
   const accounts = [
-    { user: 'citizen1', pass: 'citizen123', role: 'Citizen' },
-    { user: 'citizen2', pass: 'citizen456', role: 'Citizen' },
-    { user: 'clerk1', pass: 'clerk456', role: 'Clerk' },
-    { user: 'supervisor1', pass: 'super999', role: 'Supervisor' },
-    { user: 'admin', pass: 'admin789', role: 'Admin' },
+    { user: 'alice', pass: 'password123', role: 'Citizen' },
+    { user: 'bob', pass: 'password123', role: 'Citizen' },
+    { user: 'clerk_johnson', pass: 'clerk2024!', role: 'Clerk' },
+    { user: 'supervisor_chen', pass: 'super2024!', role: 'Supervisor' },
+    { user: 'sysadmin', pass: 'GovConnect@2024', role: 'Admin' },
   ];
 
   return (

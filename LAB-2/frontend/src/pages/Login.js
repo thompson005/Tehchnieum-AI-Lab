@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 
+const PORTAL_URL = `http://${window.location.hostname}:5555`;
+
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -223,7 +225,7 @@ export default function Login() {
           </div>
 
           <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-            <a href="http://localhost:5555" style={{ fontSize: '0.75rem', fontWeight: 600, color: '#FF6A00', textDecoration: 'none' }}>
+            <a href={PORTAL_URL} style={{ fontSize: '0.75rem', fontWeight: 600, color: '#FF6A00', textDecoration: 'none' }}>
               ← Back to Technieum Portal
             </a>
           </div>

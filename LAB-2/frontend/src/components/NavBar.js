@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTheme } from '../context/ThemeContext';
 
+const PORTAL_URL = `http://${window.location.hostname}:5555`;
+
 export default function NavBar({ user, sessionTimeout, onLogout }) {
   const { isDark, toggleTheme } = useTheme();
 
@@ -85,7 +87,7 @@ export default function NavBar({ user, sessionTimeout, onLogout }) {
             onMouseOut={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}>
             Dashboard
           </a>
-          <a href="http://localhost:5555" style={s.navLink}
+          <a href="{PORTAL_URL}" style={s.navLink}
             onMouseOver={e => { e.currentTarget.style.color = '#FF6A00'; e.currentTarget.style.background = 'rgba(255,106,0,0.08)'; }}
             onMouseOut={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}>
             Scoreboard
@@ -93,7 +95,7 @@ export default function NavBar({ user, sessionTimeout, onLogout }) {
         </div>
       </div>
       <div style={s.right}>
-        <a href="http://localhost:5555" style={s.flagBtn}>Submit Flag</a>
+        <a href="{PORTAL_URL}" style={s.flagBtn}>Submit Flag</a>
         <span style={s.sessionBadge}>Session: {sessionTimeout}m</span>
         {user && <span style={s.userLabel}>{user.full_name || user.username}</span>}
         <button
