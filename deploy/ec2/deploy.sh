@@ -6,8 +6,8 @@ BRANCH=${2:-main}
 APP_DIR=${3:-/home/ubuntu/ai-labs}
 ROLLBACK_SHA=${4:-}
 
-# Allow up to 3 parallel builds to reduce total deploy time on EC2.
-export COMPOSE_PARALLEL_LIMIT=${COMPOSE_PARALLEL_LIMIT:-3}
+# Keep image build/extract pressure low on single-disk EC2 hosts.
+export COMPOSE_PARALLEL_LIMIT=${COMPOSE_PARALLEL_LIMIT:-1}
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "docker is not installed on this host" >&2
@@ -45,6 +45,10 @@ docker compose config >/dev/null
 
 # Pull newer base images when available, but continue if an image is build-only.
 docker compose pull --ignore-pull-failures || true
+
+# Free up disk space before building to prevent "no space left on device" errors.
+docker system prune -f || true
+docker volume prune -f || true
 
 # Rebuild and apply updates.
 docker compose up -d --build --remove-orphans

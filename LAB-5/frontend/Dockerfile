@@ -9,6 +9,9 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# API URL must be baked in at build time (Next.js inlines NEXT_PUBLIC_* vars)
+ARG NEXT_PUBLIC_API_URL=http://localhost:8100/api
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV RUNNING_IN_DOCKER=true
 RUN npm run build

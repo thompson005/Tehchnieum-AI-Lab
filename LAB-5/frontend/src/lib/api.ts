@@ -131,7 +131,7 @@ export async function submitFlag(flag: string, token: string) {
 }
 
 export async function getMyProgress(token: string) {
-  const response = await fetch(`${API_URL}/flags/progress`, {
+  const response = await fetch(`${API_URL}/flags/my-progress`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,

@@ -146,11 +146,12 @@ services:
     build:
       context: ./LAB-2/frontend
       dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: ${PUBLIC_BASE_URL:-http://localhost}:8000
     container_name: technieum-lab2-ui
     ports:
       - "3000:3000"
     environment:
-      REACT_APP_API_URL: ${PUBLIC_BASE_URL:-http://localhost}:8000
       NODE_ENV: production
       CI: "false"
       BROWSER: none
@@ -749,11 +750,11 @@ services:
     build:
       context: ./LAB-5/frontend
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${PUBLIC_BASE_URL:-http://localhost}:8100/api
     container_name: govconnect-frontend
     ports:
       - "3200:3000"
-    environment:
-      NEXT_PUBLIC_API_URL: ${PUBLIC_BASE_URL:-http://localhost}:8100
     depends_on:
       - lab5-backend
     networks:

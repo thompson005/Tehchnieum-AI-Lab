@@ -12,6 +12,9 @@ RUN apt-get update && apt-get install -y \
 # Copy requirements
 COPY requirements.txt .
 
+# Force CPU-only torch to avoid 5-8 GB NVIDIA CUDA packages on EC2
+ENV PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu
+
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 

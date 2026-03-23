@@ -11,6 +11,10 @@ ENV GENERATE_SOURCEMAP=false
 ENV DISABLE_ESLINT_PLUGIN=true
 ENV TSC_COMPILE_ON_ERROR=true
 
+# API URL must be baked in at build time (React CRA inlines REACT_APP_* vars)
+ARG REACT_APP_API_URL=http://localhost:8000
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
 COPY package*.json ./
 # npm overrides in package.json pin:
 #   - root ajv to ^8  (required by webpack5/schema-utils@4 for dist/compile/codegen)
