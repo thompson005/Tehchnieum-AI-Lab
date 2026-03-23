@@ -12,10 +12,11 @@ ENV DISABLE_ESLINT_PLUGIN=true
 ENV TSC_COMPILE_ON_ERROR=true
 
 COPY package*.json ./
-# Install deps, then upgrade ajv + ajv-keywords together so webpack5 codegen path resolves
+# npm overrides in package.json pin:
+#   - root ajv to ^8  (required by webpack5/schema-utils@4 for dist/compile/codegen)
+#   - fork-ts-checker-webpack-plugin's ajv to ^6 (its bundled ajv-keywords@3 needs ajv@6)
 RUN --mount=type=cache,target=/root/.npm \
-    npm install --legacy-peer-deps && \
-    npm install ajv@^8 ajv-keywords@^5 --legacy-peer-deps --no-save
+    npm install --legacy-peer-deps
 
 COPY . .
 RUN npm run build
