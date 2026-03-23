@@ -9,7 +9,8 @@ ENV NODE_OPTIONS=--openssl-legacy-provider
 
 COPY package*.json ./
 RUN --mount=type=cache,target=/root/.npm \
-    npm install --legacy-peer-deps
+    npm install --legacy-peer-deps && \
+    npm install ajv@^8 --legacy-peer-deps --no-save
 
 COPY . .
 RUN npm run build
