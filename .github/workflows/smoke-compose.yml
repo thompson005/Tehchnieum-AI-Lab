@@ -11,21 +11,49 @@ jobs:
   compose-config:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      OPENAI_API_KEY: test-key-for-ci
+      OPENAI_MODEL: gpt-4o-mini
+      LLM_MODEL: gpt-4o-mini
+      PUBLIC_BASE_URL: http://localhost
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Resolve compose command
+        shell: bash
+        run: |
+          if docker compose version >/dev/null 2>&1; then
+            echo "COMPOSE_CMD=docker compose" >> "$GITHUB_ENV"
+          elif command -v docker-compose >/dev/null 2>&1; then
+            echo "COMPOSE_CMD=docker-compose" >> "$GITHUB_ENV"
+          else
+            echo "Neither 'docker compose' nor 'docker-compose' is available" >&2
+            exit 1
+          fi
+
+      - name: Normalize shell script line endings
+        shell: bash
+        run: |
+          sed -i 's/\r$//' deploy/ec2/healthcheck.sh
+          sed -i 's/\r$//' deploy/ec2/deploy.sh
+
       - name: Validate root compose
-        run: docker compose -f docker-compose.yml config -q
+        shell: bash
+        run: $COMPOSE_CMD -f docker-compose.yml config -q
 
       - name: Validate lab compose files
+        shell: bash
         run: |
-          docker compose -f LAB-1/docker-compose.yml config -q
-          docker compose -f LAB-2/docker-compose.yml config -q
-          docker compose -f LAB-3/docker-compose.yml config -q
-          docker compose -f LAB-4/docker-compose.yml config -q
-          docker compose -f LAB-5/docker-compose.yml config -q
+          $COMPOSE_CMD -f LAB-1/docker-compose.yml config -q
+          $COMPOSE_CMD -f LAB-2/docker-compose.yml config -q
+          $COMPOSE_CMD -f LAB-3/docker-compose.yml config -q
+          $COMPOSE_CMD -f LAB-4/docker-compose.yml config -q
+          $COMPOSE_CMD -f LAB-5/docker-compose.yml config -q
 
       - name: Validate deploy health script syntax
-        run: bash -n deploy/ec2/healthcheck.sh
+        shell: bash
+        run: |
+          bash -n deploy/ec2/deploy.sh
+          bash -n deploy/ec2/healthcheck.sh
