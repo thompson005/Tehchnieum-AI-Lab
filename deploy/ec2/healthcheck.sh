@@ -53,24 +53,45 @@ probe_endpoint() {
 }
 
 # ─── Required endpoints (failure blocks deploy) ────────────────────────────
-deploy_ok=1
-for endpoint in \
-  "${BASE_URL}:5555/health" \
-  "${BASE_URL}:5000/health" \
+required_endpoints=(
+  "${BASE_URL}:5555/health"
+  "${BASE_URL}:5000/health"
   "${BASE_URL}:8000/health"
-do
-  if [ "$(probe_endpoint "$endpoint" 18)" -ne 1 ]; then
-    echo "FAIL: required endpoint unreachable: $endpoint"
-    deploy_ok=0
-  else
-    echo "OK:   $endpoint"
+)
+
+all_required_up=0
+for attempt in $(seq 1 60); do
+  missing=0
+
+  for endpoint in "${required_endpoints[@]}"; do
+    if [ "$(probe_endpoint "$endpoint" 1)" -ne 1 ]; then
+      missing=$((missing + 1))
+    fi
+  done
+
+  if [ "$missing" -eq 0 ]; then
+    all_required_up=1
+    break
   fi
+
+  sleep 10
 done
 
-if [ "$deploy_ok" -ne 1 ]; then
-  echo "One or more required endpoints are down. Deploy failed."
+if [ "$all_required_up" -ne 1 ]; then
+  echo "One or more required endpoints are down after readiness window."
+  for endpoint in "${required_endpoints[@]}"; do
+    if [ "$(probe_endpoint "$endpoint" 1)" -ne 1 ]; then
+      echo "FAIL: required endpoint unreachable: $endpoint"
+    else
+      echo "OK:   $endpoint"
+    fi
+  done
   exit 1
 fi
+
+for endpoint in "${required_endpoints[@]}"; do
+  echo "OK:   $endpoint"
+done
 
 # ─── Optional endpoints (warnings only) ────────────────────────────────────
 for endpoint in \
