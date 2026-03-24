@@ -39,6 +39,13 @@ jobs:
           sed -i 's/\r$//' deploy/ec2/healthcheck.sh
           sed -i 's/\r$//' deploy/ec2/deploy.sh
 
+      - name: Prepare CI env files for compose validation
+        shell: bash
+        run: |
+          if [ ! -f LAB-1/.env ]; then
+            cp LAB-1/.env.example LAB-1/.env
+          fi
+
       - name: Validate root compose
         shell: bash
         run: $COMPOSE_CMD -f docker-compose.yml config -q
