@@ -70,7 +70,7 @@ By completing this lab, you will learn to:
 ## Prerequisites
 
 - Python 3.10+
-- Groq API Key (free at https://console.groq.com)
+- OpenAI API Key (gpt-4o-mini recommended)
 - Basic understanding of REST APIs
 - Familiarity with command line
 
@@ -91,7 +91,7 @@ pip install -r requirements.txt
 
 ```bash
 cp .env.example .env
-# Edit .env and add your GROQ_API_KEY
+# Edit .env and add your OPENAI_API_KEY
 ```
 
 ### 3. Initialize Database

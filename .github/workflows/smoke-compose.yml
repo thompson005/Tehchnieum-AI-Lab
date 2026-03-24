@@ -1,0 +1,31 @@
+name: Compose Config Smoke
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  compose-config:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate root compose
+        run: docker compose -f docker-compose.yml config -q
+
+      - name: Validate lab compose files
+        run: |
+          docker compose -f LAB-1/docker-compose.yml config -q
+          docker compose -f LAB-2/docker-compose.yml config -q
+          docker compose -f LAB-3/docker-compose.yml config -q
+          docker compose -f LAB-4/docker-compose.yml config -q
+          docker compose -f LAB-5/docker-compose.yml config -q
+
+      - name: Validate deploy health script syntax
+        run: bash -n deploy/ec2/healthcheck.sh

@@ -31,3 +31,7 @@ build/
 
 # Docker local artifacts
 docker-data/
+
+# Runtime sqlite artifacts (generated at runtime, never source-controlled)
+portal/portal.db
+**/*.db

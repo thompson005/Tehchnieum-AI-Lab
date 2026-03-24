@@ -33,7 +33,7 @@ A unified platform for learning AI/LLM security through hands-on exploitation of
 
 ## Quick Start
 
-For EC2 auto-deploy from GitHub Actions, see `DEPLOYMENT_EC2.md`.
+For EC2 auto-deploy from GitHub Actions, see DEPLOYMENT_EC2.md.
 
 ### Prerequisites
 - Docker Desktop (with BuildKit enabled — default on Docker Desktop ≥ 4.x)
@@ -42,7 +42,7 @@ For EC2 auto-deploy from GitHub Actions, see `DEPLOYMENT_EC2.md`.
 ### 1. Configure
 
 ```bash
-cd Labs/
+cd /path/to/Labs
 # Edit .env and set your OPENAI_API_KEY
 ```
 
@@ -54,12 +54,17 @@ The `.env` file already exists. Only `OPENAI_API_KEY` needs to be set — all ot
 powershell -ExecutionPolicy Bypass -File .\preflight.ps1
 ```
 
+Linux/macOS:
+
+```bash
+bash ./preflight.sh
+```
+
 This validates Docker availability, required init files, `OPENAI_API_KEY`, and common port conflicts before building.
 
 ### 3. Launch Everything
 
 ```bash
-cd Labs/
 docker compose up --build -d
 ```
 
@@ -95,7 +100,7 @@ This single command starts **Portal + all 5 labs** on the shared `technieum` net
 
 ## Environment Variables
 
-The `.env` file in this directory controls the platform. Required:
+The .env file in this directory controls the platform. Required:
 
 ```env
 OPENAI_API_KEY=sk-...        # Required — used by all AI labs
@@ -104,11 +109,35 @@ OPENAI_API_KEY=sk-...        # Required — used by all AI labs
 Optional overrides (defaults shown):
 
 ```env
+OPENAI_MODEL=gpt-4o-mini
+LLM_MODEL=gpt-4o-mini
+
+LAB1_ADMIN_API_KEY=admin_secret_123
+
+LAB2_DB_NAME=securebank
+LAB2_DB_USER=bankadmin
+LAB2_DB_PASSWORD=SecureBank2024!
+LAB2_SECRET_KEY=technieum-lab2-secret-key-change-me
+
+LAB3_DB_NAME=shopsec_db
+LAB3_DB_USER=shopsec
+LAB3_DB_PASSWORD=shopsec123
+LAB3_ADMIN_PASSWORD=admin123
+
 LAB4_DB_PASSWORD=travelnest123
 LAB4_SECRET_KEY=travelnest_secret_key_2024
+
+LAB5_DB_NAME=govconnect
+LAB5_DB_USER=govconnect
+LAB5_DB_PASSWORD=govconnect2024
+LAB5_JWT_SECRET=govconnect_secret_key_2024
 ```
 
-All other secrets (LAB-2, LAB-3, LAB-5 DB passwords) are hardcoded to their development defaults in `docker-compose.yml`.
+Note: These defaults are intentionally weak for training realism. Override them in .env for safer shared environments.
+
+Provider notes:
+- Root platform compose currently uses OpenAI variables (OPENAI_API_KEY and OPENAI_MODEL).
+- If you run any lab standalone with an alternate provider, use that lab's own README and env settings.
 
 ---
 

@@ -82,12 +82,12 @@ curl http://localhost:5000/api/patients/1
 
 ## Need API Key?
 
-1. Visit: https://console.groq.com
+1. Visit: https://platform.openai.com/api-keys
 2. Sign up (free)
 3. Create API key
 4. Add to `.env`:
    ```
-   GROQ_API_KEY=gsk_your_key_here
+  OPENAI_API_KEY=sk_your_key_here
    ```
 
 ---

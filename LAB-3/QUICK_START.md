@@ -25,7 +25,7 @@ node --version
 ### Step 1: Clone and Navigate
 
 ```bash
-cd "Rejen Thompson/AI_course/Labs/LAB-3"
+cd /path/to/Labs/LAB-3
 ```
 
 ### Step 2: Configure Environment
@@ -71,16 +71,15 @@ python backend/database/seed_data.py
 
 ```bash
 # Check all services are healthy
-curl http://localhost:8000/health
+curl http://localhost:8080/health
 
 # Should return:
 # {
-#   "status": "healthy",
+#   "status": "healthy|degraded",
 #   "services": {
 #     "gateway": "healthy",
-#     "order_service": "healthy",
-#     "search_service": "healthy",
-#     "agent_service": "healthy"
+#     "order_service": "healthy|unhealthy",
+#     "agent_service": "healthy|unhealthy"
 #   }
 # }
 ```
@@ -89,8 +88,8 @@ curl http://localhost:8000/health
 
 Open your browser:
 - **Storefront**: http://localhost:3000
-- **API Documentation**: http://localhost:8000/docs
-- **Admin Panel**: http://localhost:3000/admin
+- **Storefront**: http://localhost:3001
+- **API Documentation**: http://localhost:8080/docs
 
 ## Option 2: Manual Setup (For Development)
 

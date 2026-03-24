@@ -25,7 +25,7 @@ This lab is inspired by actual AI security failures:
 
 ### Technology Stack
 
-- **Frontend**: Next.js 14 (App Router) - Industry-standard headless commerce UI
+- **Frontend**: Lite static storefront (Nginx-served)
 - **Backend API**: FastAPI + LangGraph - Stateful agent workflows
 - **Database**: PostgreSQL + pgvector - Hybrid search (keyword + semantic)
 - **Payment**: Stripe-Mock - Simulated payment gateway
@@ -39,7 +39,7 @@ This lab is inspired by actual AI security failures:
 
 ```
 ┌─────────────────┐
-│  Next.js UI     │ :3000
+│  Lite UI        │ :3001
 │  (Storefront)   │
 └────────┬────────┘
          │
@@ -48,14 +48,14 @@ This lab is inspired by actual AI security failures:
     └────┬────────────────────────────┘
          │
     ┌────┴─────────┬──────────┬───────────┐
-    │              │          │           │
-┌───▼────┐  ┌─────▼─────┐ ┌──▼──────┐ ┌─▼────────┐
-│ Order  │  │  Search   │ │  Agent  │ │ Payment  │
-│Service │  │  Service  │ │  Core   │ │ Gateway  │
-│ :8001  │  │  :8002    │ │  :8003  │ │ :8004    │
-└───┬────┘  └─────┬─────┘ └──┬──────┘ └─┬────────┘
-    │             │           │          │
-    └─────────────┴───────────┴──────────┘
+     │              │
+┌───▼────┐    ┌────▼─────┐
+│ Order  │    │  Agent   │
+│Service │    │  Core    │
+│ :8001  │    │  :8003   │
+└───┬────┘    └────┬─────┘
+     │              │
+     └──────────────┘
                   │
             ┌─────▼──────┐
             │ PostgreSQL │
@@ -119,7 +119,7 @@ Visualization of agent "thought chains" to debug and audit decision-making.
 
 ```bash
 # 1. Clone and navigate
-cd "Rejen Thompson/AI_course/Labs/LAB-3"
+cd /path/to/Labs/LAB-3
 
 # 2. Install dependencies
 make install
@@ -131,9 +131,8 @@ make up
 make seed
 
 # 5. Access the platform
-# - Storefront: http://localhost:3000
-# - API Docs: http://localhost:8000/docs
-# - Admin Dashboard: http://localhost:3000/admin
+# - Storefront: http://localhost:3001
+# - API Docs: http://localhost:8080/docs
 ```
 
 ### Manual Setup
@@ -182,13 +181,7 @@ LAB-3/
 │   │   ├── pricing_rails.co    # NeMo Guardrails config
 │   │   └── rag_filters.py      # Context sanitization
 │   └── main.py                 # FastAPI gateway
-├── frontend/
-│   ├── app/
-│   │   ├── page.tsx            # Homepage
-│   │   ├── products/           # Product listing
-│   │   ├── chat/               # AI chat interface
-│   │   └── admin/              # Admin dashboard
-│   └── components/
+├── lite_frontend/              # Nginx-served training UI
 ├── labs/                       # Individual exercises
 ├── solutions/                  # Attack walkthroughs
 ├── monitoring/
