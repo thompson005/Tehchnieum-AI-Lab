@@ -294,7 +294,7 @@ Good luck, and happy hacking!
 For issues or questions about this lab:
 - Check the troubleshooting section in each lab guide
 - Review the solutions for guidance
-- Ensure your Groq API key is valid
+- Ensure your OPENAI_API_KEY is valid
 
 ---
 

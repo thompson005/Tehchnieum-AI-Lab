@@ -17,7 +17,7 @@ LLMs have finite context windows (4K-128K tokens). Attacks include:
 ## Lab Setup
 
 1. MedAssist AI running at `http://localhost:5000`
-2. Understanding of token limits (Groq Llama 3.1: ~128K tokens)
+2. Understanding of token limits (OpenAI Llama 3.1: ~128K tokens)
 3. Ability to send large payloads
 
 ## Exercises
@@ -317,7 +317,7 @@ if __name__ == "__main__":
 
 **Hint 2:** System prompts are typically at the start - fill context to push them out.
 
-**Hint 3:** Groq Llama 3.1 has ~128K token context - that's roughly 500K characters.
+**Hint 3:** OpenAI Llama 3.1 has ~128K token context - that's roughly 500K characters.
 
 **Hint 4:** Combine with RAG to inject persistent overflow content.
 
@@ -458,3 +458,4 @@ Upon completing all 15 labs, you have demonstrated proficiency in:
 - Defense strategy awareness
 
 **Continue learning and stay ethical!**
+

@@ -42,7 +42,7 @@ pip install -r requirements_FIXED.txt
 
 # 3. Configure environment
 cp .env.example .env
-# Edit .env and add your GROQ_API_KEY
+# Edit .env and add your OPENAI_API_KEY
 
 # 4. Initialize database
 python setup_database.py
@@ -74,16 +74,16 @@ python app.py
 
 ---
 
-## Getting Your Groq API Key
+## Getting Your OpenAI API Key
 
-1. Visit https://console.groq.com
+1. Visit https://platform.openai.com/api-keys
 2. Sign up for a free account
 3. Navigate to API Keys section
 4. Create a new API key
-5. Copy the key (format: `gsk_...`)
+5. Copy the key (format: `sk_...`)
 6. Add to `.env` file:
    ```
-   GROQ_API_KEY=gsk_your_actual_key_here
+   OPENAI_API_KEY=sk_your_actual_key_here
    ```
 
 **Free Tier Limits:**
@@ -101,18 +101,18 @@ python app.py
 # ============================================
 # REQUIRED - Application will not work without this
 # ============================================
-GROQ_API_KEY=gsk_your_actual_key_here
+OPENAI_API_KEY=sk_your_actual_key_here
 
 # ============================================
-# Model Selection (Groq models)
+# Model Selection
 # ============================================
 # Fast & Good Quality (Recommended for lab)
-LLM_MODEL=llama-3.1-70b-versatile
+LLM_MODEL=gpt-4o-mini
 
 # Alternatives:
-# LLM_MODEL=llama-3.1-8b-instant     # Faster, less capable
-# LLM_MODEL=mixtral-8x7b-32768       # Good for complex tasks
-# LLM_MODEL=gemma2-9b-it             # Experimental
+
+
+
 
 # ============================================
 # Security Settings (KEEP AS-IS FOR LAB)
@@ -142,7 +142,7 @@ python3 --version
 ### 2. Verify Dependencies
 
 ```bash
-pip list | grep -E "(flask|groq|sqlalchemy|chroma)"
+pip list | grep -E "(flask|openai|sqlalchemy|chroma)"
 # Should show all packages installed
 ```
 
@@ -182,13 +182,13 @@ pip install -r requirements_FIXED.txt
 
 ---
 
-### Issue: "groq.APIError: Invalid API key"
+### Issue: "OpenAI API Error: Invalid API key"
 
-**Cause:** GROQ_API_KEY not configured or invalid
+**Cause:** OPENAI_API_KEY not configured or invalid
 
 **Solution:**
-1. Check `.env` file has correct key (starts with `gsk_`)
-2. Verify key is active at https://console.groq.com
+1. Check `.env` file has correct key (starts with `sk_`)
+2. Verify key is active at https://platform.openai.com/api-keys
 3. Ensure no extra spaces in `.env` file
 
 ---
@@ -322,5 +322,6 @@ This system contains the following OWASP LLM Top 10 vulnerabilities:
 
 - Lab Issues: Check troubleshooting section above
 - OWASP LLM Top 10: https://owasp.org/www-project-top-10-for-large-language-model-applications/
-- Groq Documentation: https://console.groq.com/docs
+- OpenAI Documentation: https://platform.openai.com/docs
 - Flask Documentation: https://flask.palletsprojects.com/
+

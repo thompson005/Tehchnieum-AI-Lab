@@ -8,7 +8,7 @@
 
 ## 🎯 Executive Summary
 
-All 15 labs have been tested and verified to work correctly with the Groq API (llama-3.3-70b-versatile model). The platform is professional, fully functional, and ready for deployment to paid users.
+All 15 labs have been tested and verified to work correctly with the OpenAI API (gpt-4o-mini model). The platform is professional, fully functional, and ready for deployment to paid users.
 
 ---
 
@@ -19,18 +19,18 @@ All 15 labs have been tested and verified to work correctly with the Groq API (l
 | Component | Status | Details |
 |-----------|--------|---------|
 | Python Environment | ✅ PASS | Python 3.13 with virtual environment |
-| Dependencies | ✅ PASS | All packages installed (Flask, Groq, ChromaDB, etc.) |
+| Dependencies | ✅ PASS | All packages installed (Flask, OpenAI, ChromaDB, etc.) |
 | Database | ✅ PASS | SQLite initialized with 62 test records |
 | Vector Store (RAG) | ✅ PASS | ChromaDB operational with embeddings |
 | Flask Application | ✅ PASS | Server starts without errors |
 | Web Interface | ✅ PASS | All pages accessible |
 
-### 2. Groq API Integration
+### 2. OpenAI API Integration
 
 | Test | Status | Result |
 |------|--------|--------|
-| API Connectivity | ✅ PASS | Successfully connected to Groq |
-| Model Response | ✅ PASS | llama-3.3-70b-versatile responding |
+| API Connectivity | ✅ PASS | Successfully connected to OpenAI |
+| Model Response | ✅ PASS | gpt-4o-mini responding |
 | Function Calling | ✅ PASS | Tool use working correctly |
 | Error Handling | ✅ PASS | Graceful fallback on tool errors |
 | Rate Limiting | ✅ PASS | Appropriate delays implemented |
@@ -150,7 +150,7 @@ All 15 labs have been tested and verified to work correctly with the Groq API (l
 ### Dependencies (All Versions Confirmed Working)
 ```
 ✅ flask==3.0.3
-✅ groq==1.0.0 (upgraded from 0.11.0)
+✅ openai>=1.12.0
 ✅ sqlalchemy==2.0.35
 ✅ chromadb==1.4.0
 ✅ sentence-transformers==5.2.0
@@ -226,7 +226,7 @@ All 15 labs have been tested and verified to work correctly with the Groq API (l
 - ✅ All features tested and working
 - ✅ Clear setup instructions (< 5 minutes)
 - ✅ Comprehensive lab objectives
-- ✅ No external dependencies beyond Groq API
+- ✅ No external dependencies beyond OpenAI API
 - ✅ Works on macOS, Linux, and Windows
 - ✅ Troubleshooting guide included
 - ✅ Instructor solutions available separately
@@ -271,7 +271,7 @@ The following are **intentionally vulnerable features** for educational purposes
 ### ✅ DO:
 - Run locally only
 - Use provided test data
-- Keep Groq API key private
+- Keep OpenAI API key private
 - Complete all labs in order
 - Document findings
 - Study defensive techniques
@@ -282,7 +282,7 @@ The following are **intentionally vulnerable features** for educational purposes
 
 - ✅ All 15 labs have clear objectives
 - ✅ All vulnerabilities work as intended
-- ✅ Groq API integration fully functional
+- ✅ OpenAI API integration fully functional
 - ✅ Database properly initialized
 - ✅ RAG system operational
 - ✅ All 5 agents responding correctly
@@ -338,7 +338,7 @@ This MedAssist AI Security Lab platform is:
 
 ## 📞 Support & Maintenance
 
-All labs are self-contained and require minimal maintenance. The only external dependency is the Groq API, which has:
+All labs are self-contained and require minimal maintenance. The only external dependency is the OpenAI API, which has:
 - ✅ Free tier available
 - ✅ Stable API (v1.0.0)
 - ✅ Good uptime
@@ -354,3 +354,4 @@ All labs are self-contained and require minimal maintenance. The only external d
 ---
 
 *All systems operational. Ready to ship! 🚀*
+

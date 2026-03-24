@@ -73,7 +73,7 @@ if [ ! -f ".env" ]; then
     if [ -f ".env.example" ]; then
         cp .env.example .env
         echo -e "${GREEN}✓${NC} .env file created from template"
-        echo -e "${YELLOW}!${NC} ${RED}IMPORTANT:${NC} Edit .env and add your GROQ_API_KEY"
+        echo -e "${YELLOW}!${NC} ${RED}IMPORTANT:${NC} Edit .env and add your OPENAI_API_KEY"
     else
         echo -e "${RED}✗${NC} .env.example not found!"
         exit 1
@@ -83,9 +83,9 @@ else
 fi
 
 # Check if API key is configured
-if grep -q "your_groq_api_key_here" .env 2>/dev/null; then
-    echo -e "${RED}⚠${NC}  GROQ_API_KEY not configured in .env"
-    echo -e "    Get your free API key at: ${BLUE}https://console.groq.com${NC}"
+if grep -q "your_openai_api_key_here" .env 2>/dev/null; then
+    echo -e "${RED}⚠${NC}  OPENAI_API_KEY not configured in .env"
+    echo -e "    Generate your API key at: ${BLUE}https://platform.openai.com/api-keys${NC}"
 fi
 
 # Initialize database
@@ -115,7 +115,7 @@ echo -e "${GREEN}✓ Setup Complete!${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════${NC}"
 echo ""
 echo -e "Next steps:"
-echo -e "  1. ${YELLOW}Edit .env and add your GROQ_API_KEY${NC}"
+echo -e "  1. ${YELLOW}Edit .env and add your OPENAI_API_KEY${NC}"
 echo -e "  2. ${BLUE}source venv/bin/activate${NC}"
 echo -e "  3. ${BLUE}python app.py${NC}"
 echo -e "  4. Open ${BLUE}http://localhost:5000${NC}"

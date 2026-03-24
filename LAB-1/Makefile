@@ -110,7 +110,7 @@ clean-all: clean
 check-env:
 	@echo "Checking environment..."
 	@if [ ! -f .env ]; then echo "❌ .env file not found"; exit 1; fi
-	@if grep -q "your_groq_api_key_here" .env; then echo "❌ GROQ_API_KEY not configured"; exit 1; fi
+	@if grep -q "your_openai_api_key_here" .env; then echo "❌ OPENAI_API_KEY not configured"; exit 1; fi
 	@echo "✅ Environment configured"
 
 health-check:

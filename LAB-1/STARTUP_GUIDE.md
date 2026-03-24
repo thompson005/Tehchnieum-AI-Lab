@@ -9,7 +9,7 @@ Follow these steps to get the labs up and running quickly.
 ## Prerequisites
 
 ✅ **Python 3.13+** installed
-✅ **Groq API Key** (get one free at [console.groq.com](https://console.groq.com))
+✅ **OpenAI API Key** (create one at [platform.openai.com/api-keys](https://platform.openai.com/api-keys))
 ✅ **Terminal/Command Line** access
 ✅ **Web Browser** (Chrome, Firefox, or Safari)
 
@@ -63,7 +63,7 @@ pip install -r requirements_FIXED.txt
 
 **Note:** This will install:
 - Flask (web framework)
-- Groq (AI API client)
+- OpenAI (AI API client)
 - SQLAlchemy (database)
 - ChromaDB (vector database for RAG)
 - Sentence Transformers (embeddings)
@@ -75,19 +75,19 @@ pip install -r requirements_FIXED.txt
 
 ## Step 4: Configure Environment Variables
 
-The `.env` file already contains a valid Groq API key for testing. If you want to use your own:
+The `.env` file already contains a valid OpenAI API key for testing. If you want to use your own:
 
 1. Open `.env` in a text editor
-2. Replace the `GROQ_API_KEY` value with your key:
+2. Replace the `OPENAI_API_KEY` value with your key:
 
 ```env
-GROQ_API_KEY=your_groq_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
 3. Save the file
 
 **Default Configuration:**
-- Model: `llama-3.3-70b-versatile`
+- Model: `gpt-4o-mini`
 - Port: `5000`
 - Database: SQLite (local file)
 
@@ -194,13 +194,13 @@ venv\Scripts\activate     # Windows
 pip install -r requirements_FIXED.txt
 ```
 
-### Problem: "Groq API Error"
+### Problem: "OpenAI API Error"
 
 **Solution:**
 1. Check your API key in `.env`
 2. Test API key:
 ```bash
-python3 -c "from groq import Groq; import os; from dotenv import load_dotenv; load_dotenv(); client = Groq(api_key=os.getenv('GROQ_API_KEY')); print('API Key Valid!')"
+python3 -c "import os; from openai import OpenAI; from dotenv import load_dotenv; load_dotenv(); client = OpenAI(api_key=os.getenv('OPENAI_API_KEY')); print('API Key Loaded:', bool(os.getenv('OPENAI_API_KEY')))"
 ```
 
 ### Problem: Database errors
@@ -342,3 +342,5 @@ Create a simple checklist to track your progress:
 6. 📝 Document your findings
 
 **Happy Learning! 🚀**
+
+

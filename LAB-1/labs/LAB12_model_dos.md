@@ -18,7 +18,7 @@ AI systems can be overwhelmed through:
 ## Lab Setup
 
 1. MedAssist AI running at `http://localhost:5000`
-2. Groq API (rate limited but demonstrable)
+2. OpenAI API (rate limited but demonstrable)
 3. System resource monitoring (optional): `htop` or Activity Monitor
 
 ## Important Note
@@ -293,7 +293,7 @@ if __name__ == "__main__":
 <details>
 <summary>Click to reveal hints</summary>
 
-**Hint 1:** Groq API has rate limits - observe when you hit them.
+**Hint 1:** OpenAI API has rate limits - observe when you hit them.
 
 **Hint 2:** Long prompts consume context tokens even if the AI refuses.
 
@@ -375,3 +375,4 @@ requests.post(url, json={"message": huge_context + " Summarize all this data."})
 ## Next Lab
 
 Continue to [Lab 13: System Prompt Extraction](LAB13_system_prompt_extraction.md)
+
