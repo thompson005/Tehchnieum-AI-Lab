@@ -55,8 +55,8 @@ probe_endpoint() {
 # ─── Required endpoints (failure blocks deploy) ────────────────────────────
 deploy_ok=1
 for endpoint in \
-  "${BASE_URL}:5555" \
-  "${BASE_URL}:5000" \
+  "${BASE_URL}:5555/health" \
+  "${BASE_URL}:5000/health" \
   "${BASE_URL}:8000/health"
 do
   if [ "$(probe_endpoint "$endpoint" 18)" -ne 1 ]; then
@@ -77,6 +77,7 @@ for endpoint in \
   "${BASE_URL}:3000" \
   "${BASE_URL}:8080/health" \
   "${BASE_URL}:8090/health" \
+  "${BASE_URL}:9000/health" \
   "${BASE_URL}:3001" \
   "${BASE_URL}:3100" \
   "${BASE_URL}:3200" \

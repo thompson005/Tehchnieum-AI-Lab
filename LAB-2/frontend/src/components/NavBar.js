@@ -82,12 +82,12 @@ export default function NavBar({ user, sessionTimeout, onLogout }) {
         <span style={s.divider}>|</span>
         <span style={s.labLabel}>SecureBank AI — LAB-2</span>
         <div style={s.navLinks}>
-          <a href="#" style={s.navLink}
+          <a href="/" style={s.navLink}
             onMouseOver={e => { e.currentTarget.style.color = '#FF6A00'; e.currentTarget.style.background = 'rgba(255,106,0,0.08)'; }}
             onMouseOut={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}>
             Dashboard
           </a>
-          <a href="{PORTAL_URL}" style={s.navLink}
+          <a href={`${PORTAL_URL}/scoreboard`} style={s.navLink}
             onMouseOver={e => { e.currentTarget.style.color = '#FF6A00'; e.currentTarget.style.background = 'rgba(255,106,0,0.08)'; }}
             onMouseOut={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent'; }}>
             Scoreboard
@@ -95,7 +95,7 @@ export default function NavBar({ user, sessionTimeout, onLogout }) {
         </div>
       </div>
       <div style={s.right}>
-        <a href="{PORTAL_URL}" style={s.flagBtn}>Submit Flag</a>
+        <a href={`${PORTAL_URL}/dashboard`} style={s.flagBtn}>Submit Flag</a>
         <span style={s.sessionBadge}>Session: {sessionTimeout}m</span>
         {user && <span style={s.userLabel}>{user.full_name || user.username}</span>}
         <button

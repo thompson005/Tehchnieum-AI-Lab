@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 
 # Service URLs
 ORDER_SERVICE_URL = os.getenv("ORDER_SERVICE_URL", "http://localhost:8001")
-SEARCH_SERVICE_URL = os.getenv("SEARCH_SERVICE_URL", "http://localhost:8002")
 AGENT_SERVICE_URL = os.getenv("AGENT_SERVICE_URL", "http://localhost:8003")
 
 @asynccontextmanager
@@ -76,7 +75,6 @@ async def health_check():
     services = {
         "gateway": "healthy",
         "order_service": "unknown",
-        "search_service": "unknown",
         "agent_service": "unknown"
     }
     
@@ -87,13 +85,6 @@ async def health_check():
             services["order_service"] = "healthy" if response.status_code == 200 else "unhealthy"
         except:
             services["order_service"] = "unhealthy"
-        
-        # Check search service
-        try:
-            response = await client.get(f"{SEARCH_SERVICE_URL}/health", timeout=2.0)
-            services["search_service"] = "healthy" if response.status_code == 200 else "unhealthy"
-        except:
-            services["search_service"] = "unhealthy"
         
         # Check agent service
         try:

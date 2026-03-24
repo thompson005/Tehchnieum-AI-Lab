@@ -348,22 +348,37 @@
     {% endfor %}
   ];
 
-  async function checkLabStatus(lab) {
-    const el = document.getElementById('status-' + lab.id);
-    if (!el) return;
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3000);
-      await fetch(`${lab.url}/health`, { signal: controller.signal, mode: 'no-cors' });
-      clearTimeout(timeout);
+  function setStatus(el, online) {
+    if (online) {
       el.innerHTML = '<span class="status-online"></span> Online';
       el.className = 'lab-status font-label text-[9px] uppercase font-bold px-2 py-0.5 bg-green-500/10 text-green-500 border border-green-500/20 flex items-center gap-1 flex-shrink-0';
-    } catch (e) {
+    } else {
       el.innerHTML = '<span class="status-offline"></span> Offline';
       el.className = 'lab-status font-label text-[9px] uppercase font-bold px-2 py-0.5 bg-zinc-800 text-zinc-500 border border-zinc-700/50 flex items-center gap-1 flex-shrink-0';
     }
   }
 
-  labs.forEach((lab, i) => { setTimeout(() => checkLabStatus(lab), i * 400); });
+  async function refreshLabStatuses() {
+    try {
+      const res = await fetch('/api/lab-health', { credentials: 'same-origin' });
+      if (!res.ok) throw new Error('health fetch failed');
+      const data = await res.json();
+      labs.forEach((lab) => {
+        const el = document.getElementById('status-' + lab.id);
+        if (!el) return;
+        const online = Boolean(data?.labs?.[lab.id]?.online);
+        setStatus(el, online);
+      });
+    } catch (e) {
+      labs.forEach((lab) => {
+        const el = document.getElementById('status-' + lab.id);
+        if (!el) return;
+        setStatus(el, false);
+      });
+    }
+  }
+
+  refreshLabStatuses();
+  setInterval(refreshLabStatuses, 20000);
 </script>
 {% endblock %}

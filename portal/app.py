@@ -5,6 +5,9 @@ Single entry point for all three labs with login, scoreboard, and flag submissio
 import os
 from datetime import datetime
 from functools import wraps
+from urllib.parse import urlparse
+import urllib.request
+import urllib.error
 
 from flask import (
     Flask, request, jsonify, render_template,
@@ -225,6 +228,55 @@ def api_my_flags():
 @app.route("/api/health")
 def health():
     return jsonify({"status": "ok", "service": "technieum-portal"})
+
+
+@app.route("/health")
+def health_root():
+    return jsonify({"status": "healthy", "service": "technieum-portal"})
+
+
+def _build_health_url(lab_id, lab_url):
+    parsed = urlparse(lab_url)
+    scheme = parsed.scheme or "http"
+    host = parsed.hostname or "localhost"
+    health_ports = {
+        "lab1": 5000,
+        "lab2": 8000,
+        "lab3": 8080,
+        "lab4": 8090,
+        "lab5": 8100,
+    }
+    port = health_ports.get(lab_id)
+    if not port:
+        return None
+    return f"{scheme}://{host}:{port}/health"
+
+
+@app.route("/api/lab-health")
+@login_required
+def api_lab_health():
+    statuses = {}
+    for lab_id, meta in Config.LAB_META.items():
+        lab_url = {
+            "lab1": Config.LAB1_URL,
+            "lab2": Config.LAB2_URL,
+            "lab3": Config.LAB3_URL,
+            "lab4": Config.LAB4_URL,
+            "lab5": Config.LAB5_URL,
+        }.get(lab_id, f"http://localhost:{meta['port']}")
+        health_url = _build_health_url(lab_id, lab_url)
+        if not health_url:
+            statuses[lab_id] = {"online": False, "health_url": None}
+            continue
+        try:
+            with urllib.request.urlopen(health_url, timeout=3) as resp:
+                statuses[lab_id] = {
+                    "online": 200 <= resp.status < 300,
+                    "health_url": health_url,
+                }
+        except (urllib.error.URLError, TimeoutError, ValueError):
+            statuses[lab_id] = {"online": False, "health_url": health_url}
+    return jsonify({"labs": statuses, "timestamp": datetime.utcnow().isoformat()})
 
 
 # ─── Entry point ──────────────────────────────────────────────────────────────

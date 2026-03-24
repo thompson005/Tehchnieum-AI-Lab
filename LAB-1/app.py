@@ -664,6 +664,12 @@ def health_check():
         "version": "1.0.0"
     })
 
+
+@app.route('/health', methods=['GET'])
+def health_check_root():
+    """Root health alias used by deployment checks."""
+    return health_check()
+
 @app.route('/api/debug/info', methods=['GET'])
 def debug_info():
     """

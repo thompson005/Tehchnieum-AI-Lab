@@ -9,7 +9,7 @@ import sys
 # Add backend to path to import models
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from database.models import Product, CartItem, Order, OrderItem, Base
+from database.models import Product, CartItem, Order, OrderItem, User, Base
 
 app = FastAPI(title="ShopSec-AI Order Service (Lite)")
 
@@ -18,6 +18,92 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./shopsec.db")
 engine = create_engine(DATABASE_URL)
 Base.metadata.create_all(bind=engine)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+DEFAULT_PRODUCTS = [
+    {
+        "name": "Flagship Gaming Laptop",
+        "description": "High-performance laptop with RTX 4090, 32GB RAM, 1TB SSD.",
+        "category": "Electronics",
+        "price": 2499.99,
+        "cost": 1800.0,
+        "stock": 15,
+        "image_url": "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=1000&q=80",
+        "is_digital": False,
+        "is_refundable": True,
+        "max_discount_percent": 10.0,
+    },
+    {
+        "name": "Wireless Noise-Cancelling Headphones",
+        "description": "Premium audio with active noise cancellation and long battery life.",
+        "category": "Electronics",
+        "price": 349.99,
+        "cost": 180.0,
+        "stock": 50,
+        "image_url": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1000&q=80",
+        "is_digital": False,
+        "is_refundable": True,
+        "max_discount_percent": 15.0,
+    },
+    {
+        "name": "Premium Software Suite (1-Year License)",
+        "description": "Productivity software bundle with yearly subscription.",
+        "category": "Software",
+        "price": 199.99,
+        "cost": 5.0,
+        "stock": 9999,
+        "image_url": "https://images.unsplash.com/photo-1629654297299-c8506221ca97?auto=format&fit=crop&w=1000&q=80",
+        "is_digital": True,
+        "is_refundable": False,
+        "max_discount_percent": 20.0,
+    },
+    {
+        "name": "Premium Hiking Boots",
+        "description": "Waterproof hiking boots with strong grip and ankle support.",
+        "category": "Outdoor",
+        "price": 179.99,
+        "cost": 80.0,
+        "stock": 40,
+        "image_url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=80",
+        "is_digital": False,
+        "is_refundable": True,
+        "max_discount_percent": 15.0,
+    },
+]
+
+
+def seed_initial_data() -> None:
+    """Seed a minimal deterministic dataset so core lab workflows are usable on first boot."""
+    db = SessionLocal()
+    try:
+        guest_user = db.query(User).filter(User.id == 1).first()
+        if guest_user is None:
+            db.add(
+                User(
+                    id=1,
+                    email="guest@shopsec.local",
+                    username="guest",
+                    password_hash="hashed_guest123",
+                    first_name="Guest",
+                    last_name="User",
+                )
+            )
+
+        has_products = db.query(Product.id).first() is not None
+        if not has_products:
+            db.add_all(Product(**product_data) for product_data in DEFAULT_PRODUCTS)
+
+        db.commit()
+    except Exception as exc:
+        db.rollback()
+        print(f"[order-service] data bootstrap failed: {exc}")
+    finally:
+        db.close()
+
+
+@app.on_event("startup")
+def on_startup() -> None:
+    seed_initial_data()
 
 
 def get_db():
