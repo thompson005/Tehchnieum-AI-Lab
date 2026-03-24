@@ -37,6 +37,22 @@ export async function chat(message: string, sessionId: string, token: string) {
   return response.json();
 }
 
+export async function deleteChatHistory(sessionId: string, token: string) {
+  const response = await fetch(`${API_URL}/chat/history/${sessionId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: 'Failed to delete history' }));
+    throw new Error(error.detail || 'Failed to clear history');
+  }
+
+  return response.json();
+}
+
 export async function getChatHistory(sessionId: string, token: string) {
   const response = await fetch(`${API_URL}/chat/history/${sessionId}`, {
     method: 'GET',
