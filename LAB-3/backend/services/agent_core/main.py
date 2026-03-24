@@ -12,6 +12,17 @@ from datetime import datetime
 import httpx
 from openai import OpenAI
 
+from agents.vulnerable_agents import (
+    SummaryAgent, SummaryAgentRequest,
+    ShippingAssistantAgent, ShippingAgentRequest,
+    ReceiptScannerAgent, ReceiptScanRequest,
+    TranslatorAgent, TranslationRequest,
+    CheckoutAgent, CurrencyConvertRequest,
+    ResolutionAgent, TicketRequest,
+    DataExfiltrationAgent, OrderQueryRequest,
+    SalesBotAgent, SalesBotRequest,
+)
+
 app = FastAPI(title="Technieum LAB-3: ShopSec-AI Agent Core")
 
 # Configuration — OpenAI is the primary LLM (gpt-4o-mini)
@@ -324,6 +335,99 @@ def mock_support(request, user_message):
         "agent": "support", 
         "message": "I cannot refund digital items. (Mock Agent)"
     }
+
+# ============================================================================
+# AGENT: SUMMARY (LAB05 - Stored XSS via RAG)
+# ============================================================================
+class SummaryRequestWrapper(BaseModel):
+    product_id: int
+    include_reviews: bool = True
+    reviews: List[Dict] = []
+
+@app.post("/summary/generate")
+async def generate_summary(request: SummaryRequestWrapper):
+    """Generate product summary - VULNERABLE to stored XSS via RAG"""
+    agent_request = SummaryAgentRequest(
+        product_id=request.product_id,
+        include_reviews=request.include_reviews
+    )
+    result = await SummaryAgent.generate_summary(agent_request, request.reviews)
+    response = result.dict()
+    # Award chain attack master flag when full RAG poison→XSS chain is demonstrated
+    if result.flag == "TECHNIEUM{st0r3d_xss_r4g}":
+        response["chain_flag"] = "TECHNIEUM{ch41n_4tt4ck_m4st3r}"
+    return response
+
+
+# ============================================================================
+# AGENT: SHIPPING ASSISTANT (LAB06 - God Mode Tool Execution)
+# ============================================================================
+@app.post("/shipping/assist")
+async def shipping_assist(request: ShippingAgentRequest):
+    """Shipping assistant - VULNERABLE to debug tool abuse"""
+    result = await ShippingAssistantAgent.process_request(request)
+    return result.dict()
+
+
+# ============================================================================
+# AGENT: RECEIPT SCANNER (LAB07 - Multi-Modal Injection)
+# ============================================================================
+@app.post("/receipt/scan")
+async def scan_receipt(request: ReceiptScanRequest):
+    """Receipt scanner - VULNERABLE to hidden instructions in images"""
+    result = await ReceiptScannerAgent.scan_receipt(request)
+    return result.dict()
+
+
+# ============================================================================
+# AGENT: TRANSLATOR (LAB08 - System Prompt Extraction)
+# ============================================================================
+@app.post("/translate")
+async def translate(request: TranslationRequest):
+    """Translator - VULNERABLE to system prompt extraction"""
+    result = await TranslatorAgent.translate(request)
+    return result.dict()
+
+
+# ============================================================================
+# AGENT: CHECKOUT (LAB09 - Supply Chain Poisoning)
+# ============================================================================
+@app.post("/checkout/convert")
+async def checkout_convert(request: CurrencyConvertRequest):
+    """Checkout with currency conversion - VULNERABLE to poisoned plugin"""
+    result = await CheckoutAgent.process_checkout(request)
+    return result.dict()
+
+
+# ============================================================================
+# AGENT: RESOLUTION (LAB10 - Denial of Wallet)
+# ============================================================================
+@app.post("/ticket/resolve")
+async def resolve_ticket(request: TicketRequest):
+    """Ticket resolution - VULNERABLE to circular dependency DoW attack"""
+    result = await ResolutionAgent.resolve_ticket(request)
+    return result.dict()
+
+
+# ============================================================================
+# AGENT: DATA EXFILTRATION (LAB11 - RAG Data Exfiltration)
+# ============================================================================
+@app.post("/orders/query")
+async def query_orders(request: OrderQueryRequest):
+    """Order query via RAG - VULNERABLE to cross-user data leakage"""
+    result = await DataExfiltrationAgent.query_orders(request)
+    return result.dict()
+
+
+# ============================================================================
+# AGENT: SALESBOT (LAB12 - Goal Hijacking)
+# ============================================================================
+@app.post("/salesbot/chat")
+async def salesbot_chat(request: SalesBotRequest):
+    """Sales bot - VULNERABLE to goal hijacking"""
+    result = await SalesBotAgent.chat(request)
+    return result.dict()
+
 
 # Admin endpoint
 @app.get("/admin/thought-chains")

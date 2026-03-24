@@ -28,7 +28,7 @@ services:
       - "8100:8100"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - DATABASE_URL=postgresql://govconnect:govconnect2024@postgres:5432/govconnect
+      - DATABASE_URL=postgresql+asyncpg://govconnect:govconnect2024@postgres:5432/govconnect
       - JWT_SECRET=govconnect_secret_key_2024
       - REDIS_URL=redis://redis:6379
       - MCP_CITIZEN_URL=http://mcp-citizen:8110
@@ -44,6 +44,24 @@ services:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      mcp-citizen:
+        condition: service_healthy
+      mcp-dmv:
+        condition: service_healthy
+      mcp-tax:
+        condition: service_healthy
+      mcp-permit:
+        condition: service_healthy
+      mcp-health:
+        condition: service_healthy
+      mcp-docs:
+        condition: service_healthy
+      mcp-notify:
+        condition: service_healthy
+      mcp-files:
+        condition: service_healthy
+      mcp-civic:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8100/health"]

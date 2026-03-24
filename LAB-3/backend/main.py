@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 # Service URLs
 ORDER_SERVICE_URL = os.getenv("ORDER_SERVICE_URL", "http://localhost:8001")
 AGENT_SERVICE_URL = os.getenv("AGENT_SERVICE_URL", "http://localhost:8003")
+SEARCH_SERVICE_URL = os.getenv("SEARCH_SERVICE_URL", ORDER_SERVICE_URL)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -243,6 +244,118 @@ async def support_chat(message: str, order_id: Optional[int] = None, user_id: Op
             return response.json()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ── Advanced Agent Endpoints ──────────────────────────────────────────────────
+
+@app.post("/api/reviews")
+async def submit_review(request: dict):
+    """Submit product review - VULNERABLE to RAG poisoning via XSS payload"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(f"{ORDER_SERVICE_URL}/reviews", json=request, timeout=10.0)
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/reviews/{product_id}")
+async def get_reviews(product_id: int):
+    """Get product reviews"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{ORDER_SERVICE_URL}/reviews/{product_id}", timeout=10.0)
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/summary/generate")
+async def summary_generate(request: dict):
+    """LAB05: Product summary - VULNERABLE to stored XSS via RAG"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(f"{AGENT_SERVICE_URL}/summary/generate", json=request, timeout=30.0)
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/shipping/assist")
+async def shipping_assist(request: dict):
+    """LAB06: Shipping assistant - VULNERABLE to debug tool abuse"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(f"{AGENT_SERVICE_URL}/shipping/assist", json=request, timeout=30.0)
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/receipt/scan")
+async def receipt_scan(request: dict):
+    """LAB07: Receipt scanner - VULNERABLE to multi-modal injection"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(f"{AGENT_SERVICE_URL}/receipt/scan", json=request, timeout=30.0)
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/translate")
+async def translate(request: dict):
+    """LAB08: Translator - VULNERABLE to system prompt extraction"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(f"{AGENT_SERVICE_URL}/translate", json=request, timeout=30.0)
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/checkout/convert")
+async def checkout_convert(request: dict):
+    """LAB09: Checkout currency - VULNERABLE to supply chain poisoning"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(f"{AGENT_SERVICE_URL}/checkout/convert", json=request, timeout=30.0)
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/ticket/resolve")
+async def ticket_resolve(request: dict):
+    """LAB10: Ticket resolution - VULNERABLE to denial-of-wallet loop"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(f"{AGENT_SERVICE_URL}/ticket/resolve", json=request, timeout=60.0)
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/orders/query")
+async def orders_query(request: dict):
+    """LAB11: Order query - VULNERABLE to RAG data exfiltration"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(f"{AGENT_SERVICE_URL}/orders/query", json=request, timeout=30.0)
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/salesbot/chat")
+async def salesbot_chat(request: dict):
+    """LAB12: Sales bot - VULNERABLE to goal hijacking"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(f"{AGENT_SERVICE_URL}/salesbot/chat", json=request, timeout=30.0)
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # WebSocket for real-time chat
 @app.websocket("/ws/chat")

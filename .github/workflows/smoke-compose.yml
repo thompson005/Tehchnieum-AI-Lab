@@ -42,9 +42,11 @@ jobs:
       - name: Prepare CI env files for compose validation
         shell: bash
         run: |
-          if [ ! -f LAB-1/.env ]; then
-            cp LAB-1/.env.example LAB-1/.env
-          fi
+          for lab in LAB-1 LAB-2 LAB-3 LAB-4 LAB-5; do
+            if [ ! -f "$lab/.env" ] && [ -f "$lab/.env.example" ]; then
+              cp "$lab/.env.example" "$lab/.env"
+            fi
+          done
 
       - name: Validate root compose
         shell: bash

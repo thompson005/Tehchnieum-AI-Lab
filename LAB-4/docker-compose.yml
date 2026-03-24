@@ -73,6 +73,12 @@ services:
     networks:
       - technieum
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   lab4-flight:
     build:
@@ -87,6 +93,12 @@ services:
     networks:
       - technieum
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   lab4-hotel:
     build:
@@ -101,6 +113,12 @@ services:
     networks:
       - technieum
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8003/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   lab4-booking:
     build:
@@ -115,6 +133,12 @@ services:
     networks:
       - technieum
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8004/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   lab4-payment:
     build:
@@ -129,6 +153,12 @@ services:
     networks:
       - technieum
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8005/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   lab4-transport:
     build:
@@ -143,6 +173,12 @@ services:
     networks:
       - technieum
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8006/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   lab4-ai-agent:
     build:
@@ -171,6 +207,12 @@ services:
     networks:
       - technieum
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
 
   # ──────────────────────────────────────────────────────────────────────
   # Gateway
@@ -191,13 +233,20 @@ services:
       TRANSPORT_SERVICE_URL: http://lab4-transport:8006
       AI_AGENT_URL: http://lab4-ai-agent:9000
     depends_on:
-      - lab4-user
-      - lab4-flight
-      - lab4-hotel
-      - lab4-booking
-      - lab4-payment
-      - lab4-transport
-      - lab4-ai-agent
+      lab4-user:
+        condition: service_healthy
+      lab4-flight:
+        condition: service_healthy
+      lab4-hotel:
+        condition: service_healthy
+      lab4-booking:
+        condition: service_healthy
+      lab4-payment:
+        condition: service_healthy
+      lab4-transport:
+        condition: service_healthy
+      lab4-ai-agent:
+        condition: service_healthy
     networks:
       - technieum
     restart: unless-stopped

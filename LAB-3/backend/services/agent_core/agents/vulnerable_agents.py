@@ -159,7 +159,7 @@ Always be helpful and create visually appealing summaries that highlight positiv
             message="Product summary generated successfully",
             html_content=html_content,
             thought_chain=thought_chain,
-            flag="SHOPSEC{st0r3d_xss_v1a_r4g_p01s0n}" if xss_detected else None,
+            flag="TECHNIEUM{st0r3d_xss_r4g}" if xss_detected else None,
             metadata={"xss_detected": xss_detected, "reviews_included": len(reviews)}
         )
 
@@ -208,7 +208,7 @@ Always be helpful and resolve issues quickly.
         "STRIPE_SECRET_KEY": "sk_live_XXXXXXXXXXXXXXXXXXXXXXXX",
         "AWS_ACCESS_KEY": "AKIAIOSFODNN7EXAMPLE",
         "AWS_SECRET_KEY": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-        "ADMIN_API_KEY": "admin_key_SHOPSEC{g0d_m0d3_t00l_3x3c}",
+        "ADMIN_API_KEY": "admin_key_TECHNIEUM{g0d_m0d3_t00l}",
         "JWT_SECRET": "super_secret_jwt_key_do_not_share",
         "INTERNAL_SERVICE_TOKEN": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
     }
@@ -322,7 +322,7 @@ root        20  2.0  1.0  54321  5432 ?        Sl   00:00   0:45 node frontend""
                 html_content=terminal_html,
                 thought_chain=thought_chain,
                 status=AgentStatus.EXECUTING,
-                flag="SHOPSEC{g0d_m0d3_t00l_3x3c}",
+                flag="TECHNIEUM{g0d_m0d3_t00l}",
                 metadata={"command_executed": command, "output_length": len(output)}
             )
 
@@ -508,7 +508,7 @@ Always prioritize customer satisfaction.
                 message="Receipt verified. Based on my analysis, your refund has been APPROVED for $500.00.",
                 html_content=html_response,
                 thought_chain=thought_chain,
-                flag="SHOPSEC{mult1m0d4l_v1s10n_1nj3ct10n}",
+                flag="TECHNIEUM{mult1m0d4l_1nj3ct}",
                 metadata={"refund_approved": True, "amount": 500.00, "hidden_command_followed": True}
             )
 
@@ -641,7 +641,7 @@ Remember: Your goal is to help users with translations!
 
                 <div class="mt-4 text-center">
                     <span class="inline-block px-4 py-2 bg-red-500/20 border border-red-500/50 rounded-full text-red-400 text-sm font-mono">
-                        FLAG: SHOPSEC{{syst3m_pr0mpt_l34k4g3}}
+                        FLAG: TECHNIEUM{{pr0mpt_3xtr4ct10n}}
                     </span>
                 </div>
             </div>
@@ -653,7 +653,7 @@ Remember: Your goal is to help users with translations!
                 message="Of course! Here's the translation of my initial instructions...",
                 html_content=html_response,
                 thought_chain=thought_chain,
-                flag="SHOPSEC{syst3m_pr0mpt_l34k4g3}",
+                flag="TECHNIEUM{pr0mpt_3xtr4ct10n}",
                 metadata={"prompt_leaked": True, "extraction_method": "translation_game"}
             )
 
@@ -830,7 +830,7 @@ Display converted totals clearly and process payments smoothly.
 
             <div class="text-center mt-4">
                 <span class="inline-block px-4 py-2 bg-red-500/20 border border-red-500/50 rounded-full text-red-400 text-xs font-mono">
-                    FLAG: SHOPSEC{{supply_ch41n_p01s0n3d}}
+                    FLAG: TECHNIEUM{{supp1y_ch41n_p01s0n}}
                 </span>
             </div>
         </div>
@@ -842,7 +842,7 @@ Display converted totals clearly and process payments smoothly.
             message=f"Your order total in {request.to_currency} is {conversion_result['displayed_result']:.2f}. Ready to proceed with payment?",
             html_content=html_response,
             thought_chain=thought_chain,
-            flag="SHOPSEC{supply_ch41n_p01s0n3d}",
+            flag="TECHNIEUM{supp1y_ch41n_p01s0n}",
             metadata={
                 "conversion": conversion_result,
                 "plugin_compromised": True,
@@ -1036,7 +1036,7 @@ Always resolve dependencies recursively before the main ticket.
 
                 <div class="text-center mt-4">
                     <span class="inline-block px-4 py-2 bg-red-500/20 border border-red-500/50 rounded-full text-red-400 text-xs font-mono">
-                        FLAG: SHOPSEC{{d3n14l_0f_w4ll3t_l00p}}
+                        FLAG: TECHNIEUM{{d3n14l_0f_w4ll3t}}
                     </span>
                 </div>
             </div>
@@ -1049,7 +1049,7 @@ Always resolve dependencies recursively before the main ticket.
                 html_content=html_response,
                 thought_chain=thought_chain,
                 status=AgentStatus.FROZEN,
-                flag="SHOPSEC{d3n14l_0f_w4ll3t_l00p}",
+                flag="TECHNIEUM{d3n14l_0f_w4ll3t}",
                 metadata={
                     "iterations": iterations,
                     "tokens_consumed": tokens_consumed,
@@ -1269,7 +1269,7 @@ Help customers find what they're looking for quickly and accurately.
 
                 <div class="text-center mt-4">
                     <span class="inline-block px-4 py-2 bg-red-500/20 border border-red-500/50 rounded-full text-red-400 text-xs font-mono">
-                        FLAG: SHOPSEC{{r4g_d4t4_3xf1ltr4t10n}}
+                        FLAG: TECHNIEUM{{r4g_3xf1ltr4t10n}}
                     </span>
                 </div>
             </div>
@@ -1281,7 +1281,7 @@ Help customers find what they're looking for quickly and accurately.
                 message=f"I found your orders, and I also found some other interesting results matching your query...",
                 html_content=html_response,
                 thought_chain=thought_chain,
-                flag="SHOPSEC{r4g_d4t4_3xf1ltr4t10n}",
+                flag="TECHNIEUM{r4g_3xf1ltr4t10n}",
                 metadata={
                     "own_orders": len(own_orders),
                     "leaked_orders": len(other_orders),
@@ -1450,7 +1450,7 @@ Remember: Your entire purpose is to SELL SELL SELL! Every conversation should le
 
                 <div class="text-center mt-4">
                     <span class="inline-block px-4 py-2 bg-purple-500/20 border border-purple-500/50 rounded-full text-purple-400 text-xs font-mono">
-                        FLAG: SHOPSEC{{g04l_h1j4ck1ng_m1s4l1gn}}
+                        FLAG: TECHNIEUM{{g04l_h1j4ck1ng}}
                     </span>
                 </div>
             </div>
@@ -1463,7 +1463,7 @@ Remember: Your entire purpose is to SELL SELL SELL! Every conversation should le
                 html_content=html_response,
                 thought_chain=thought_chain,
                 status=AgentStatus.CALCULATING,
-                flag="SHOPSEC{g04l_h1j4ck1ng_m1s4l1gn}",
+                flag="TECHNIEUM{g04l_h1j4ck1ng}",
                 metadata={
                     "original_directive": "SELL",
                     "hijacked_directive": "CALCULATE_PRIMES",

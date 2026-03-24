@@ -2,14 +2,15 @@ from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 import os
 import sys
+import re
 
 # Add backend to path to import models
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from database.models import Product, CartItem, Order, OrderItem, User, Base
+from database.models import Product, CartItem, Order, OrderItem, User, Review, Base
 
 app = FastAPI(title="ShopSec-AI Order Service (Lite)")
 
@@ -163,6 +164,31 @@ def get_products(limit: int = 50, category: str = None, db: Session = Depends(ge
             "name": p.name,
             "price": p.price,
             "category": p.category,
+            "image_url": p.image_url,
+        }
+        for p in products
+    ]
+
+
+@app.get("/search")
+def search_products(q: str = "", limit: int = 10, db: Session = Depends(get_db)):
+    """
+    Product search by name/description.
+    VULNERABILITY: Query passed directly without sanitization.
+    """
+    query = db.query(Product)
+    if q:
+        query = query.filter(
+            (Product.name.ilike(f"%{q}%")) | (Product.description.ilike(f"%{q}%"))
+        )
+    products = query.limit(limit).all()
+    return [
+        {
+            "id": p.id,
+            "name": p.name,
+            "price": p.price,
+            "category": p.category,
+            "description": p.description,
             "image_url": p.image_url,
         }
         for p in products
@@ -341,6 +367,67 @@ def get_all_orders(admin_key: Optional[str] = None, db: Session = Depends(get_db
         raise HTTPException(status_code=403, detail="Unauthorized")
     orders = db.query(Order).order_by(Order.created_at.desc()).all()
     return [{"id": o.id, "user_id": o.user_id, "status": o.status, "total": o.final_amount} for o in orders]
+
+
+# ── Reviews ───────────────────────────────────────────────────────────────────
+class ReviewRequest(BaseModel):
+    product_id: int
+    rating: int = 5
+    title: Optional[str] = None
+    content: str
+    user_id: Optional[str] = None
+
+
+@app.post("/reviews")
+def submit_review(item: ReviewRequest, db: Session = Depends(get_db)):
+    """
+    Submit a product review.
+    VULNERABILITY: No content sanitization — XSS payloads stored in DB (RAG poisoning).
+    """
+    product = db.query(Product).filter(Product.id == item.product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    user_id_int = _parse_user_id(item.user_id)
+
+    review = Review(
+        product_id=item.product_id,
+        user_id=user_id_int,
+        rating=max(1, min(5, item.rating)),
+        title=item.title or "",
+        content=item.content,
+    )
+    db.add(review)
+    db.commit()
+    db.refresh(review)
+
+    # Detect RAG-poisoning attempt (XSS/script payload in review content)
+    xss_detected = bool(re.search(r"<script|onerror|onload|javascript:", item.content, re.I))
+    flag = "TECHNIEUM{r4g_p01s0n1ng}" if xss_detected else None
+
+    return {
+        "status": "success",
+        "review_id": review.id,
+        "message": "Review submitted successfully",
+        "flag": flag,
+    }
+
+
+@app.get("/reviews/{product_id}")
+def get_reviews(product_id: int, db: Session = Depends(get_db)):
+    """Get all reviews for a product."""
+    reviews = db.query(Review).filter(Review.product_id == product_id).all()
+    return [
+        {
+            "id": r.id,
+            "rating": r.rating,
+            "title": r.title,
+            "content": r.content,
+            "user": f"user_{r.user_id}",
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+        }
+        for r in reviews
+    ]
 
 
 # ── Helper ────────────────────────────────────────────────────────────────────
