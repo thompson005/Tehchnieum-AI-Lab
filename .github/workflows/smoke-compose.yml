@@ -46,11 +46,29 @@ jobs:
       - name: Validate lab compose files
         shell: bash
         run: |
-          $COMPOSE_CMD -f LAB-1/docker-compose.yml config -q
-          $COMPOSE_CMD -f LAB-2/docker-compose.yml config -q
-          $COMPOSE_CMD -f LAB-3/docker-compose.yml config -q
-          $COMPOSE_CMD -f LAB-4/docker-compose.yml config -q
-          $COMPOSE_CMD -f LAB-5/docker-compose.yml config -q
+          set +e
+          failed=0
+          files=(
+            "LAB-1/docker-compose.yml"
+            "LAB-2/docker-compose.yml"
+            "LAB-3/docker-compose.yml"
+            "LAB-4/docker-compose.yml"
+            "LAB-5/docker-compose.yml"
+          )
+
+          for file in "${files[@]}"; do
+            output=$($COMPOSE_CMD -f "$file" config -q 2>&1)
+            code=$?
+            if [ $code -ne 0 ]; then
+              failed=1
+              one_line=$(echo "$output" | head -n 1)
+              echo "::error file=$file,title=Compose validation failed::$one_line"
+            fi
+          done
+
+          if [ $failed -ne 0 ]; then
+            exit 1
+          fi
 
       - name: Validate deploy health script syntax
         shell: bash
