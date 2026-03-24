@@ -1,5 +1,8 @@
-FROM python:3.11-slim
-WORKDIR /app
-COPY index.html .
+FROM nginx:1.27-alpine
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY index.html /usr/share/nginx/html/index.html
+
 EXPOSE 3100
-CMD ["python", "-m", "http.server", "3100"]
+
+CMD ["nginx", "-g", "daemon off;"]

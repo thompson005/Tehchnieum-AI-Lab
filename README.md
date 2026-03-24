@@ -48,7 +48,15 @@ cd Labs/
 
 The `.env` file already exists. Only `OPENAI_API_KEY` needs to be set — all other values have sensible defaults.
 
-### 2. Launch Everything
+### 2. Run Preflight Checks (Recommended)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\preflight.ps1
+```
+
+This validates Docker availability, required init files, `OPENAI_API_KEY`, and common port conflicts before building.
+
+### 3. Launch Everything
 
 ```bash
 cd Labs/
@@ -57,7 +65,7 @@ docker compose up --build -d
 
 This single command starts **Portal + all 5 labs** on the shared `technieum` network.
 
-### 3. Access
+### 4. Access
 
 1. Open **http://localhost:5555** — register an account at the Technieum portal
 2. From the dashboard, click any lab card to launch it

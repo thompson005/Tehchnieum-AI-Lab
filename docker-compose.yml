@@ -254,14 +254,12 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8000
 
   lab3-frontend:
-    image: python:3.11-slim
+    image: nginx:1.27-alpine
     container_name: technieum-lab3-ui
     ports:
-      - "3001:3001"
+      - "3001:80"
     volumes:
-      - ./LAB-3/lite_frontend:/app
-    working_dir: /app
-    command: python -m http.server 3001
+      - ./LAB-3/lite_frontend:/usr/share/nginx/html:ro
     networks:
       - technieum
     restart: unless-stopped
